@@ -1,0 +1,51 @@
+---
+layout: default
+title: Search
+---
+
+<div id="search-container" class="container">
+    <h1>Search Results</h1>
+    <input type="text" id="search-input" class="form-control" placeholder="Search...">
+    <ul id="results-container" class="list-unstyled"></ul>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/simple-jekyll-search@1.7.3/destination/jekyll-search.min.js"></script>
+<script>
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('results-container'),
+        json: '{{ site.baseurl }}/search.json',
+        searchResultTemplate: '<li><a href="{url}">{title}</a></li>',
+        noResultsText: 'No results found',
+        limit: 10
+    });
+</script>
+
+<style>
+    #search-container {
+        margin-top: 20px;
+    }
+
+    #search-input {
+        margin-bottom: 20px;
+        width: 100%;
+    }
+
+    #results-container {
+        list-style: none;
+        padding: 0;
+    }
+
+    #results-container li {
+        margin-bottom: 10px;
+    }
+
+    #results-container a {
+        text-decoration: none;
+        color: #333;
+    }
+
+    #results-container a:hover {
+        text-decoration: underline;
+    }
+</style>

@@ -1,0 +1,29 @@
+---
+title: All Posts
+layout: default
+---
+
+<div class="container">
+  <h1>Archive</h1>
+  <div class="post-list">
+    <ul class="posts">
+      {% for post in paginator.posts %}
+      <li>
+        <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
+        <time class="post-date">{{ post.date | date_to_string | date: "%b %-d, %Y" }}</time>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <!-- 페이지네이션 링크 -->
+    <div class="pagination">
+      {% if paginator.previous_page %}
+      <a href="{{ paginator.previous_page_path }}" class="btn btn-primary">Previous</a>
+      {% endif %}
+
+      {% if paginator.next_page %}
+      <a href="{{ paginator.next_page_path }}" class="btn btn-primary">Next</a>
+      {% endif %}
+    </div>
+  </div>
+</div>

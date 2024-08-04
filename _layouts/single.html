@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- 헤더 파일을 포함하여 메타데이터와 스타일시트 링크를 설정 -->
+    {% include header.html %}
+    <style>
+        /* 기존 스타일 */
+        pre {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: monospace;
+            color: #d6336c;
+        }
+
+
+    </style>
+</head>
+<body>
+<i class="fa fa-bars fa-2x"></i> Gihak111
+<!-- 네비게이션 파일을 포함하여 메뉴를 설정 -->
+{% include navigation.html %}
+
+<div id="wrapper">
+    <!-- 각 페이지의 콘텐츠가 이 위치에 삽입됨 -->
+    <div class="container">
+        {{ content }}
+    </div>
+</div>
+<!-- 여백 역할을 하는 HTML 파일 포함 -->
+{% include spacer.html %}
+<!-- 푸터 파일을 포함하여 페이지 하단에 표시할 내용 설정 -->
+{% include footer.html %}
+
+<!-- 스크립트 파일을 포함하여 추가 JavaScript를 설정 -->
+{% include scripts.html %}
+</body>
+</html>
