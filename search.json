@@ -1,7 +1,11 @@
+---
+layout: none
+---
 [
+{% for post in site.posts %}
   {
-    "title": "Sample Post",
-    "url": "/sample-post/",
-    "content": "This is a sample post for testing search functionality."
-  }
+    "title": "{{ post.title | escape }}",
+    "url": "{{ site.baseurl }}{{ post.url }}"
+  }{% if forloop.last %}{% else %},{% endif %}
+{% endfor %}
 ]
