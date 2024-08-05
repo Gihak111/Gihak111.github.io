@@ -128,12 +128,12 @@
     padding: 10px 20px; /* 버튼 안쪽 여백 */
     font-size: 16px; /* 버튼 글자 크기 */
     color: #fff; /* 버튼 글자 색상 */
-    background-color: #007bff; /* 버튼 배경 색상 */
+    background-color: #333; /* 버튼 배경 색상 */
     border: none; /* 버튼 경계선 제거 */
     border-radius: 4px; /* 버튼 경계선 둥글게 */
     text-decoration: none; /* 버튼의 텍스트 장식 제거 */
 }
 
 .pagination .btn:hover {
-    background-color: #0056b3; /* 버튼의 호버 배경 색상 */
+    background-color: #333; /* 버튼의 호버 배경 색상 */
 }
