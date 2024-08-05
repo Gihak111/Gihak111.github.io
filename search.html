@@ -3,29 +3,39 @@ layout: default
 title: Search
 ---
 
-<div id="search-container" class="container">
+<div class="container">
     <h1>Search Results</h1>
     <input type="text" id="search-input" class="form-control" placeholder="Search...">
-    <ul id="results-container" class="list-unstyled"></ul>
+    <ul id="results-container" class="list-unstyled">
+        {% for post in site.posts %}
+        <li class="search-item" data-title="{{ post.title | escape }}" data-url="{{ site.baseurl }}{{ post.url }}">
+            <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
+        </li>
+        {% endfor %}
+    </ul>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/simple-jekyll-search@1.7.3/destination/jekyll-search.min.js"></script>
 <script>
-    SimpleJekyllSearch({
-        searchInput: document.getElementById('search-input'),
-        resultsContainer: document.getElementById('results-container'),
-        json: '{{ site.baseurl }}/search.json',
-        searchResultTemplate: '<li><a href="{url}">{title}</a></li>',
-        noResultsText: 'No results found',
-        limit: 10
+    document.addEventListener('DOMContentLoaded', function() {
+        var searchInput = document.getElementById('search-input');
+        var resultsContainer = document.getElementById('results-container');
+        var items = resultsContainer.getElementsByClassName('search-item');
+
+        searchInput.addEventListener('input', function() {
+            var searchTerm = searchInput.value.toLowerCase();
+            for (var i = 0; i < items.length; i++) {
+                var title = items[i].getAttribute('data-title').toLowerCase();
+                if (title.includes(searchTerm)) {
+                    items[i].style.display = '';
+                } else {
+                    items[i].style.display = 'none';
+                }
+            }
+        });
     });
 </script>
 
 <style>
-    #search-container {
-        margin-top: 20px;
-    }
-
     #search-input {
         margin-bottom: 20px;
         width: 100%;
@@ -36,16 +46,16 @@ title: Search
         padding: 0;
     }
 
-    #results-container li {
+    .search-item {
         margin-bottom: 10px;
     }
 
-    #results-container a {
+    .search-item a {
         text-decoration: none;
         color: #333;
     }
 
-    #results-container a:hover {
+    .search-item a:hover {
         text-decoration: underline;
     }
 </style>

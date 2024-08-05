@@ -1,11 +1,4 @@
 ---
-layout: none
+layout: json_layout
+permalink: /search.json
 ---
-[
-{% for post in site.posts %}
-  {
-    "title": "{{ post.title | escape }}",
-    "url": "{{ site.baseurl }}{{ post.url }}"
-  }{% if forloop.last %}{% else %},{% endif %}
-{% endfor %}
-]
