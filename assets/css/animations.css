@@ -1,0 +1,33 @@
+/* 페이지 상단 요소가 아래로 내려오는 애니메이션 */
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.nav-toggle {
+    animation: slideDown 0.5s ease-out forwards;
+}
+
+#wrapper {
+    animation: slideDown 0.5s ease-out forwards;
+}
+
+/* 페이드 인 애니메이션 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.container {
+    animation: fadeIn 0.5s ease-in forwards;
+}

@@ -1,0 +1,83 @@
+---
+title: All Posts
+layout: default
+---
+
+<div class="container">
+  <h1>Archive</h1>
+  <div class="post-list">
+    <ul id="posts-container" class="posts">
+      {% for post in site.posts %}
+      <li class="post-item">
+        <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
+        <time class="post-date">{{ post.date | date_to_string | date: "%b %-d, %Y" }}</time>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <!-- 페이지네이션 링크 -->
+    <div class="pagination">
+      <button id="prev-button" class="btn btn-primary" onclick="changePage(-1)">Previous</button>
+      <button id="next-button" class="btn btn-primary" onclick="changePage(1)">Next</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const postsPerPage = 5;
+      const postsContainer = document.getElementById('posts-container');
+      const posts = Array.from(postsContainer.getElementsByClassName('post-item'));
+      const totalPosts = posts.length;
+      const totalPages = Math.ceil(totalPosts / postsPerPage);
+      let currentPage = 1;
+
+      function renderPage(page) {
+          posts.forEach((post, index) => {
+              post.style.display = (index >= (page - 1) * postsPerPage && index < page * postsPerPage) ? '' : 'none';
+          });
+
+          // 이전 버튼 상태
+          document.getElementById('prev-button').disabled = page === 1;
+          // 다음 버튼 상태
+          document.getElementById('next-button').disabled = page === totalPages;
+      }
+
+      function changePage(direction) {
+          const newPage = currentPage + direction;
+          if (newPage >= 1 && newPage <= totalPages) {
+              currentPage = newPage;
+              renderPage(currentPage);
+          }
+      }
+
+      document.getElementById('prev-button').addEventListener('click', () => changePage(-1));
+      document.getElementById('next-button').addEventListener('click', () => changePage(1));
+
+      renderPage(currentPage);
+  });
+</script>
+
+
+<style>
+    .post-item {
+        margin-bottom: 10px;
+    }
+
+    .post-item a {
+        text-decoration: none;
+        color: #333;
+    }
+
+    .post-item a:hover {
+        text-decoration: underline;
+    }
+
+    .pagination {
+        margin-top: 20px;
+    }
+
+    .pagination button {
+        margin: 0 5px;
+    }
+</style>
