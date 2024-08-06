@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "spring boot 5. 데이터 파고들기1"
+title:  "spring boot 5. 데이터 파고들기"
 categories: "spring"
 tag: "code"
 toc: true
