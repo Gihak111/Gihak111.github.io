@@ -58,5 +58,5 @@ else:
 
 위의 코드처럼 파일의 링크를 직접 집어넣는 것으로 모델을 사용할 수 있다.
 온라인에 돌아다니는 뉴진스 하니 사진을 활용하여 위의 모델을 돌려보면, 다음과 같은 결과를 얻을 수 있다.  
-![입력 사진](https://github.com/user-attachments/assets/c754a30c-bfe3-477f-a21f-eed4ff369466)  
-![출력 사진](https://github.com/user-attachments/assets/29d5e020-a64f-419a-8070-c27a2ae0c2d7)  
+![입력 사진](https://github.com/user-attachments/assets/c3600d63-dc26-4d8d-9b12-40e65e46ff88)  
+![출력 사진](https://github.com/user-attachments/assets/6f490615-194d-4ca2-bcf5-58ed268becf7)  
