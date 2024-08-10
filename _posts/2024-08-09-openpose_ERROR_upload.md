@@ -1,8 +1,8 @@
 ---
 layout: single
 title:  "openpose 설치"
-categories: "ERROR"
-tag: "code"
+categories: "pynb"
+tag: "ERROR"
 toc: true
 author_profile: false
 sidebar:
