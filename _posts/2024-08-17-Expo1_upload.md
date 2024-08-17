@@ -66,7 +66,7 @@ cmd에서 cd 파일위치, 위의 코드를 통해 프로젝트를 만들고, vs
 
 이어서, 설치가 도니 cmd에 다음을 입력해서 설치하자.  
 ```cmd
-npm install -g eas-cil
+npm install -g eas-cli
 ```
 이어서, eas를 통해 로그인 하자.  
 ```cmd
