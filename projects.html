@@ -12,9 +12,19 @@ title: Projects
     </div>
 </div>
 
+<style>
+    #repo-list {
+        font-size: 1.2em; /* 글자 크기를 원하는 만큼 조정하세요. */
+    }
+
+    #repo-list a {
+        font-size: 1.2em; /* 링크의 글자 크기도 조정할 수 있습니다. */
+    }
+</style>
+
 <script>
     async function fetchRepos() {
-        const username = 'Gihak111'; // 제공된 GitHub 사용자명으로 변경
+        const username = 'Gihak111';
         const apiUrl = `https://api.github.com/users/${username}/repos?type=public`;
 
         try {
@@ -34,6 +44,7 @@ title: Projects
             });
         } catch (error) {
             console.error('Error fetching repositories:', error);
+            document.getElementById('error-message').textContent = 'Failed to load repositories. Please try again later.';
         }
     }
 
