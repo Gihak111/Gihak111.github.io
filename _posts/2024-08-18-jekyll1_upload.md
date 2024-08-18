@@ -9,7 +9,7 @@ sidebar:
     nav: "docs"
 ---
 
-# Expo
+# jekytll
 자신의 깃허브에 올라가 잇는 repository는 github API를 통해서 플로그에 링크를 띄울 수 있다.  
 다음의 코들르 참고하자.  
 ```html
