@@ -1,6 +1,6 @@
 ---
 layout: single  
-title:  "알고리즘 정리 5. 너비 우선 탐색(BFS) & 깊이 우선 탐색(DFS)"  
+title:  "알고리즘 정리 6. 너비 우선 탐색(BFS) & 깊이 우선 탐색(DFS)"  
 categories: "algorithm"  
 tag: "code"  
 toc: true  
