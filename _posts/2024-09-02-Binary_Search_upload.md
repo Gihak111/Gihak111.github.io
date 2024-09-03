@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "알고리즘 정리 4. 이분탐색 알고리즘"
+title:  "알고리즘 정리 5. 이분탐색 알고리즘"
 categories: "algorithm"
 tag: "code"
 toc: true
