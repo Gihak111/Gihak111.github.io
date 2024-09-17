@@ -1,3 +1,14 @@
+---
+layout: single
+title:  "아두이노 시작하기"
+categories: "arduino"
+tag: "code"
+toc: true
+author_profile: false
+sidebar:
+    nav: "docs"
+---
+
 # arduino
 아두이노 쉽고 재밌으니까 해보자.
 아두이노의 기초적인 것을데 대해 서술하겠다.
