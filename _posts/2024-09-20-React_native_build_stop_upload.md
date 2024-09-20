@@ -2,7 +2,7 @@
 layout: single
 title:  "리액트 네이티브 빌드 후 앱 중지"
 categories: "ReactNative"
-tag: "code"
+tag: "ERROR"
 toc: true
 author_profile: false
 sidebar:
