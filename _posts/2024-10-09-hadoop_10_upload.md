@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "하둡 간좌 1편"
+title:  "하둡 강좌 10편"
 categories: "hadoop"
 tag: "code"
 toc: true
