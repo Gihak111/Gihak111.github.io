@@ -15,7 +15,7 @@ sidebar:
 간단하게 JDK 버전을 전환할 수 있는 방법을 알아보자.  
 
 ### 1. JDK 설치  
-오라클에서 원하는 버전의 JDK를 다운로드합니다.  
+오라클에서 원하는 버전의 JDK를 다운로드 한다.  
 [https://www.oracle.com/java/technologies/downloads/](https://www.oracle.com/java/technologies/downloads/)  
 
 ### 2. 스크립트 폴더 생성  
