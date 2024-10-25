@@ -1,8 +1,8 @@
 ---
 layout: single
 title:  "윈도우에서 네트워크 트래픽 차단하기"
-categories: "pynb"
-tag: "code"
+categories: "Secure"
+tag: "Secure"
 toc: true
 author_profile: false
 sidebar:
