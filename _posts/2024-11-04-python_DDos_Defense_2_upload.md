@@ -24,12 +24,11 @@ sidebar:
 
 3. **stem 및 requests 라이브러리 설치**:
    - 파이썬 코드에서 Tor를 제어하기 위해 `stem` 라이브러리와 HTTP 요청을 보내기 위해 `requests` 라이브러리를 설치하자.  
-   ```bash
-   pip install stem requests
-   ```  
+   ```pip install stem requests```  
 
 4. **Tor를 통한 HTTP 요청 설정**:
 - 다음은 토어 네트워크를 통해 IP를 숨기고 HTTP 요청을 보내는 예제 코드이다:  
+
 ```python
 import requests
 from stem import Signal
@@ -75,7 +74,7 @@ print(response.text)
 Tor 제어 포트에 대한 접근 권한이 필요하며, 이를 위해 `torrc` 파일에서 `ControlPort`와 `HashedControlPassword` 설정을 확인해야 한다.  
 
 추가적으로, Tor 설정 파일 (`torrc`)에서 제어 포트를 설정하고 비밀번호를 설정해야 한다:  
-```
+```bash
 ControlPort 9051
 HashedControlPassword your_hashed_password
 ```
