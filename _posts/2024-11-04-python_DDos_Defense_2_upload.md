@@ -29,36 +29,36 @@ sidebar:
    ```  
 
 4. **Tor를 통한 HTTP 요청 설정**:
-   - 다음은 토어 네트워크를 통해 IP를 숨기고 HTTP 요청을 보내는 예제 코드이다:  
-   ```python
-   import requests
-   from stem import Signal
-   from stem.control import Controller
+- 다음은 토어 네트워크를 통해 IP를 숨기고 HTTP 요청을 보내는 예제 코드이다:  
+```python
+import requests
+from stem import Signal
+from stem.control import Controller
 
-   # Tor 컨트롤러를 통해 새로운 Tor 회로를 요청하는 함수
-   def renew_tor_ip():
-       with Controller.from_port(port=9051) as controller:
-           controller.authenticate(password='your_password')  # Tor 설정에서 설정한 비밀번호 사용
-           controller.signal(Signal.NEWNYM)
+# Tor 컨트롤러를 통해 새로운 Tor 회로를 요청하는 함수
+def renew_tor_ip():
+   with Controller.from_port(port=9051) as controller:
+       controller.authenticate(password='your_password')  # Tor 설정에서 설정한 비밀번호 사용
+       controller.signal(Signal.NEWNYM)
 
-   # Tor를 사용하여 HTTP 요청을 보내는 함수
-   def get(url):
-       session = requests.Session()
-       session.proxies = {
-           'http': 'socks5h://127.0.0.1:9050',
-           'https': 'socks5h://127.0.0.1:9050'
-       }
-       response = session.get(url)
-       return response
+# Tor를 사용하여 HTTP 요청을 보내는 함수
+def get(url):
+    session = requests.Session()
+    session.proxies = {
+        'http': 'socks5h://127.0.0.1:9050',
+        'https': 'socks5h://127.0.0.1:9050'
+    }
+    response = session.get(url)
+    return response
 
-   # Tor IP 갱신
-   renew_tor_ip()
+# Tor IP 갱신
+renew_tor_ip()
 
-   # 예제 HTTP 요청
-   url = 'http://httpbin.org/ip'
-   response = get(url)
-   print(response.text)
-   ```
+# 예제 HTTP 요청
+url = 'http://httpbin.org/ip'
+response = get(url)
+print(response.text)
+```
 
 ### 설명
 1. **Tor 서비스 시작**:
