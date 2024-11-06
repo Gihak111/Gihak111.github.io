@@ -16,7 +16,7 @@ sidebar:
 - [팩토리 패턴](https://gihak111.github.io/design/patterns/2024/10/15/Design_Patterns_2_upload.html)    
 - [추상 책토리 패턴](https://gihak111.github.io/design/patterns/2024/10/18/Design_Patterns_3_upload.html)  
 - [빌더 패턴](https://gihak111.github.io/design/patterns/2024/10/19/Design_Patterns_4_upload.html)  
-- 프로토타입 패턴  
+- [프로토타입 패턴](https://gihak111.github.io/design/patterns/2024/11/06/Design_Patterns_6_upload.html)  
 - [싱글턴 패턴](https://gihak111.github.io/design/patterns/2024/10/14/Design_Patterns_1_upload.html)    
 
 ### 2. 구조 패턴  
