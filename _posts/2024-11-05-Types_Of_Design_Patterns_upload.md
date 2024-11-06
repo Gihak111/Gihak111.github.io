@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "디자인 패턴의 구본과 종류"
+title:  "디자인 패턴의 구분과 종류"
 categories: "Design Patterns"
 tag: "code"
 toc: true
@@ -13,11 +13,11 @@ sidebar:
 
 
 ### 1. 생성 디자인 패턴  
-- 팩토리 패턴  
-- 추상 책토리 패턴  
-- 빌더 패턴  
+- [팩토리 패턴](https://gihak111.github.io/design/patterns/2024/10/15/Design_Patterns_2_upload.html)    
+- [추상 책토리 패턴](https://gihak111.github.io/design/patterns/2024/10/18/Design_Patterns_3_upload.html)  
+- [빌더 패턴](https://gihak111.github.io/design/patterns/2024/10/19/Design_Patterns_4_upload.html)  
 - 프로토타입 패턴  
-- 싱글텅 패턴  
+- [싱글턴 패턴](https://gihak111.github.io/design/patterns/2024/10/14/Design_Patterns_1_upload.html)    
 
 ### 2. 구조 패턴  
 - 어댑터 패턴  
@@ -36,7 +36,7 @@ sidebar:
 - 메멘토 패턴  
 - 옵서버 패턴  
 - 상태 패턴  
-- 전략 패턴  
+- [전략 패턴](https://gihak111.github.io/design/patterns/2024/11/03/Design_Patterns_5_upload.html)   
 - 템플릿메서드 패턴  
 - 비지터 패턴  
 
