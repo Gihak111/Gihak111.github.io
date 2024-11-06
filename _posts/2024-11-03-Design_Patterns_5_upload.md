@@ -138,5 +138,5 @@ public class Main {
 **전략 패턴(Strategy Pattern)**은 다양한 알고리즘을 동적으로 적용해야 하는 경우에 유용한 패턴이다.  
 특히 게임과 같은 시나리오에서 캐릭터의 다양한 공격 방식을 구현할 때, 이 패턴을 사용하면 코드의 유연성과 확장성을 높일 수 있다.  
 
-다음 글에서는 **옵저버 패턴(Observer Pattern)**을 다룰 예정이다.  
-옵저버 패턴은 **상태 변화에 따라 자동으로 알림을 받는 패턴**으로, 주로 이벤트 기반 시스템에서 많이 사용된다.  
+아래 글에서 다른 디자인 패턴들을 확인할 수 있다.  
+[디자인 패턴 모음](https://gihak111.github.io/design/patterns/2024/11/05/Types_Of_Design_Patterns_upload.html)  

@@ -39,6 +39,3 @@ sidebar:
 - [전략 패턴](https://gihak111.github.io/design/patterns/2024/11/03/Design_Patterns_5_upload.html)   
 - 템플릿메서드 패턴  
 - 비지터 패턴  
-
-아래의 사이트에서 정확히 알 수 있다.
-[https://refactoring.guru/ko/design-patterns/catalog](https://refactoring.guru/ko/design-patterns/catalog)
