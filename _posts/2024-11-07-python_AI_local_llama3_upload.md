@@ -186,14 +186,17 @@ tokenizer.save_pretrained("./llama_character_finetuned")
 3. 프롬프트 엔지니어링링  
 후에 사용할 때, 질문시 약간 다르게 설정하여 캐릭터의 느낌도 살릴 수 있다.  
 예를들어, 다음과 같이 할 수 있다.  
+
 ```python
 prompt = "주인공처럼 말해줘: 안녕하세요! 오늘 기분이 어떤가요?"
 inputs = tokenizer(prompt, return_tensors="pt").to(device)
 output = model.generate(**inputs, max_length=50)
 print(tokenizer.decode(output[0], skip_special_tokens=True))
 
-```
+```  
+
 전체 코드로 보면,  
+
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
