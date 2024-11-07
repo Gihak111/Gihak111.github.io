@@ -110,7 +110,7 @@ tokenizer.save_pretrained("./llama_korean_finetuned")
 이걸 json이나, txt로 만들어 활용하면 도니다.  
 
 txt 예시
-```
+```bash
 안녕하세요! 오늘은 정말 기분이 좋아요! 당신은 어때요? 혹시 커피 한 잔 같이 마시고 싶으세요?
 저는 완벽하지 않지만, 조금씩 나아지고 있어요!
 기분 좋은 날에는 세상이 다 잘 되는 것 같죠? 계속 웃어요, 저는 항상 당신을 응원해요! 😁
@@ -142,8 +142,9 @@ json 예시
 저기에 자주 사용하는 키워드 같은걸 집어넣어서 성격을 반영시킬 수 있다.  
 위처럼 하면 대화내용, 어투, 특징적인 표형이 포함되게끔 하여 구현할 수 있다.  
 
-2. 데이터 추가 학습
+2. 데이터 추가 학습  
 이제, 파인튜닝 하자.  
+
 ```python
 from transformers import Trainer, TrainingArguments
 
@@ -179,7 +180,7 @@ trainer.train()
 model.save_pretrained("./llama_character_finetuned")
 tokenizer.save_pretrained("./llama_character_finetuned")
 
-```
+```  
 위 방법으로 추가적인학습을 시행한 모델을 만들 수 있다.  
 
 3. 프롬프트 엔지니어링링  
