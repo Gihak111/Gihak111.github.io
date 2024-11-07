@@ -44,7 +44,7 @@ Ollama에서 다운받자.
 위 링크에 들어가서, Ollama를 다운받고, 설치하자.  
 
 위에서 다운받은 파일이 실행이 되지 않는다면, 처음 화면에서 밑에 작게 있는 Lama3.1을 누르고, 원하는 모델을 눌러 8b, 4.7GB를 선택해 명령어를 받자.  
-[아니면, 이 링크로 들어가도 있다.]https://ollama.com/library/llama3.1:8b)
+[아니면, 이 링크로 들어가도 있다.](https://ollama.com/library/llama3.1:8b)
 ```bash
 ollama run llama3.1:8b
 ```
