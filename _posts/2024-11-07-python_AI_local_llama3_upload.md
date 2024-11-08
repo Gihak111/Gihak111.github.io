@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "lama 로컬 설치 및 사용해보기"
+title:  "lama, Falcon 로컬 설치 및 사용해보기"
 categories: "pynb"
 tag: "code"
 toc: true
@@ -57,25 +57,99 @@ ollama run llama3.1:8b
 더 최근 모델인 라마 3.2도 있으니 이걸 다운받아도 된다.  
 3.2가 성능, 효율 전부다 앞선다. 최적화에 경량화 가지 되어있으니, 3.2 사용을 적극 권장한다.  
 
+---
+
+다운받은 라마를 보면, 헤시 함수 SHA 256으로 암호화 되어 있는 것을 볼 수 있다.  
+따라서 일반적인 방식으로 파인튜닝 하기 힘들기 때문에,  
+이후부터는  Falcon-7B 모델로 진행하였다.  
 ## 2. 한국어 패치하기
 일단, 한국어를 사용할 수 있게 딥러닝 시켜보자.  
 공개되어 있는 한국어 데이터 셋에는 모두의 말뭉치, AI Hub의 한국어 데이터셋, Kaist 말뭉치 등이 있다.  
+이에 앞서, 우선 한번 사용해 보자.  
+```python
+from transformers import AutoModelForCausalLM, AutoTokenizer
+import torch
+
+# 모델 및 토크나이저 로드
+model_name = "tiiuae/falcon-7b"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name)
+
+# 텍스트 생성 함수
+def generate_response(prompt, max_length=100):
+    inputs = tokenizer(prompt, return_tensors="pt")
+    
+    # 모델이 사용할 디바이스 설정 (GPU가 있으면 GPU 사용)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
+    inputs = {key: val.to(device) for key, val in inputs.items()}
+    
+    # 모델을 사용해 답변 생성
+    outputs = model.generate(
+        inputs["input_ids"],
+        max_length=max_length,
+        do_sample=True,
+        top_k=50,
+        top_p=0.95,
+        pad_token_id=tokenizer.eos_token_id
+    )
+    
+    # 생성된 답변을 디코딩하여 반환
+    response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    return response
+
+# 실시간 대화
+print("실시간 대화를 시작합니다. 종료하려면 '종료'라고 입력하세요.")
+while True:
+    user_input = input("You: ")
+    if user_input.lower() in ["종료", "exit", "quit"]:
+        print("대화를 종료합니다.")
+        break
+    
+    # 사용자 입력에 대한 모델 응답 생성
+    response = generate_response(user_input)
+    print("Bot:", response)
+
+```
+위 코드로 실시간 대화가 가능하다.  
+물론, 컴퓨터가 상당히 좋아야 한다.  
 
 허깅페이스에서 트랜스포머 라이브러리르 ㄹ통해 파인튜닝 할 수 있다.  
 ```python
-from transformers import LlamaForCausalLM, LlamaTokenizer, Trainer, TrainingArguments
+from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments
+from datasets import load_dataset
 
-# 모델 및 토크나이저 로드
-model_name = "path_to_downloaded_llama_model"
-tokenizer = LlamaTokenizer.from_pretrained(model_name)
-model = LlamaForCausalLM.from_pretrained(model_name)
+# 모델 및 토크나이저 로드 (Falcon-7B 모델 경로)
+model_name = "tiiuae/falcon-7b"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name)
 
-# 데이터셋 로드 (한국어 데이터셋 경로 지정)
-dataset = load_dataset("text", data_files="korean_data.txt")
+# 한국어 데이터셋 로드 (KoQuAD 사용 예시)
+dataset = load_dataset("squad_kor_v1")
+
+# 데이터셋 텍스트 변환 (질문과 답변을 이어 붙인 형태로 파인튜닝용 데이터 생성)
+def preprocess_function(examples):
+    texts = []
+    for question, answers in zip(examples["question"], examples["answers"]):
+        # 질문 텍스트 추출
+        question_text = question if isinstance(question, str) else " ".join(question)
+        # 첫 번째 답변 텍스트 추출
+        answer_text = answers["text"][0] if "text" in answers and len(answers["text"]) > 0 else ""
+        
+        # 질문과 답변이 모두 있을 때만 추가
+        if question_text and answer_text:
+            texts.append(question_text + " " + answer_text)
+    return {"text": texts}
+
+# 각 데이터셋에 대해 텍스트로 변환 및 빈 샘플 제거
+tokenized_dataset = dataset.map(preprocess_function, batched=True, remove_columns=dataset["train"].column_names)
+
+# 데이터셋의 빈 샘플 확인 및 제거
+tokenized_dataset = tokenized_dataset.filter(lambda example: len(example["text"]) > 0)
 
 # 학습 설정
 training_args = TrainingArguments(
-    output_dir="./llama_korean_finetuned",
+    output_dir=r"C:\Falcon_AI",
     per_device_train_batch_size=2,
     num_train_epochs=3,
     save_steps=10_000,
@@ -86,7 +160,7 @@ training_args = TrainingArguments(
 trainer = Trainer(
     model=model,
     args=training_args,
-    train_dataset=dataset['train'],
+    train_dataset=tokenized_dataset["train"],
     tokenizer=tokenizer,
 )
 
@@ -94,8 +168,10 @@ trainer = Trainer(
 trainer.train()
 
 # 학습된 모델 저장
-model.save_pretrained("./llama_korean_finetuned")
-tokenizer.save_pretrained("./llama_korean_finetuned")
+model.save_pretrained(r"C:\Falcon_AI")
+tokenizer.save_pretrained(r"C:\Falcon_AI")
+
+
 
 ```
 위 방법으로 데이터를 딥러닝 시켜 모델을 업그레이드 할 수 있다.  
@@ -146,19 +222,27 @@ json 예시
 이제, 파인튜닝 하자.  
 
 ```python
-from transformers import Trainer, TrainingArguments
+from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments
+from datasets import load_dataset
 
-# 모델과 토크나이저 로드 (이전에 저장한 한국어 모델 또는 원하는 모델 사용)
-model_name = "./llama_korean_finetuned"
-model = LlamaForCausalLM.from_pretrained(model_name)
-tokenizer = LlamaTokenizer.from_pretrained(model_name)
+# 모델과 토크나이저 로드 (Falcon-7B)
+model_name = "tiiuae/falcon-7b"
+model = AutoModelForCausalLM.from_pretrained(model_name)
+tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 # 캐릭터 대화 데이터셋 불러오기
 dataset = load_dataset("text", data_files="character_data.txt")  # 캐릭터 데이터 경로 지정
 
+# 텍스트 전처리 함수 (필요시 수정 가능)
+def preprocess_function(examples):
+    return tokenizer(examples["text"], truncation=True, padding="max_length", max_length=128)
+
+# 데이터셋 전처리 적용
+tokenized_dataset = dataset.map(preprocess_function, batched=True)
+
 # 트레이닝 설정
 training_args = TrainingArguments(
-    output_dir="./llama_character_finetuned",
+    output_dir="./falcon_character_finetuned",
     num_train_epochs=3,
     per_device_train_batch_size=2,
     save_steps=10_000,
@@ -169,7 +253,7 @@ training_args = TrainingArguments(
 trainer = Trainer(
     model=model,
     args=training_args,
-    train_dataset=dataset['train'],
+    train_dataset=tokenized_dataset["train"],
     tokenizer=tokenizer,
 )
 
@@ -177,8 +261,8 @@ trainer = Trainer(
 trainer.train()
 
 # 학습된 모델 저장
-model.save_pretrained("./llama_character_finetuned")
-tokenizer.save_pretrained("./llama_character_finetuned")
+model.save_pretrained("./falcon_character_finetuned")
+tokenizer.save_pretrained("./falcon_character_finetuned")
 
 ```  
 위 방법으로 추가적인학습을 시행한 모델을 만들 수 있다.  
@@ -201,8 +285,8 @@ print(tokenizer.decode(output[0], skip_special_tokens=True))
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 
-# 모델과 토크나이저 로드
-model_name = "meta-llama/Llama-3.2-3b"  # 예시: Llama 3.2 3B 모델
+# Falcon-7B 모델과 토크나이저 로드
+model_name = "tiiuae/falcon-7b"  # Falcon-7B 모델 사용
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -262,14 +346,16 @@ print(tokenizer.decode(output[0], skip_special_tokens=True))
 # 필요한 라이브러리 설치
 !pip install transformers datasets torch
 
-from transformers import Trainer, TrainingArguments, LlamaForCausalLM, LlamaTokenizer
+from transformers import Trainer, TrainingArguments, AutoModelForCausalLM, AutoTokenizer
 from datasets import load_dataset, concatenate_datasets
 import torch
 
-# 모델과 토크나이저 로드 (Llama 모델)
-model_name = "./llama_korean_finetuned"  # 모델 경로
-model = LlamaForCausalLM.from_pretrained(model_name)
-tokenizer = LlamaTokenizer.from_pretrained(model_name)
+# 모델과 토크나이저 로드 (Falcon-7B 모델)
+model_name = "tiiuae/falcon-7b"  # Falcon-7B 모델 경로
+model = AutoModelForCausalLM.from_pretrained(model_name)
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device)
 
 # Step 1: 다양한 코딩 데이터셋 불러오기
 print("Loading datasets...")
@@ -300,7 +386,7 @@ tokenized_dataset = dataset.map(preprocess_function, batched=True, remove_column
 
 # Step 3: 트레이닝 설정
 training_args = TrainingArguments(
-    output_dir="./llama_code_finetuned",
+    output_dir="./falcon_code_finetuned",
     num_train_epochs=3,
     per_device_train_batch_size=2,
     save_steps=10_000,
@@ -323,8 +409,8 @@ print("Starting training...")
 trainer.train()
 
 # 학습된 모델 저장
-model.save_pretrained("./llama_code_finetuned")
-tokenizer.save_pretrained("./llama_code_finetuned")
+model.save_pretrained("./falcon_code_finetuned")
+tokenizer.save_pretrained("./falcon_code_finetuned")
 print("Training completed and model saved.")
 
 ```
