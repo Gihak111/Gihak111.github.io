@@ -116,16 +116,28 @@ while True:
 
 허깅페이스에서 트랜스포머 라이브러리르 ㄹ통해 파인튜닝 할 수 있다.  
 ```python
-from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments
+from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments, DataCollatorForLanguageModeling
 from datasets import load_dataset
+import logging
+
+# 로깅 설정
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # 모델 및 토크나이저 로드 (Falcon-7B 모델 경로)
 model_name = "tiiuae/falcon-7b"
+logger.info(f"Loading tokenizer and model from {model_name}...")
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name)
 
-# 한국어 데이터셋 로드 (KoQuAD 사용 예시)
-dataset = load_dataset("squad_kor_v1")
+# 패딩 토큰 설정 (필요에 따라 eos_token을 pad_token으로 사용하거나 새로운 토큰을 추가)
+if tokenizer.pad_token is None:
+    tokenizer.pad_token = tokenizer.eos_token  # 또는 새로 추가하려면 `{'pad_token': '[PAD]'}` 사용
+    # tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+
+# 한국어 데이터셋 로드 (KLUE MRC 태스크 사용)
+logger.info("Loading KLUE MRC dataset...")
+dataset = load_dataset("klue", "mrc")
 
 # 데이터셋 텍스트 변환 (질문과 답변을 이어 붙인 형태로 파인튜닝용 데이터 생성)
 def preprocess_function(examples):
@@ -134,44 +146,78 @@ def preprocess_function(examples):
         # 질문 텍스트 추출
         question_text = question if isinstance(question, str) else " ".join(question)
         # 첫 번째 답변 텍스트 추출
-        answer_text = answers["text"][0] if "text" in answers and len(answers["text"]) > 0 else ""
+        answer_text = answers["text"][0] if answers and "text" in answers and answers["text"] else ""
         
-        # 질문과 답변이 모두 있을 때만 추가
-        if question_text and answer_text:
-            texts.append(question_text + " " + answer_text)
+        # 질문과 답변이 모두 존재하는 경우만 텍스트 생성
+        if question_text.strip() and answer_text.strip():
+            combined_text = question_text + " " + answer_text
+            texts.append(combined_text)
     return {"text": texts}
 
-# 각 데이터셋에 대해 텍스트로 변환 및 빈 샘플 제거
+logger.info("Preprocessing dataset...")
+# 데이터셋에 대해 텍스트로 변환 및 빈 샘플 제거
 tokenized_dataset = dataset.map(preprocess_function, batched=True, remove_columns=dataset["train"].column_names)
 
-# 데이터셋의 빈 샘플 확인 및 제거
-tokenized_dataset = tokenized_dataset.filter(lambda example: len(example["text"]) > 0)
+# 텍스트가 유효하지 않은 샘플 필터링 (텍스트가 비어 있거나 너무 짧은 경우 제거)
+logger.info("Filtering invalid samples...")
+tokenized_dataset = tokenized_dataset.filter(lambda example: len(example["text"].strip()) > 10)
+
+# 필터링 후 데이터셋의 크기 확인
+for split in ["train", "validation"]:
+    split_size = len(tokenized_dataset[split])
+    logger.info(f"'{split}' split size after filtering: {split_size}")
+
+    if split_size == 0:
+        raise ValueError(f"'{split}' split has no valid samples after filtering.")
+
+# 토크나이저를 사용하여 데이터셋 토크나이징
+def tokenize_function(examples):
+    return tokenizer(examples["text"], truncation=True, padding='max_length', max_length=512)
+
+logger.info("Tokenizing dataset...")
+tokenized_dataset = tokenized_dataset.map(tokenize_function, batched=True)
+
+# 필요없는 컬럼 제거
+tokenized_dataset = tokenized_dataset.remove_columns(["text"])
+
+# DataCollator 설정 (언어 모델링을 위한 데이터 콜레이터)
+data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
 # 학습 설정
 training_args = TrainingArguments(
     output_dir=r"C:\Falcon_AI",
+    overwrite_output_dir=True,
     per_device_train_batch_size=2,
+    per_device_eval_batch_size=2,
     num_train_epochs=3,
-    save_steps=10_000,
+    save_steps=500,  # 더 자주 저장하도록 조정
     save_total_limit=2,
     learning_rate=5e-5,
+    logging_steps=100,
+    evaluation_strategy="epoch",
+    save_strategy="steps",
+    logging_dir=r"C:\Falcon_AI\logs",
 )
 
+logger.info("Initializing Trainer...")
 trainer = Trainer(
     model=model,
     args=training_args,
     train_dataset=tokenized_dataset["train"],
+    eval_dataset=tokenized_dataset["validation"],
     tokenizer=tokenizer,
+    data_collator=data_collator,
 )
 
 # 모델 학습
+logger.info("Starting training...")
 trainer.train()
 
 # 학습된 모델 저장
+logger.info("Saving model and tokenizer...")
 model.save_pretrained(r"C:\Falcon_AI")
 tokenizer.save_pretrained(r"C:\Falcon_AI")
-
-
+logger.info("Training and saving completed successfully.")
 
 ```
 위 방법으로 데이터를 딥러닝 시켜 모델을 업그레이드 할 수 있다.  
