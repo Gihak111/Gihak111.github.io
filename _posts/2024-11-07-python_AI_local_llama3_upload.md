@@ -116,6 +116,7 @@ while True:
 
 허깅페이스에서 트랜스포머 라이브러리르 ㄹ통해 파인튜닝 할 수 있다.  
 ```python
+import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments, DataCollatorForLanguageModeling
 from datasets import load_dataset
 import logging
@@ -124,11 +125,16 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# GPU 사용 여부 확인
+device = "cuda" if torch.cuda.is_available() else "cpu"
+logger.info(f"Using device: {device}")
+
 # 모델 및 토크나이저 로드 (Falcon-7B 모델 경로)
 model_name = "tiiuae/falcon-7b"
 logger.info(f"Loading tokenizer and model from {model_name}...")
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name)
+model.to(device)  # 모델을 GPU로 이동
 
 # 패딩 토큰 설정 (필요에 따라 eos_token을 pad_token으로 사용하거나 새로운 토큰을 추가)
 if tokenizer.pad_token is None:
