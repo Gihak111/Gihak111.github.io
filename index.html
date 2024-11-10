@@ -9,15 +9,6 @@ title: Home
 <div class="container">
   <h1>Welcome to {{ site.title }}</h1>
   
-  <h2 class="legend-title">Legend Posts</h2>
-  <ul class="legend-list">
-    <li>
-      <a href="https://gihak111.github.io/design/patterns/2024/11/05/Types_Of_Design_Patterns_upload.html">
-        디자인 패턴의 구분과 종류
-      </a>
-    </li>
-  </ul>
-
   <div class="recent-posts">
     <h2>Recent Posts</h2>
     <ul>
@@ -46,16 +37,19 @@ title: Home
       <li><a href="{{ site.baseurl }}/list.html">View More...</a></li>
     </ul>
   </div>
+
+  <h2 class="legend-title">Legend Posts</h2>
+  <ul class="legend-list">
+    <li>
+      <a href="https://gihak111.github.io/design/patterns/2024/11/05/Types_Of_Design_Patterns_upload.html">
+        디자인 패턴의 구분과 종류
+      </a>
+    </li>
+  </ul>
 </div>
 {% endif %}
 
 <style>
-  /*
-  .legend-title {
-    font-size: 1.5em; /* 제목 크기 조정 
-  }
-  */
-
   .legend-list li a {
     font-size: 1.2em; /* 링크 글자 크기 조정 */
   }
