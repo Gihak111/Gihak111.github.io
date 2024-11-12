@@ -27,7 +27,8 @@ Python 라이브러리인 BeautifulSoup 또는 Scrapy를 사용하여 웹 페이
 단계를 보면, 웹 크롤링을 진행, 일르 통해 FAISS 인덱스 구축, 검색쿼리 처리, 답변 생성이 된다.  
 
 코드로 보자.  
-1. 웹 크롤링
+1. 웹 크롤링  
+
 ```python
 import requests
 from bs4 import BeautifulSoup
@@ -49,7 +50,8 @@ print(crawled_data[:500])  # 크롤링한 데이터 일부 확인
 
 ```
 
-2. 크롤링 데이터로 FAISS 인덱스 생성
+2. 크롤링 데이터로 FAISS 인덱스 생성  
+
 ```python
 import faiss
 import torch
@@ -75,7 +77,8 @@ index.add(doc_embeddings)  # FAISS에 데이터 추가
 
 ```
 
-3. 실시간 검색 및 답변 생성
+3. 실시간 검색 및 답변 생성  
+
 ```python
 # 검색 함수: 쿼리에 대해 FAISS에서 유사한 문서 검색
 def search(query, top_k=3):
@@ -103,7 +106,8 @@ def generate_answer(query):
 
 ```
 
-4. 실시간 대화 인터페이스
+4. 실시간 대화 인터페이스  
+
 ```python
 def chat():
     print("AI와 대화를 시작합니다. '종료'라고 입력하면 대화가 종료됩니다.")
