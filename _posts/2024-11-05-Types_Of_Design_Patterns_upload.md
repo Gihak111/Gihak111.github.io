@@ -34,7 +34,7 @@ sidebar:
 - 반복자 패턴  
 - 중재자 패턴  
 - 메멘토 패턴  
-- 옵서버 패턴  
+- [옵저버 패턴](https://gihak111.github.io/design/patterns/2024/11/16/Design_Patterns_7_upload.html)  
 - 상태 패턴  
 - [전략 패턴](https://gihak111.github.io/design/patterns/2024/11/03/Design_Patterns_5_upload.html)   
 - 템플릿메서드 패턴  

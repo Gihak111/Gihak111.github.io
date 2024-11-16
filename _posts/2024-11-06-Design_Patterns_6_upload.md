@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "디자인 패턴 시리즈 5. 프로토타입 패턴"
+title:  "디자인 패턴 시리즈 6. 프로토타입 패턴"
 categories: "Design Patterns"
 tag: "code"
 toc: true
