@@ -1,7 +1,7 @@
 ---
 layout: single
 title:  "디자인 패턴의 구분과 종류"
-categories: "Design Patterns"
+categories: "Design_Patterns"
 tag: "code"
 toc: true
 author_profile: false

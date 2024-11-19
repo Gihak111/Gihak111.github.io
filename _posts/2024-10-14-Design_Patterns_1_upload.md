@@ -1,7 +1,7 @@
 ---
 layout: single
 title:  "디자인 패턴 시리즈 1. 싱글턴"
-categories: "Design Patterns"
+categories: "Design_Patterns"
 tag: "code"
 toc: true
 author_profile: false
