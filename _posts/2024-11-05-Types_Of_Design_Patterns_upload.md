@@ -30,7 +30,7 @@ sidebar:
 
 ### 3. 행동패턴  
 - 책임연쇄 패턴  
-- 커맨드 패턴  
+- [커맨드 패턴](https://gihak111.github.io/design/patterns/2024/11/19/Design_Patterns_10_upload.html)  
 - 반복자 패턴  
 - 중재자 패턴  
 - 메멘토 패턴  
