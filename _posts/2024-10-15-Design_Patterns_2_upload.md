@@ -204,4 +204,4 @@ public class Main {
 **팩토리 패턴**은 객체 생성 로직을 클라이언트 코드에서 분리하고, 다양한 객체 생성 방식을 제공하여 코드의 확장성과 유지보수성을 향상시킨다. 이번 글에서는 **단순 팩토리**, **팩토리 메서드**, 그리고 **추상 팩토리** 패턴을 소개하였다.  
 
 아래 글에서 다른 디자인 패턴들을 확인할 수 있다.  
-[디자인 패턴 모음](https://gihak111.github.io/design/patterns/2024/11/05/Types_Of_Design_Patterns_upload.html)  
+[디자인 패턴 모음](https://gihak111.github.io/design_patterns/2024/11/05/Types_Of_Design_Patterns_upload.html)  

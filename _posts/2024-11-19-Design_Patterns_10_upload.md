@@ -177,4 +177,4 @@ public class Main {
 이 패턴은 단일 명령을 독립적으로 관리해야 할 때, 또는 여러 명령을 조합하여 복합 명령을 처리해야 할 때 매우 유용하다.  
 
 아래 글에서 다른 디자인 패턴들을 확인할 수 있다.  
-[디자인 패턴 모음](https://gihak111.github.io/design/patterns/2024/11/05/Types_Of_Design_Patterns_upload.html)  
+[디자인 패턴 모음](https://gihak111.github.io/design_patterns/2024/11/05/Types_Of_Design_Patterns_upload.html)  

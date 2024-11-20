@@ -162,4 +162,4 @@ public class Main {
 각 객체는 자신이 처리할 수 있는 요청만 처리하고, 그렇지 않으면 다음 객체로 넘기며, 클라이언트는 어느 객체가 요청을 처리할지 알 필요 없이 체인만 설정하면 된다.  
 
 아래 글에서 다른 디자인 패턴들을 확인할 수 있다.  
-[디자인 패턴 모음](https://gihak111.github.io/design/patterns/2024/11/05/Types_Of_Design_Patterns_upload.html)  
+[디자인 패턴 모음](https://gihak111.github.io/design_patterns/2024/11/05/Types_Of_Design_Patterns_upload.html)  

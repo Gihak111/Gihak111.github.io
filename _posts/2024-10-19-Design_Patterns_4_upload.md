@@ -147,4 +147,4 @@ Computer [CPU=AMD Ryzen 9, RAM=32GB, storage=1TB SSD, graphicsCard=NVIDIA RTX 30
 특히, 매개변수의 수가 많거나 객체가 복잡한 구조를 가질 때 가독성을 높이고 유지보수성을 개선할 수 있다.  
 
 아래 글에서 다른 디자인 패턴들을 확인할 수 있다.  
-[디자인 패턴 모음](https://gihak111.github.io/design/patterns/2024/11/05/Types_Of_Design_Patterns_upload.html)  
+[디자인 패턴 모음](https://gihak111.github.io/design_patterns/2024/11/05/Types_Of_Design_Patterns_upload.html)  

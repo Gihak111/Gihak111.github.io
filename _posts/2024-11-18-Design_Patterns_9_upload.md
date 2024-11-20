@@ -167,4 +167,4 @@ HTML 보고서를 출력합니다.
 특히, 공통적인 로직을 많이 사용하는 시스템에서 효과적으로 사용할 수 있다.  
 
 아래 글에서 다른 디자인 패턴들을 확인할 수 있다.  
-[디자인 패턴 모음](https://gihak111.github.io/design/patterns/2024/11/05/Types_Of_Design_Patterns_upload.html)  
+[디자인 패턴 모음](https://gihak111.github.io/design_patterns/2024/11/05/Types_Of_Design_Patterns_upload.html)  

@@ -186,4 +186,4 @@ Mac 스타일 체크박스 토글
 각 제품군을 팩토리로 묶어 관리함으로써 객체 생성의 복잡성을 줄일 수 있고, 새로운 제품군을 쉽게 추가할 수 있다.  
 
 아래 글에서 다른 디자인 패턴들을 확인할 수 있다.  
-[디자인 패턴 모음](https://gihak111.github.io/design/patterns/2024/11/05/Types_Of_Design_Patterns_upload.html)  
+[디자인 패턴 모음](https://gihak111.github.io/design_patterns/2024/11/05/Types_Of_Design_Patterns_upload.html)  

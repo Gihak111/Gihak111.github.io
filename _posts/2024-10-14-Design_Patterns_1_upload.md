@@ -183,4 +183,4 @@ Java에서는 다양한 방식으로 싱글턴 패턴을 구현할 수 있으며
 그러나 패턴의 남용은 테스트나 확장성을 어렵게 할 수 있으므로, 필요할 때 신중하게 적용하는 것이 중요하다.  
 
 아래 글에서 다른 디자인 패턴들을 확인할 수 있다.  
-[디자인 패턴 모음](https://gihak111.github.io/design/patterns/2024/11/05/Types_Of_Design_Patterns_upload.html)  
+[디자인 패턴 모음](https://gihak111.github.io/design_patterns/2024/11/05/Types_Of_Design_Patterns_upload.html)  

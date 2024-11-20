@@ -175,4 +175,4 @@ public class Main {
 뉴스 발행 시스템처럼 상태 변화를 실시간으로 전달해야 하는 곳에서 자주 사용되며, 확장성과 유연성을 보장하는 중요한 디자인 패턴 중 하나다.  
 
 아래 글에서 다른 디자인 패턴들을 확인할 수 있다.  
-[디자인 패턴 모음](https://gihak111.github.io/design/patterns/2024/11/05/Types_Of_Design_Patterns_upload.html)  
+[디자인 패턴 모음](https://gihak111.github.io/design_patterns/2024/11/05/Types_Of_Design_Patterns_upload.html)  
