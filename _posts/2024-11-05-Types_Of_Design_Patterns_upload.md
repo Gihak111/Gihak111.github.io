@@ -21,7 +21,7 @@ sidebar:
 
 ### 2. 구조 패턴  
 - 어댑터 패턴  
-- 브리지 패턴  
+- [브리지 패턴](https://gihak111.github.io/design_patterns/2024/11/21/Design_Patterns_12_upload.html)  
 - 복합체 패턴  
 - 데코레이터 패턴  
 - 퍼사드 패턴  
