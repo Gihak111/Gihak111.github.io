@@ -21,7 +21,7 @@ sidebar:
 
 ### 2. 구조 패턴  
 - 어댑터 패턴  
-- [브리지 패턴](https://gihak111.github.io/design_patterns/2024/11/21/Design_Patterns_12_upload.html)  
+- [브리지 패턴](https://gihak111.github.io/design_patterns/2024/11/21/Design_Patterns_13_upload.html)  
 - 복합체 패턴  
 - 데코레이터 패턴  
 - 퍼사드 패턴  
@@ -31,7 +31,7 @@ sidebar:
 ### 3. 행동패턴  
 - [책임연쇄 패턴](https://gihak111.github.io/design_patterns/2024/11/20/Design_Patterns_11_upload.html)  
 - [커맨드 패턴](https://gihak111.github.io/design_patterns/2024/11/19/Design_Patterns_10_upload.html)  
-- 반복자 패턴  
+- [반복자 패턴](https://gihak111.github.io/design_patterns/2024/11/22/Design_Patterns_12_upload.html)  
 - 중재자 패턴  
 - 메멘토 패턴  
 - [옵저버 패턴](https://gihak111.github.io/design_patterns/2024/11/16/Design_Patterns_7_upload.html)  
