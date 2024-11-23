@@ -9,7 +9,7 @@ sidebar:
     nav: "docs"
 ---
 
-# 디자인 패턴 시리즈 14: 메멘토 패턴 (Memento Pattern)
+# 디자인 패턴 시리즈 15: 메멘토 패턴 (Memento Pattern)
 
 메멘토 패턴(Memento Pattern)은 객체의 상태를 저장하고 필요할 때 해당 상태를 복원할 수 있도록 하는 행동 패턴이다.  
 주로 "실행 취소(Undo)" 기능을 구현하는 데 사용된다.  
