@@ -33,7 +33,7 @@ sidebar:
 - [커맨드 패턴](https://gihak111.github.io/design_patterns/2024/11/19/Design_Patterns_10_upload.html)  
 - [반복자 패턴](https://gihak111.github.io/design_patterns/2024/11/22/Design_Patterns_13_upload.html)  
 - [중재자 패턴](https://gihak111.github.io/design_patterns/2024/11/23/Design_Patterns_14_upload)  
-- 메멘토 패턴  
+- [메멘토 패턴](https://gihak111.github.io/design_patterns/2024/11/24/Design_Patterns_15_upload)  
 - [옵저버 패턴](https://gihak111.github.io/design_patterns/2024/11/16/Design_Patterns_7_upload.html)  
 - [상태 패턴](https://gihak111.github.io/design_patterns/2024/11/17/Design_Patterns_8_upload.html)  
 - [전략 패턴](https://gihak111.github.io/design_patterns/2024/11/03/Design_Patterns_5_upload.html)   
