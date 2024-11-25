@@ -38,4 +38,4 @@ sidebar:
 - [상태 패턴](https://gihak111.github.io/design_patterns/2024/11/17/Design_Patterns_8_upload.html)  
 - [전략 패턴](https://gihak111.github.io/design_patterns/2024/11/03/Design_Patterns_5_upload.html)   
 - [템플릿메서드 패턴](https://gihak111.github.io/design_patterns/2024/11/18/Design_Patterns_9_upload.html)  
-- 비지터 패턴  
+- [비지터 패턴](https://gihak111.github.io/design_patterns/2024/11/05/Types_Of_Design_Patterns_upload.html)  
