@@ -9,7 +9,7 @@ sidebar:
     nav: "docs"
 ---
 
-# 디자인 패턴 시리즈 15: 비지터 패턴 (Visitor Pattern)
+# 디자인 패턴 시리즈 16: 비지터 패턴 (Visitor Pattern)
 
 비지터 패턴(Visitor Pattern)은 객체 구조를 변경하지 않고 새로운 동작(기능)을 추가할 수 있도록 설계된 행동 패턴이다.  
 이 패턴은 요소(Element)와 방문자(Visitor)의 협력을 통해 복잡한 연산을 객체 외부에서 처리할 수 있도록 한다.  
