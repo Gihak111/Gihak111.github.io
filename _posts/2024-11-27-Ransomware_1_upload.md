@@ -530,10 +530,7 @@ public class RansomwareSimulationWithTor {
 
     2. 컴파일 및 실행  
     먼저, 컴파일 하고  
-    ```bash
-    javac RansomwareSimulation.java
-
-    ```  
+    ```javac RansomwareSimulation.java```   
 
     실행  
     ```bash
