@@ -25,7 +25,7 @@ sidebar:
 - [복합체 패턴](https://gihak111.github.io/design_patterns/2024/11/28/Design_Patterns_18_upload.html)  
 - [데코레이터 패턴](https://gihak111.github.io/design_patterns/2024/11/29/Design_Patterns_19_upload.html)  
 - [퍼사드 패턴](https://gihak111.github.io/design_patterns/2024/11/30/Design_Patterns_20_upload.html)  
-- 플라이웨이트 패턴  
+- [플라이웨이트 패턴](https://gihak111.github.io/design_patterns/2024/12/01/Design_Patterns_21_upload.html)  
 - 프록시 패턴  
 
 ### 3. 행동패턴  
