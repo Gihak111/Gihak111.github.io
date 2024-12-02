@@ -158,5 +158,5 @@ photo2.jpg 화면에 표시 중...
 프록시 패턴(Proxy Pattern)은 객체에 대한 접근을 제어하거나, 추가 기능을 캡슐화하는 데 유용하다.  
 특히, 리소스가 무거운 객체의 생성을 지연시키거나, 민감한 리소스에 대한 접근을 제한할 때 유용하다.  
 
-아래 글에서 다른 아키텍쳐 패턴들을 확인할 수 있다.  
-[아키텍처 패턴 모음](https://gihak111.github.io/Architecture_patterns/2024/12/04/Types_Of_Architecture_Patterns_upload.html)  
+아래 글에서 다른 디자인 패턴들을 확인할 수 있다.  
+[디자인 패턴 모음](https://gihak111.github.io/design_patterns/2024/11/05/Types_Of_Design_Patterns_upload.html)  
