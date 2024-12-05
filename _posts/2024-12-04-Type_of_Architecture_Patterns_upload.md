@@ -32,7 +32,7 @@ sidebar:
 
 여러가지 아키텍쳐 패턴이 있지만, 종류는 다음으로 축약된다.  
 
-1. 계층화 패턴 (Layered Pattern)  
+1. [계층화 패턴 (Layered Pattern)](https://gihak111.github.io/architecture_patterns/2024/12/05/Architecture_Patterns_01_upload.html)  
 2. 클라이언트-서버 패턴 (Client-Server Pattern)  
 3. 마스터-슬레이브 패턴 (Master-Slave Pattern)  
 4. 파이프-필터 패턴 (Pipe-Filter Pattern)  
