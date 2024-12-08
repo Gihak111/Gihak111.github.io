@@ -35,7 +35,7 @@ sidebar:
 1. [계층화 패턴 (Layered Pattern)](https://gihak111.github.io/architecture_patterns/2024/12/05/Architecture_Patterns_01_upload.html)  
 2. [클라이언트-서버 패턴 (Client-Server Pattern)](https://gihak111.github.io/architecture_patterns/2024/12/06/Architecture_Patterns_02_upload.html)  
 3. [마스터-슬레이브 패턴 (Master-Slave Pattern)](https://gihak111.github.io/architecture_patterns/2024/12/07/Architecture_Patterns_03_upload.html)  
-4. 파이프-필터 패턴 (Pipe-Filter Pattern)  
+4. [파이프-필터 패턴 (Pipe-Filter Pattern)](https://gihak111.github.io/architecture_patterns/2024/12/08/Architecture_Patterns_04_upload.html)  
 5. 브로커 패턴 (Broker Pattern)  
 6. 피어 투 피어 패턴 (Peer-to-Peer Pattern)  
 7. 이벤트-버스 패턴 (Event-Bus Pattern)  
