@@ -37,7 +37,7 @@ sidebar:
 3. [마스터-슬레이브 패턴 (Master-Slave Pattern)](https://gihak111.github.io/architecture_patterns/2024/12/07/Architecture_Patterns_03_upload.html)  
 4. [파이프-필터 패턴 (Pipe-Filter Pattern)](https://gihak111.github.io/architecture_patterns/2024/12/08/Architecture_Patterns_04_upload.html)  
 5. [브로커 패턴 (Broker Pattern)](https://gihak111.github.io/architecture_patterns/2024/12/09/Architecture_Patterns_05_upload.html)  
-6. 피어 투 피어 패턴 (Peer-to-Peer Pattern)  
+6. [피어 투 피어 패턴 (Peer-to-Peer Pattern)](https://gihak111.github.io/architecture_patterns/2024/12/10/Architecture_Patterns_06_upload.html)  
 7. 이벤트-버스 패턴 (Event-Bus Pattern)  
 8. MVC 패턴 (Model-View-Controller Pattern)  
 9. MVP 패턴 (Model-View-Presenter Pattern)  
