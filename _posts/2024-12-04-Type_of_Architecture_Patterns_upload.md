@@ -40,7 +40,7 @@ sidebar:
 6. [피어 투 피어 패턴 (Peer-to-Peer Pattern)](https://gihak111.github.io/architecture_patterns/2024/12/10/Architecture_Patterns_06_upload.html)  
 7. [이벤트-버스 패턴 (Event-Bus Pattern)](https://gihak111.github.io/architecture_patterns/2024/12/11/Architecture_Patterns_07_upload.html)  
 8. [MVC 패턴 (Model-View-Controller Pattern)](https://gihak111.github.io/architecture_patterns/2024/12/12/Architecture_Patterns_08_upload.html)  
-9. MVP 패턴 (Model-View-Presenter Pattern)  
+9. [MVP 패턴 (Model-View-Presenter Pattern)](https://gihak111.github.io/architecture_patterns/2024/12/13/Architecture_Patterns_09_upload.html)  
 10. MVVM 패턴 (Model-View-ViewModel Pattern) 
 11. FLUX 패턴  
 12. 블랙보드 패턴 (Blackboard Pattern)  
