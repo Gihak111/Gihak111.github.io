@@ -42,7 +42,7 @@ sidebar:
 8. [MVC 패턴 (Model-View-Controller Pattern)](https://gihak111.github.io/architecture_patterns/2024/12/12/Architecture_Patterns_08_upload.html)  
 9. [MVP 패턴 (Model-View-Presenter Pattern)](https://gihak111.github.io/architecture_patterns/2024/12/13/Architecture_Patterns_09_upload.html)  
 10. [MVVM 패턴 (Model-View-ViewModel Pattern)](https://gihak111.github.io/architecture_patterns/2024/12/14/Architecture_Patterns_10_upload.html)  
-11. FLUX 패턴  
+11. [FLUX 패턴](https://gihak111.github.io/architecture_patterns/2024/12/15/Architecture_Patterns_11_upload.html)  
 12. 블랙보드 패턴 (Blackboard Pattern)  
 13. 인터프리터 패턴 (Interpreter Pattern)  
 14. 마이크로서비스 아키텍처 (Microservices Architecture)  
