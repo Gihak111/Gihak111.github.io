@@ -47,7 +47,7 @@ sidebar:
 13. [인터프리터 패턴 (Interpreter Pattern)](https://gihak111.github.io/architecture_patterns/2024/12/17/Architecture_Patterns_13_upload.html)  
 14. [마이크로서비스 아키텍처 (Microservices Architecture)](https://gihak111.github.io/architecture_patterns/2024/12/18/Architecture_Patterns_14_upload.html)  
 15. [서비스 지향 아키텍처 (Service-Oriented Architecture, SOA)](https://gihak111.github.io/architecture_patterns/2024/12/19/Architecture_Patterns_15_upload.html)  
-16. 헥사고날 아키텍처 (Hexagonal Architecture)  
+16. [헥사고날 아키텍처 (Hexagonal Architecture)](https://gihak111.github.io/architecture_patterns/2024/12/20/Architecture_Patterns_16_upload.html)  
 17. CQRS (Command Query Responsibility Segregation)  
 18. 스트랭글러 패턴 (Strangler fig Pattern)  
 
