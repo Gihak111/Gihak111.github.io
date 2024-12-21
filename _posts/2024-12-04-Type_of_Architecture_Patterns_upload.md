@@ -48,7 +48,7 @@ sidebar:
 14. [마이크로서비스 아키텍처 (Microservices Architecture)](https://gihak111.github.io/architecture_patterns/2024/12/18/Architecture_Patterns_14_upload.html)  
 15. [서비스 지향 아키텍처 (Service-Oriented Architecture, SOA)](https://gihak111.github.io/architecture_patterns/2024/12/19/Architecture_Patterns_15_upload.html)  
 16. [헥사고날 아키텍처 (Hexagonal Architecture)](https://gihak111.github.io/architecture_patterns/2024/12/20/Architecture_Patterns_16_upload.html)  
-17. CQRS (Command Query Responsibility Segregation)  
+17. [CQRS (Command Query Responsibility Segregation)](https://gihak111.github.io/architecture_patterns/2024/12/21/Architecture_Patterns_17_upload.html)  
 18. 스트랭글러 패턴 (Strangler fig Pattern)  
 
 많은 패턴들이 있지만, 위와 같은 패턴들이 대표적이다.  
