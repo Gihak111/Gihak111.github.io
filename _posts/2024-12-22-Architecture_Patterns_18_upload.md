@@ -1,8 +1,8 @@
 ---
 layout: single
 title:  "스트랭글러 패턴: 단계적 시스템 전환의 전략"
-categories: "Software Architecture"
-tag: "strangler fig pattern"
+categories: "Architecture_Patterns"
+tag: "code"
 toc: true
 author_profile: false
 sidebar:
