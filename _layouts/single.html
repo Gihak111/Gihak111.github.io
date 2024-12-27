@@ -7,10 +7,20 @@
     <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/animations_for_post.css"> <!-- 새 애니메이션 CSS 파일 -->
     <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/code_style.css"> <!-- 분리된 코드 스타일 파일 -->
 
-    <!-- MathJax 스크립트 추가 -->
-    <script type="text/javascript" async
-        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    <!-- MathJax 설정 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
     </script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
 <i class="fa fa-bars fa-2x"></i> Gihak111
