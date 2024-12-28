@@ -5,36 +5,22 @@
     {% include header.html %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/animations_for_post.css"> <!-- 새 애니메이션 CSS 파일 -->
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/code_style.css"> <!-- 분리된 코드 스타일 파일 -->
 
-
-    <style>
-        /* 기존 스타일 */
-        pre {
-            background-color: #f5f5f5;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 10px;
-            overflow-x: auto;
-        }
-
-        code {
-            font-family: monospace;
-            color: #d6336c;
-        }
-        
-        
-        /*
-         이미지 스타일 
-        .container img {
-            max-width: 100%;  컨테이너 너비에 맞게 이미지 크기 조정 
-            height: auto; /* 비율 유지 
-            display: block; /* 이미지 주위의 여백 제거 
-            margin: 0 auto; /* 중앙 정렬 
-        }
-        */
-
-
-    </style>
+    <!-- MathJax 설정 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
 <i class="fa fa-bars fa-2x"></i> Gihak111
@@ -54,5 +40,32 @@
 
 <!-- 스크립트 파일을 포함하여 추가 JavaScript를 설정 -->
 {% include scripts.html %}
+
+<!-- 복사 기능을 위한 JavaScript 추가 -->
+<script>
+    // 복사 버튼 생성 및 동작
+    document.addEventListener('DOMContentLoaded', () => {
+        const preBlocks = document.querySelectorAll('pre');
+        
+        preBlocks.forEach(pre => {
+            // 복사 버튼 추가
+            const button = document.createElement('button');
+            button.innerText = 'Copy';
+            button.classList.add('copy-button');
+            pre.appendChild(button);
+
+            // 복사 기능 동작
+            button.addEventListener('click', () => {
+                const codeText = pre.innerText;
+                navigator.clipboard.writeText(codeText).then(() => {
+                    button.innerText = 'Copied!';
+                    setTimeout(() => button.innerText = 'Copy', 2000);
+                }).catch(err => {
+                    console.error('Copy failed', err);
+                });
+            });
+        });
+    });
+</script>
 </body>
 </html>
