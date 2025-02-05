@@ -26,22 +26,22 @@ gradlew clean
 ```
 
 #### 2. **`gradlew` 파일 실행 불가 문제 해결**
-Gradle Wrapper(`gradlew`) 파일이 실행되지 않을 경우 다음 단계를 수행하세요:
+Gradle Wrapper(`gradlew`) 파일이 실행되지 않을 경우 다음 단계를 수행하자:
 
 - **실행 권한 부여**:
-  Windows CMD에서는 실행 권한 부여가 필요하지 않지만, 파일이 제대로 동작하지 않을 경우 **Git Bash** 또는 **WSL**에서 아래 명령어를 실행해 권한을 부여하세요:
+  Windows CMD에서는 실행 권한 부여가 필요하지 않지만, 파일이 제대로 동작하지 않을 경우 **Git Bash** 또는 **WSL**에서 아래 명령어를 실행해 권한을 부여하자:
   ```bash
   chmod +x gradlew
   ```
 
 #### 3. **PowerShell에서 실행**
-CMD 대신 PowerShell을 사용하는 경우 명령어 앞에 `./` 대신 `./`를 사용해야 합니다:
+CMD 대신 PowerShell을 사용하는 경우 명령어 앞에 `./` 대신 `./`를 사용해야 한다:
 ```powershell
 ./gradlew clean
 ```
 
 #### 4. **Java 환경 변수 확인**
-Gradle은 Java를 필요로 하므로 Java가 설치되어 있어야 하며, 환경 변수 `JAVA_HOME`이 올바르게 설정되어 있어야 합니다.
+Gradle은 Java를 필요로 하므로 Java가 설치되어 있어야 하며, 환경 변수 `JAVA_HOME`이 올바르게 설정되어 있어야 한다.
 
 - **`JAVA_HOME` 설정 방법:**
   1. **Java 설치 경로 확인:** Java가 설치된 디렉터리(예: `C:\Program Files\Java\jdk-<version>`).
@@ -53,13 +53,13 @@ Gradle은 Java를 필요로 하므로 Java가 설치되어 있어야 하며, 환
      - 또는, **제어판 > 시스템 > 고급 시스템 설정 > 환경 변수**에서 `JAVA_HOME`을 추가.
 
 #### 5. **Gradle 버전 확인**
-Gradle 버전 정보를 확인하려면 다음 명령어를 실행하세요:
+Gradle 버전 정보를 확인하려면 다음 명령어를 실행하자:
 ```cmd
 gradlew -v
 ```
 
 #### 6. **React Native 실행 명령**
-Gradle 작업이 완료되면 프로젝트 루트 디렉터리로 돌아가 React Native 앱을 실행합니다:
+Gradle 작업이 완료되면 프로젝트 루트 디렉터리로 돌아가 React Native 앱을 실행하자:
 ```cmd
 cd ..
 npx react-native run-android
@@ -68,7 +68,7 @@ npx react-native run-android
 ---
 
 ### 최종 명령어 정리
-Windows CMD에서 React Native 프로젝트의 Gradle 작업을 실행하려면 아래 명령어를 순서대로 입력하세요:
+Windows CMD에서 React Native 프로젝트의 Gradle 작업을 실행하려면 아래 명령어를 순서대로 입력하자:
 ```cmd
 cd C:\ver2\MonitoringApp\android
 gradlew clean
@@ -79,11 +79,8 @@ npx react-native run-android
 
 ### 추가 팁
 - **Gradle 캐시 정리:**
-  Gradle 캐시를 정리하려면 다음 명령어를 실행하세요:
+  Gradle 캐시를 정리하려면 다음 명령어를 실행하자:
   ```cmd
   gradlew cleanBuildCache
   ```
-
-- **문제가 계속 발생할 경우:**
-  CMD에서 실행한 오류 로그를 확인하거나 추가 정보를 공유해 주세요.
 
