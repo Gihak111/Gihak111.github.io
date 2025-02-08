@@ -80,7 +80,7 @@ npx react-native run-android
 
 ### 추가 팁
 - **Gradle 캐시 정리:**
-  Gradle 캐시를 정리하려면 다음 명령어를 실행한다.
+  Gradle 캐시를 정리하려면 다음 명령어를 실행한다.  
   ```cmd
   gradlew cleanBuildCache
   ```
