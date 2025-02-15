@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "구글 플레이 스토어에 앱 출시중 발생하는 오류들
+title:  "구글 플레이 스토어에 앱 출시중 발생하는 오류들"
 categories: "Google"
 tag: "code"
 toc: true

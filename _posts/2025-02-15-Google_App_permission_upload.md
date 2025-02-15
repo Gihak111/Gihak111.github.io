@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "앱의 특수 권한에 따른 앱 출시
+title:  "앱의 특수 권한에 따른 앱 출시"
 categories: "Google"
 tag: "code"
 toc: true
