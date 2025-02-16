@@ -20,7 +20,7 @@ sidebar:
 
 이러한 문제를 겪고, 해결해 보니, 방법은 간단했다.  
 안드로이드의 도움말에 들어가 잘 읽어보면,  
-(도움말)[https://support.google.com/googleplay/android-developer/answer/9845334?hl=ko&sjid=8661691761638689841-AP#zippy=%2C%ED%95%98%EB%82%98%EC%9D%98-%EC%95%B1%EC%97%90%EC%84%9C-%EC%97%AC%EB%9F%AC-%ED%85%8C%EC%8A%A4%ED%8A%B8%EB%A5%BC-%EB%8F%99%EC%8B%9C%EC%97%90-%EC%A7%84%ED%96%89%ED%95%A0-%EC%88%98-%EC%9E%88%EB%82%98%EC%9A%94]
+[도움말](https://support.google.com/googleplay/android-developer/answer/9845334?hl=ko&sjid=8661691761638689841-AP#zippy=%2C%ED%95%98%EB%82%98%EC%9D%98-%EC%95%B1%EC%97%90%EC%84%9C-%EC%97%AC%EB%9F%AC-%ED%85%8C%EC%8A%A4%ED%8A%B8%EB%A5%BC-%EB%8F%99%EC%8B%9C%EC%97%90-%EC%A7%84%ED%96%89%ED%95%A0-%EC%88%98-%EC%9E%88%EB%82%98%EC%9A%94)
 내부 태스트가 활성화 되어 잇는 상태에서, 비공개 태스트 트랙이 활성화 되면,  
 앱의 설치 링크에 충돌이 생겨서 앱을 다운받을 수 있는 링크에 오류가 생긴다고 한다.  
 
