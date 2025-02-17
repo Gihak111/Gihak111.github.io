@@ -19,13 +19,13 @@ sidebar:
 자신이 왜 그 권한을 사용했는지, 왜 그 권한을 사용할 수 밖에 없었는지에 대해 자세히 설명해야 승인이 난다.  
 예를 들면, 다음은 내가 엑세스 빌리티에 대한 권한 사용을 구글에 설명하기 위해 만든 영상이다.  
 
-(링크)[https://www.youtube.com/watch?v=RrM8QY3is-U&t=3s&ab_channel=junmoyeon]  
+[링크](https://www.youtube.com/watch?v=RrM8QY3is-U&t=3s&ab_channel=junmoyeon)  
 위처럼, 자세한 설명을 통해서 자신이 왜 그 권한을 선택할 수 밖에 없었는지에 대해 세세히 설명해야 한다.  
 
 추가적으로 볼 만한 글들이 있다.  
-1. (앱 사용권한)[https://support.google.com/googleplay/android-developer/answer/9214102?hl=ko&utm_source=chatgpt.com]   
-2. (개발자 정책 센터의 권한 섹션)[https://play.google/intl/ko/developer-content-policy/?utm_source=chatgpt.com]  
-3. (구글 서비스 설정 가이드)[https://developers.google.com/android/guides/setup?hl=ko&utm_source=chatgpt.com]  
+1. [앱 사용권한](https://support.google.com/googleplay/android-developer/answer/9214102?hl=ko&utm_source=chatgpt.com)   
+2. [개발자 정책 센터의 권한 섹션](https://play.google/intl/ko/developer-content-policy/?utm_source=chatgpt.com)  
+3. [구글 서비스 설정 가이드](https://developers.google.com/android/guides/setup?hl=ko&utm_source=chatgpt.com)  
 
 위 글들을 잘 살펴보고, 앱을 만들자.  
 
