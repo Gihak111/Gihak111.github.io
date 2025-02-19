@@ -1,8 +1,8 @@
 ---
 layout: single
 title: "Android App Bundle 업로드 시 서명 키 불일치 문제 해결하기"
-categories: "Android Development"
-tags: ["Android", "Google Play", "App Signing", "Keystore"]
+categories: "ReactNative"
+tags: "code"
 toc: true
 author_profile: false
 sidebar:

@@ -1,7 +1,7 @@
 ---
 layout: single
 title: "딥러닝 모델 설계: 노드와 레이어 배치의 중요성"
-categories: "Deep Learning"
+categories: "Deep_Learning"
 tag: "node-layer-design"
 toc: true
 author_profile: false

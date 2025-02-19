@@ -1,8 +1,8 @@
 ---
 layout: single
 title:  "NLP에서 데이터 증강 (Data Augmentation)의 역할과 기법"
-categories: "Natural Language Processing"
-tag: "data-augmentation-nlp"
+categories: "Natural_Language_Processing"
+tag: "data_augmentation_nlp"
 toc: true
 author_profile: false
 sidebar:
