@@ -1,8 +1,8 @@
 ---
 layout: single
 title:  "토큰화 이후: 임베딩과 표현 학습"
-categories: "Natural Language Processing"
-tag: "embedding-representation"
+categories: "Natural_Language_Processing"
+tag: "code"
 toc: true
 author_profile: false
 sidebar:

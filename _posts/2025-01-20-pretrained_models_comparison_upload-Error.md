@@ -1,8 +1,8 @@
 ---
 layout: single
 title:  "NLP에서 사전 학습된 언어 모델 (Pretrained Language Models)의 활용"
-categories: "Natural Language Processing"
-tag: "pretrained-language-models"
+categories: "Natural_Language_Processing"
+tag: "code"
 toc: true
 author_profile: false
 sidebar:

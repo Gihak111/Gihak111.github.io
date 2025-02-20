@@ -1,8 +1,8 @@
 ---
 layout: single
 title:  "서브워드 토큰화: 자연어 처리의 기초 기술"
-categories: "Natural Language Processing"
-tag: "subword-tokenization"
+categories: "Natural_Language_Processing"
+tag: "code"
 toc: true
 author_profile: false
 sidebar:

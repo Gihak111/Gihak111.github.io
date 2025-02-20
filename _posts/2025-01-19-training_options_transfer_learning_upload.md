@@ -1,8 +1,8 @@
 ---
 layout: single
 title:  "NLP에서 전이 학습 (Transfer Learning) 활용하기"
-categories: "Natural Language Processing"
-tag: "transfer-learning-nlp"
+categories: "Natural_Language_Processing"
+tag: "code"
 toc: true
 author_profile: false
 sidebar:
