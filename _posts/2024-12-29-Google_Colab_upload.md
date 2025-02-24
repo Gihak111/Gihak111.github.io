@@ -2,7 +2,7 @@
 layout: single
 title:  "구글 코랩: 클라우드 기반의 무료 머신러닝 플랫폼"
 categories: "Tech Tools"
-tag: "google-colab"
+tag: "Google"
 toc: true
 author_profile: false
 sidebar:
