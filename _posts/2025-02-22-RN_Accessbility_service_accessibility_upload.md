@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "파이터치 버젼에 따른 오류"
+title:  "안드로이드 접근성 설정"
 categories: "pynb"
 tag: "ERROR"
 toc: true
