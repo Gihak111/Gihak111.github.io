@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "파이터치 버젼에 따른 오류"
+title:  "구글에 앱 올리기 1"
 categories: "Google"
 tag: "code"
 toc: true
