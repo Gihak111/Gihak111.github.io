@@ -1,7 +1,7 @@
 ---
 layout: single
 title:  "제로 트러스트 통신보안: 원리와 구현 방법"
-categories: "Security"
+categories: "Secure"
 tag: "network"
 toc: true
 author_profile: false

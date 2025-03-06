@@ -1,7 +1,7 @@
 ---
 layout: single
 title:  "제로 트러스트: 사용자 딜레이 최소화 및 경험 최적화 방법"
-categories: "Security"
+categories: "Secure"
 tag: "zero trust"
 toc: true
 author_profile: false
