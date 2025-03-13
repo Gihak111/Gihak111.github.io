@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "딥시크 DeepGEMM-main에 대해 알아보기기"
+title:  "딥시크 DeepGEMM-main에 대해 알아보기"
 categories: "AI"
 tag: "code"
 toc: true

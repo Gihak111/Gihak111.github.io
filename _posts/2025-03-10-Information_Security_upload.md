@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "정보보안 글 목록록"
+title:  "정보보안 글 목록"
 categories: "Google"
 tag: "code"
 toc: true

@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "딥시크 DeepEP-main 알아보기기"
+title:  "딥시크 DeepEP-main 알아보기"
 categories: "AI"
 tag: "code"
 toc: true
