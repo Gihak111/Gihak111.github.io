@@ -2,7 +2,7 @@
 layout: single
 title:  "개인 사업자 내는 법"
 categories: "Google"
-tag: "Vlog"
+tag: "hello"
 toc: true
 author_profile: false
 sidebar:

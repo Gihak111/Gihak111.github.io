@@ -1,7 +1,7 @@
 ---
 layout: single
 title:  "jekyll 블로그와 깃허브 repository 연동"
-categories: "jekyll"
+categories: "Vlog"
 tag: "code"
 toc: true
 author_profile: false

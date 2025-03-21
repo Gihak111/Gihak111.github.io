@@ -2,7 +2,7 @@
 layout: single
 title:  " Expo 실행시 오류 설치"
 categories: "pynb"
-tag: "ERRORe"
+tag: "ERRORE"
 toc: true
 author_profile: false
 sidebar:
