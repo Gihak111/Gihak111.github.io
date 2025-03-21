@@ -1,7 +1,7 @@
 ---
 layout: single
 title:  "모델 경량화 및 배포: 딥러닝의 실용화"
-categories: "Deep Learning"
+categories: "Deep_Learning"
 tag: "model-optimization-deployment"
 toc: true
 author_profile: false

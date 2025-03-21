@@ -1,7 +1,7 @@
 ---
 layout: single
 title:  "정규화 기법: 딥러닝 모델의 일반화 성능을 높이는 핵심"
-categories: "Deep Learning"
+categories: "Deep_Learning"
 tag: "regularization"
 toc: true
 author_profile: false

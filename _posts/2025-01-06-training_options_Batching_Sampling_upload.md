@@ -1,7 +1,7 @@
 ---
 layout: single
 title:  "배치 처리 및 샘플링: 효율적인 학습 전략"
-categories: "Deep Learning"
+categories: "Deep_Learning"
 tag: "batching-sampling"
 toc: true
 author_profile: false

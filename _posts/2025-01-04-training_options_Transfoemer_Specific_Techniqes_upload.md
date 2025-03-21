@@ -1,7 +1,7 @@
 ---
 layout: single
 title:  "트랜스포머 기반 기술: 딥러닝의 혁신을 이끄는 핵심 기술"
-categories: "Deep Learning"
+categories: "Deep_Learning"
 tag: "transformer-techniques"
 toc: true
 author_profile: false

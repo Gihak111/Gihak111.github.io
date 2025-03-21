@@ -1,7 +1,7 @@
 ---
 layout: single
 title:  "허깅 페이스에 앱 올리기"
-categories: "Ai"
+categories: "AI"
 tag: "code"
 toc: true
 author_profile: false

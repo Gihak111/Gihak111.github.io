@@ -1,7 +1,7 @@
 ---
 layout: single
 title:  "F1스코어와 평가지표"
-categories: "Deep Learning"
+categories: "Deep_Learning"
 tag: "model-optimization-deployment"
 toc: true
 author_profile: false
