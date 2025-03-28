@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "딥러닝 데이터셋 얻는 법법"
+title:  "딥러닝 데이터셋 얻는 법"
 categories: "AI"
 tag: "code"
 toc: true
