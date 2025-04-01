@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "딥러닝 시 성능과 시간, 자원의 저울질 + 기법 정리
+title:  "딥러닝 시 성능과 시간, 자원의 저울질 + 기법 정리"
 categories: "AI"
 tag: "code"
 toc: true
