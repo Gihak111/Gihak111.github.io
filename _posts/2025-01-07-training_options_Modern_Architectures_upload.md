@@ -2,7 +2,7 @@
 layout: single
 title:  "최신 아키텍처 및 기술: 딥러닝의 혁신"
 categories: "Deep_Learning"
-tag: "modern-architectures-techniques"
+tag: "code"
 toc: true
 author_profile: false
 sidebar:

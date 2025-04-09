@@ -2,7 +2,7 @@
 layout: single
 title:  "학습률 조정: 모델 학습 효율을 높이는 핵심 전략"
 categories: "Deep_Learning"
-tag: "learning-rate"
+tag: "code"
 toc: true
 author_profile: false
 sidebar:

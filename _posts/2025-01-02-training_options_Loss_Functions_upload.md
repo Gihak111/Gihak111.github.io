@@ -2,7 +2,7 @@
 layout: single
 title:  "손실 함수: 모델 성능을 좌우하는 핵심 요소"
 categories: "Deep_Learning"
-tag: "loss-functions"
+tag: "code"
 toc: true
 author_profile: false
 sidebar:

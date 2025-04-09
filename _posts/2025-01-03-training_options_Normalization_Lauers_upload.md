@@ -2,7 +2,7 @@
 layout: single
 title:  "정규화 레이어: 딥러닝 모델의 안정적인 학습을 위한 핵심 기술"
 categories: "Deep_Learning"
-tag: "normalization-layers"
+tag: "code"
 toc: true
 author_profile: false
 sidebar:

@@ -2,7 +2,7 @@
 layout: single
 title:  "F1스코어와 평가지표"
 categories: "Deep_Learning"
-tag: "model-optimization-deployment"
+tag: "code"
 toc: true
 author_profile: false
 sidebar:

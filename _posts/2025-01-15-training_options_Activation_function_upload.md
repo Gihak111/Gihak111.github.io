@@ -2,7 +2,7 @@
 layout: single
 title:  "활성화 함수와 다른 이것저것"
 categories: "Deep_Learning"
-tag: "model-optimization-deployment"
+tag: "code"
 toc: true
 author_profile: false
 sidebar:

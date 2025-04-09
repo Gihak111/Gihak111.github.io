@@ -2,7 +2,7 @@
 layout: single
 title:  "최적화 알고리즘: 딥러닝 성능을 극대화하는 핵심 기술"
 categories: "Deep_Learning"
-tag: "optimization"
+tag: "code"
 toc: true
 author_profile: false
 sidebar:
