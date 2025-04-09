@@ -2,7 +2,7 @@
 layout: single
 title:  "Expo 프로젝트 백그라운드에서 실행하기"
 categories: "Expo"
-tag: "code, Expo"
+tag: "code"
 toc: true
 author_profile: false
 sidebar:

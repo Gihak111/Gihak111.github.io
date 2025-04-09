@@ -2,7 +2,7 @@
 layout: single
 title:  "Expo 프로젝트 백앤드 재대로 구현하기"
 categories: "Expo"
-tag: "code, Expo"
+tag: "code"
 toc: true
 author_profile: false
 sidebar:

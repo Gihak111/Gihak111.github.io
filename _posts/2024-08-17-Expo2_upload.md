@@ -2,7 +2,7 @@
 layout: single
 title:  "Expo 버전 오류 해결"
 categories: "Expo"
-tag: "code, Expo"
+tag: "code"
 toc: true
 author_profile: false
 sidebar:

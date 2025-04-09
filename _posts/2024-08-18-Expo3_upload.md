@@ -2,7 +2,7 @@
 layout: single
 title:  "Expo 프로젝트 생성 밑 APK 생성"
 categories: "Expo"
-tag: "code, Expo"
+tag: "code"
 toc: true
 author_profile: false
 sidebar:
