@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "게임 정리리"
+title:  "게임 정리"
 categories: "Game"
 tag: "code"
 toc: true
