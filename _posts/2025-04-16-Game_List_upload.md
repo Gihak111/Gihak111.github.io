@@ -14,5 +14,5 @@ sidebar:
 그래서, 나도 html로 깃허브 블로그에서 작동하는 게임들을 하나 둘 만들어서 올려볼까 한다.  
 
 1. 지뢰찾기  
-[링크](https://gihak111.github.io/MineSweeper.html)  
+[링크](https://gihak111.github.io/game/MineSweeper.html)  
 
