@@ -1,0 +1,254 @@
+<script type="text/javascript">
+    var gk_isXlsx = false;
+    var gk_xlsxFileLookup = {};
+    var gk_fileData = {};
+    function loadFileData(filename) {
+    if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+        try {
+            var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+            var firstSheetName = workbook.SheetNames[0];
+            var worksheet = workbook.Sheets[firstSheetName];
+
+            // Convert sheet to JSON to filter blank rows
+            var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+            // Filter out blank rows (rows where all cells are empty, null, or undefined)
+            var filteredData = jsonData.filter(row =>
+                row.some(cell => cell !== '' && cell !== null && cell !== undefined)
+            );
+
+            // Convert filtered JSON back to CSV
+            var csv = XLSX.utils.aoa_to_sheet(filteredData); // Create a new sheet from filtered array of arrays
+            csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+            return csv;
+        } catch (e) {
+            console.error(e);
+            return "";
+        }
+    }
+    return gk_fileData[filename] || "";
+    }
+    </script><!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>숫자야구</title>
+<style>
+    body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+    }
+    #game-container {
+        margin-top: 20px;
+        text-align: center;
+    }
+    #input-section {
+        margin: 10px 0;
+    }
+    #number-input {
+        padding: 5px;
+        font-size: 16px;
+        width: 100px;
+    }
+    #submit {
+        padding: 5px 10px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    #log {
+        margin-top: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    #restart {
+        margin-top: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    #status {
+        margin-top: 10px;
+        font-size: 18px;
+    }
+    #log-display {
+        margin-top: 10px;
+        text-align: left;
+        background-color: #fff;
+        padding: 10px;
+        border: 1px solid #ccc;
+        display: none;
+    }
+</style>
+</head>
+<body>
+<h1>숫자야구</h1>
+<div id="game-container">
+    <div id="input-section">
+        <input type="text" id="number-input" maxlength="4" placeholder="4자리 숫자">
+        <button id="submit">입력</button>
+    </div>
+    <div id="status">게임 시작!</div>
+    <button id="restart">새 게임</button>
+    <button id="log">기록 보기</button>
+    <div id="log-display"></div>
+</div>
+
+<script>
+    let com_list = [];
+    let get_list = [];
+    let round_count = 0;
+    let strike_count = 0;
+    let ball_count = 0;
+    let logging = [];
+    let gameOver = false;
+
+    const statusElement = document.getElementById('status');
+    const numberInput = document.getElementById('number-input');
+    const submitButton = document.getElementById('submit');
+    const restartButton = document.getElementById('restart');
+    const logButton = document.getElementById('log');
+    const logDisplay = document.getElementById('log-display');
+
+    // Generate random 4-digit number with unique digits
+    function generateComNumber() {
+        com_list = [];
+        while (com_list.length < 4) {
+            const digit = Math.floor(Math.random() * 10);
+            if (!com_list.includes(digit)) {
+                com_list.push(digit);
+            }
+        }
+    }
+
+    // Get user input and validate
+    function getNumber() {
+        const input = numberInput.value.trim();
+        if (!/^\d{4}$/.test(input)) {
+            statusElement.textContent = "4자리 숫자를 입력하세요!";
+            return null;
+        }
+        get_list = input.split('').map(Number);
+        if (new Set(get_list).size !== 4) {
+            statusElement.textContent = "중복되지 않은 4자리 숫자를 입력하세요!";
+            return null;
+        }
+        return get_list;
+    }
+
+    // Compare computer and user numbers
+    function compare() {
+        strike_count = 0;
+        ball_count = 0;
+        for (let i = 0; i < 4; i++) {
+            if (com_list[i] === get_list[i]) {
+                strike_count++;
+            } else if (com_list.includes(get_list[i])) {
+                ball_count++;
+            }
+        }
+    }
+
+    // Log the current guess
+    function getLog() {
+        const guess = get_list.join('');
+        logging.push({
+            guess: guess,
+            strike: strike_count,
+            ball: ball_count,
+            round: round_count
+        });
+    }
+
+    // Display result
+    function printResult() {
+        statusElement.textContent = `Strike: ${strike_count}, Ball: ${ball_count}`;
+    }
+
+    // Clear counts
+    function clearCounts() {
+        strike_count = 0;
+        ball_count = 0;
+    }
+
+    // Handle win condition
+    function win() {
+        statusElement.textContent = "축하합니다! 당신이 이겼습니다!";
+        gameOver = true;
+        numberInput.disabled = true;
+        submitButton.disabled = true;
+    }
+
+    // Handle lose condition
+    function lose() {
+        statusElement.textContent = `게임 오버! 정답은 ${com_list.join('')}였습니다.`;
+        gameOver = true;
+        numberInput.disabled = true;
+        submitButton.disabled = true;
+    }
+
+    // Start or restart game
+    function startGame() {
+        generateComNumber();
+        round_count = 0;
+        logging = [];
+        gameOver = false;
+        strike_count = 0;
+        ball_count = 0;
+        statusElement.textContent = "게임 시작! 4자리 숫자를 입력하세요.";
+        numberInput.value = '';
+        numberInput.disabled = false;
+        submitButton.disabled = false;
+        logDisplay.style.display = 'none';
+        numberInput.focus();
+    }
+
+    // Handle submit button click
+    submitButton.addEventListener('click', () => {
+        if (gameOver) return;
+        const userNumber = getNumber();
+        if (!userNumber) return;
+        round_count++;
+        compare();
+        getLog();
+        printResult();
+        if (strike_count === 4) {
+            win();
+        } else if (round_count >= 20) {
+            lose();
+        }
+        clearCounts();
+        numberInput.value = '';
+        numberInput.focus();
+    });
+
+    // Handle enter key press
+    numberInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            submitButton.click();
+        }
+    });
+
+    // Handle restart button
+    restartButton.addEventListener('click', startGame);
+
+    // Handle log button
+    logButton.addEventListener('click', () => {
+        if (logging.length === 0) {
+            logDisplay.textContent = "기록이 없습니다.";
+        } else {
+            logDisplay.innerHTML = logging.map(log => 
+                `라운드 ${log.round}: ${log.guess} - ${log.strike}S ${log.ball}B`
+            ).join('<br>');
+        }
+        logDisplay.style.display = 'block';
+    });
+
+    // Initialize game
+    startGame();
+</script>
+</body>
+</html>

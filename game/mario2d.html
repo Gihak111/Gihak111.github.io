@@ -1,0 +1,502 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row =>
+                    row.some(cell => cell !== '' && cell !== null && cell !== undefined)
+                );
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                var filteredData = jsonData.filter(row =>
+                    row.some(cell => cell !== '' && cell !== null && cell !== undefined)
+                );
+                var csv = XLSX.utils.aoa_to_sheet(filteredData);
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Mario Platformer</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        #game-container {
+            text-align: center;
+        }
+        canvas {
+            border: 2px solid #333;
+            background-color: #87CEEB;
+        }
+        #status {
+            font-size: 24px;
+            margin: 10px 0;
+            color: #333;
+        }
+        #restart {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #restart:hover {
+            background-color: #555;
+        }
+        #instructions {
+            font-size: 16px;
+            color: #555;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>2D Mario Platformer</h1>
+    <div id="game-container">
+        <div id="status">Score: 0</div>
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        <div id="instructions">A/D or Left/Right to move, Space to jump (Double Jump Enabled!)</div>
+        <button id="restart">Restart Game</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const statusElement = document.getElementById('status');
+        const restartButton = document.getElementById('restart');
+
+        const WORLD_HEIGHT = 400;
+
+        const player = {
+            x: 50,
+            y: 300,
+            width: 30,
+            height: 40,
+            vx: 0,
+            vy: 0,
+            speed: 5,
+            jumpPower: -10,
+            jumpCount: 0,
+            maxJumps: 2,
+            jumpPressed: false
+        };
+
+        let cameraX = 0;
+        let score = 0;
+        let gameActive = true;
+        const GRAVITY = 0.5;
+
+        const platforms = [];
+        const coins = [];
+        const spikes = [];
+        const staticEnemies = [];
+        const movingEnemies = [];
+        const fallingObjects = [];
+        const boxes = [];
+        const goal = { x: 39950, y: 300, width: 10, height: 50 };
+
+        let maxGeneratedX = 0;
+        let lastPlatformY = 350;
+        let nextPlatformX = 100;
+        let nextCoinX = 10;
+        let nextEnemyX = 100;
+        const occupiedPositions = [{ x: 50, y: 300 }];
+
+        // Initial world generation
+        function generateWorld(startX, endX) {
+            // Ground
+            if (startX === 0) {
+                platforms.push({ x: 0, y: 350, width: endX, height: 50 });
+            }
+
+            // Platforms
+            while (nextPlatformX < endX) {
+                const x = nextPlatformX;
+                const y = Math.max(100, Math.min(300, lastPlatformY + (Math.random() * 160 - 80)));
+                const width = Math.random() * 150 + 50;
+                platforms.push({ x, y, width, height: 20 });
+                nextPlatformX += Math.random() * 100 + 50;
+                lastPlatformY = y;
+
+                // Boxes on platforms (30% chance)
+                if (Math.random() < 0.3) {
+                    const boxX = x + Math.random() * (width - 30);
+                    const boxY = y - 30;
+                    boxes.push({ x: boxX, y: boxY, width: 30, height: 30, broken: false });
+                    occupiedPositions.push({ x: boxX + 15, y: boxY + 15 });
+                }
+            }
+
+            // Coins
+            while (nextCoinX < endX) {
+                const x = nextCoinX;
+                const y = Math.random() * 200 + 50;
+                coins.push({ x, y, radius: 10, collected: false });
+                nextCoinX += Math.random() * 200 + 400;
+            }
+
+            // Spikes
+            for (let i = 0; i < 30; i++) {
+                const onPlatform = Math.random() > 0.7;
+                let x, y;
+                let attempts = 0;
+                do {
+                    if (onPlatform) {
+                        const platform = platforms[Math.floor(Math.random() * (platforms.length - 1)) + 1];
+                        if (platform.x + platform.width < startX || platform.x > endX) continue;
+                        x = platform.x + Math.random() * (platform.width - 70) + 25;
+                        y = platform.y - 20;
+                    } else {
+                        x = startX + Math.random() * (endX - startX - 20) + 10;
+                        y = 330;
+                    }
+                    attempts++;
+                } while (occupiedPositions.some(pos => Math.abs(pos.x - x) < 100 && Math.abs(pos.y - y) < 50) && attempts < 10);
+                if (attempts < 10) {
+                    spikes.push({ x, y, width: 20, height: 20 });
+                    occupiedPositions.push({ x, y });
+                }
+            }
+
+            // Static Enemies
+            for (let i = 0; i < 15; i++) {
+                const platform = platforms[Math.floor(Math.random() * (platforms.length - 1)) + 1];
+                if (platform.x + platform.width < startX || platform.x > endX) continue;
+                let x = platform.x + Math.random() * (platform.width - 70) + 25;
+                let y = platform.y - 20;
+                let attempts = 0;
+                while (occupiedPositions.some(pos => Math.abs(pos.x - x) < 100 && Math.abs(pos.y - y) < 50) && attempts < 10) {
+                    x = platform.x + Math.random() * (platform.width - 70) + 25;
+                    attempts++;
+                }
+                if (attempts < 10) {
+                    staticEnemies.push({ x, y, width: 20, height: 20 });
+                    occupiedPositions.push({ x, y });
+                }
+            }
+
+            // Moving Enemies
+            while (nextEnemyX < endX) {
+                let x = nextEnemyX;
+                const y = 330;
+                const range = 50;
+                let attempts = 0;
+                while (occupiedPositions.some(pos => Math.abs(pos.x - x) < 100 && Math.abs(pos.y - y) < 50) && attempts < 10) {
+                    x = nextEnemyX + Math.random() * 100;
+                    attempts++;
+                }
+                if (attempts < 10) {
+                    movingEnemies.push({ x, y, width: 20, height: 20, startX: x, range, direction: 1, speed: 2 });
+                    occupiedPositions.push({ x, y });
+                }
+                nextEnemyX += Math.random() * 400 + 600;
+            }
+
+            maxGeneratedX = Math.max(maxGeneratedX, endX);
+        }
+
+        // Initial generation
+        generateWorld(0, 4000);
+
+        // Input handling
+        const keys = { left: false, right: false, space: false };
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') keys.left = true;
+            if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') keys.right = true;
+            if (e.key === ' ' && !player.jumpPressed) {
+                keys.space = true;
+                player.jumpPressed = true;
+            }
+        });
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') keys.left = false;
+            if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') keys.right = false;
+            if (e.key === ' ') {
+                keys.space = false;
+                player.jumpPressed = false;
+            }
+        });
+
+        // Update camera
+        function updateCamera() {
+            cameraX = player.x - canvas.width / 2;
+            cameraX = Math.max(0, cameraX);
+        }
+
+        // Procedural generation trigger
+        function updateWorld() {
+            if (player.x > maxGeneratedX - 2000) {
+                generateWorld(maxGeneratedX, maxGeneratedX + 4000);
+            }
+            // Clean up objects behind the player
+            const cleanupX = cameraX - 1000;
+            platforms.forEach((obj, i) => { if (obj.x + obj.width < cleanupX) platforms.splice(i, 1); });
+            coins.forEach((obj, i) => { if (obj.x < cleanupX) coins.splice(i, 1); });
+            spikes.forEach((obj, i) => { if (obj.x + obj.width < cleanupX) spikes.splice(i, 1); });
+            staticEnemies.forEach((obj, i) => { if (obj.x + obj.width < cleanupX) staticEnemies.splice(i, 1); });
+            movingEnemies.forEach((obj, i) => { if (obj.x + obj.width < cleanupX) movingEnemies.splice(i, 1); });
+            boxes.forEach((obj, i) => { if (obj.x + obj.width < cleanupX) boxes.splice(i, 1); });
+            occupiedPositions.filter(pos => pos.x >= cleanupX);
+        }
+
+        // Update falling objects
+        function updateFallingObjects() {
+            // Spawn new falling object (1% chance per frame)
+            if (Math.random() < 0.01) {
+                const x = player.x + Math.random() * 400 - 200;
+                const y = -20;
+                fallingObjects.push({ x, y, width: 20, height: 20, vy: 3 });
+            }
+            // Update positions
+            fallingObjects.forEach((obj, i) => {
+                obj.y += obj.vy;
+                if (obj.y > canvas.height) {
+                    fallingObjects.splice(i, 1);
+                }
+                // Player collision
+                if (
+                    player.x + player.width > obj.x &&
+                    player.x < obj.x + obj.width &&
+                    player.y + player.height > obj.y &&
+                    player.y < obj.y + obj.height
+                ) {
+                    gameActive = false;
+                    statusElement.textContent = `Game Over! Score: ${score}`;
+                }
+            });
+        }
+
+        // Update player
+        function updatePlayer() {
+            if (!gameActive) return;
+            player.vy += GRAVITY;
+            player.y += player.vy;
+            player.x += player.vx;
+            player.vx = 0;
+            if (keys.left) player.vx = -player.speed;
+            if (keys.right) player.vx = player.speed;
+            if (keys.space && player.jumpCount < player.maxJumps) {
+                player.vy = player.jumpPower;
+                player.jumpCount++;
+                keys.space = false;
+            }
+            let onPlatform = false;
+            platforms.forEach(platform => {
+                if (
+                    player.x + player.width > platform.x &&
+                    player.x < platform.x + platform.width &&
+                    player.y + player.height > platform.y &&
+                    player.y + player.height <= platform.y + platform.height &&
+                    player.vy >= 0
+                ) {
+                    player.y = platform.y - player.height;
+                    player.vy = 0;
+                    player.jumpCount = 0;
+                    onPlatform = true;
+                }
+            });
+            // Box collisions (break from below)
+            boxes.forEach((box, i) => {
+                if (
+                    !box.broken &&
+                    player.x + player.width > box.x &&
+                    player.x < box.x + box.width &&
+                    player.y + player.height > box.y &&
+                    player.y + player.height <= box.y + box.height &&
+                    player.vy < 0 // Moving upward
+                ) {
+                    box.broken = true;
+                    coins.push({ x: box.x + 15, y: box.y - 10, radius: 10, collected: false });
+                }
+            });
+            if (player.x < 0) player.x = 0;
+            if (player.y > canvas.height) {
+                gameActive = false;
+                statusElement.textContent = `Game Over! Score: ${score}`;
+            }
+            coins.forEach(coin => {
+                if (!coin.collected && Math.hypot(player.x + player.width / 2 - coin.x, player.y + player.height / 2 - coin.y) < player.width / 2 + coin.radius) {
+                    coin.collected = true;
+                    score += 10;
+                    statusElement.textContent = `Score: ${score}`;
+                }
+            });
+            spikes.forEach(spike => {
+                if (
+                    player.x + player.width > spike.x &&
+                    player.x < spike.x + spike.width &&
+                    player.y + player.height > spike.y &&
+                    player.y < spike.y + spike.height
+                ) {
+                    gameActive = false;
+                    statusElement.textContent = `Game Over! Score: ${score}`;
+                }
+            });
+            staticEnemies.forEach(enemy => {
+                if (
+                    player.x + player.width > enemy.x &&
+                    player.x < enemy.x + enemy.width &&
+                    player.y + player.height > enemy.y &&
+                    player.y < enemy.y + enemy.height
+                ) {
+                    gameActive = false;
+                    statusElement.textContent = `Game Over! Score: ${score}`;
+                }
+            });
+            movingEnemies.forEach(enemy => {
+                enemy.x += enemy.speed * enemy.direction;
+                if (enemy.x < enemy.startX - enemy.range || enemy.x > enemy.startX + enemy.range) {
+                    enemy.direction *= -1;
+                }
+                if (
+                    player.x + player.width > enemy.x &&
+                    player.x < enemy.x + enemy.width &&
+                    player.y + player.height > enemy.y &&
+                    player.y < enemy.y + enemy.height
+                ) {
+                    gameActive = false;
+                    statusElement.textContent = `Game Over! Score: ${score}`;
+                }
+            });
+            if (
+                player.x + player.width > goal.x &&
+                player.x < goal.x + goal.width &&
+                player.y + player.height > goal.y &&
+                player.y < goal.y + goal.height
+            ) {
+                gameActive = false;
+                statusElement.textContent = `You Win! Score: ${score}`;
+            }
+        }
+
+        // Draw game objects
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.translate(-cameraX, 0);
+            ctx.fillStyle = '#8B4513';
+            platforms.forEach(platform => {
+                ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+            });
+            ctx.fillStyle = '#FFD700';
+            coins.forEach(coin => {
+                if (!coin.collected) {
+                    ctx.beginPath();
+                    ctx.arc(coin.x, coin.y, coin.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+            ctx.fillStyle = '#FF0000';
+            spikes.forEach(spike => {
+                ctx.beginPath();
+                ctx.moveTo(spike.x, spike.y + spike.height);
+                ctx.lineTo(spike.x + spike.width / 2, spike.y);
+                ctx.lineTo(spike.x + spike.width, spike.y + spike.height);
+                ctx.closePath();
+                ctx.fill();
+            });
+            ctx.fillStyle = '#FF5555';
+            staticEnemies.forEach(enemy => {
+                ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+            });
+            ctx.fillStyle = '#800080';
+            movingEnemies.forEach(enemy => {
+                ctx.beginPath();
+                ctx.moveTo(enemy.x, enemy.y + enemy.height);
+                ctx.lineTo(enemy.x + enemy.width / 2, enemy.y);
+                ctx.lineTo(enemy.x + enemy.width, enemy.y + enemy.height);
+                ctx.closePath();
+                ctx.fill();
+            });
+            // Draw falling objects
+            ctx.fillStyle = '#FF4500';
+            fallingObjects.forEach(obj => {
+                ctx.beginPath();
+                ctx.arc(obj.x + obj.width / 2, obj.y + obj.height / 2, obj.width / 2, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            // Draw boxes
+            ctx.fillStyle = '#FFA500';
+            boxes.forEach(box => {
+                if (!box.broken) {
+                    ctx.fillRect(box.x, box.y, box.width, box.height);
+                }
+            });
+            ctx.fillStyle = '#00FF00';
+            ctx.fillRect(goal.x, goal.y, goal.width, goal.height);
+            ctx.fillStyle = '#0000FF';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            ctx.restore();
+        }
+
+        // Game loop
+        function gameLoop() {
+            updatePlayer();
+            updateCamera();
+            updateWorld();
+            updateFallingObjects();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Restart game by reloading page
+        restartButton.addEventListener('click', () => location.reload());
+
+        // Start game loop
+        gameLoop();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93115ea7f9b6bcba',t:'MTc0NDc4MjI1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
+</html>

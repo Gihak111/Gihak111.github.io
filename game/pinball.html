@@ -1,0 +1,329 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row =>
+                    row.some(cell => cell !== '' && cell !== null && cell !== undefined)
+                );
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinball</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        #game-container {
+            text-align: center;
+        }
+        canvas {
+            border: 2px solid #333;
+            background-color: #1a1a1a;
+        }
+        #status {
+            font-size: 24px;
+            margin: 10px 0;
+            color: #333;
+        }
+        #restart {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #restart:hover {
+            background-color: #555;
+        }
+        #instructions {
+            font-size: 16px;
+            color: #555;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pinball</h1>
+    <div id="game-container">
+        <div id="status">Score: 0</div>
+        <canvas id="gameCanvas" width="400" height="600"></canvas>
+        <div id="instructions">Use Left/Right Arrow Keys to control the paddle</div>
+        <button id="restart">Restart Game</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const statusElement = document.getElementById('status');
+        const restartButton = document.getElementById('restart');
+
+        // Game objects
+        const ball = {
+            x: 200,
+            y: 100,
+            radius: 10,
+            vx: 2,
+            vy: 4,
+            speed: 5
+        };
+
+        const paddle = {
+            x: 150,
+            y: 550,
+            width: 100,
+            height: 10,
+            speed: 10,
+            movingLeft: false,
+            movingRight: false
+        };
+
+        const bumpers = [
+            { x: 100, y: 200, radius: 20 },
+            { x: 300, y: 200, radius: 20 },
+            { x: 200, y: 300, radius: 20 }
+        ];
+
+        const walls = [
+            { x: 0, y: 0, width: 10, height: 600 }, // Left wall
+            { x: 390, y: 0, width: 10, height: 600 }, // Right wall
+            { x: 0, y: 0, width: 400, height: 10 } // Top wall
+        ];
+
+        let score = 0;
+        let gameActive = true;
+        let lastSpeedIncrease = Date.now();
+        const SPEED_INCREASE_INTERVAL = 10000; // 10 seconds
+        const SPEED_INCREMENT = 0.5;
+        const MAX_SPEED = 10;
+
+        // Handle keyboard input
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') paddle.movingLeft = true;
+            if (e.key === 'ArrowRight') paddle.movingRight = true;
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft') paddle.movingLeft = false;
+            if (e.key === 'ArrowRight') paddle.movingRight = false;
+        });
+
+        // Update paddle position
+        function updatePaddle() {
+            if (paddle.movingLeft && paddle.x > 10) {
+                paddle.x -= paddle.speed;
+            }
+            if (paddle.movingRight && paddle.x < canvas.width - paddle.width - 10) {
+                paddle.x += paddle.speed;
+            }
+        }
+
+        // Update ball position and handle collisions
+        function updateBall() {
+            if (!gameActive) return;
+
+            // Increase speed periodically
+            if (Date.now() - lastSpeedIncrease > SPEED_INCREASE_INTERVAL && ball.speed < MAX_SPEED) {
+                ball.speed = Math.min(ball.speed + SPEED_INCREMENT, MAX_SPEED);
+                // Normalize velocity to new speed
+                const currentSpeed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
+                if (currentSpeed > 0) {
+                    ball.vx = (ball.vx / currentSpeed) * ball.speed;
+                    ball.vy = (ball.vy / currentSpeed) * ball.speed;
+                }
+                lastSpeedIncrease = Date.now();
+            }
+
+            ball.x += ball.vx;
+            ball.y += ball.vy;
+
+            // Wall collisions
+            walls.forEach(wall => {
+                if (collisionRectCircle(wall, ball)) {
+                    resolveCollisionRect(ball, wall);
+                }
+            });
+
+            // Paddle collision
+            if (collisionRectCircle(paddle, ball)) {
+                resolveCollisionPaddle(ball, paddle);
+            }
+
+            // Bumper collisions
+            bumpers.forEach(bumper => {
+                if (collisionCircleCircle(ball, bumper)) {
+                    resolveCollisionCircle(ball, bumper);
+                    score += 10;
+                    statusElement.textContent = `Score: ${score}`;
+                }
+            });
+
+            // Game over if ball falls off bottom
+            if (ball.y > canvas.height) {
+                gameActive = false;
+                statusElement.textContent = `Game Over! Final Score: ${score}`;
+            }
+        }
+
+        // Rectangle-circle collision detection
+        function collisionRectCircle(rect, circle) {
+            const closestX = Math.max(rect.x, Math.min(circle.x, rect.x + rect.width));
+            const closestY = Math.max(rect.y, Math.min(circle.y, rect.y + rect.height));
+            const distanceX = circle.x - closestX;
+            const distanceY = circle.y - closestY;
+            return (distanceX ** 2 + distanceY ** 2) < (circle.radius ** 2);
+        }
+
+        // Circle-circle collision detection
+        function collisionCircleCircle(circle1, circle2) {
+            const dx = circle1.x - circle2.x;
+            const dy = circle1.y - circle2.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            return distance < (circle1.radius + circle2.radius);
+        }
+
+        // Resolve rectangle collision (walls, paddle)
+        function resolveCollisionRect(circle, rect) {
+            const closestX = Math.max(rect.x, Math.min(circle.x, rect.x + rect.width));
+            const closestY = Math.max(rect.y, Math.min(circle.y, rect.y + rect.height));
+            const dx = circle.x - closestX;
+            const dy = circle.y - closestY;
+
+            if (Math.abs(dx) > Math.abs(dy)) {
+                circle.vx = -circle.vx;
+            } else {
+                circle.vy = -circle.vy;
+            }
+        }
+
+        // Resolve paddle collision (deflect based on hit position)
+        function resolveCollisionPaddle(circle, paddle) {
+            const hitPos = (circle.x - paddle.x) / paddle.width; // 0 to 1
+            const angle = (hitPos - 0.5) * Math.PI; // -π/2 to π/2
+            circle.vx = ball.speed * Math.sin(angle);
+            circle.vy = -ball.speed * Math.cos(angle);
+        }
+
+        // Resolve circle collision (bumpers)
+        function resolveCollisionCircle(circle1, circle2) {
+            const dx = circle1.x - circle2.x;
+            const dy = circle1.y - circle2.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance === 0) return; // Prevent division by zero
+
+            const nx = dx / distance;
+            const ny = dy / distance;
+            const dot = circle1.vx * nx + circle1.vy * ny;
+
+            // Reflect velocity
+            circle1.vx -= 2 * dot * nx;
+            circle1.vy -= 2 * dot * ny;
+
+            // Normalize velocity to maintain consistent speed
+            const currentSpeed = Math.sqrt(circle1.vx * circle1.vx + circle1.vy * circle1.vy);
+            if (currentSpeed > 0) {
+                circle1.vx = (circle1.vx / currentSpeed) * ball.speed;
+                circle1.vy = (circle1.vy / currentSpeed) * ball.speed;
+            }
+
+            // Move ball out of collision to prevent sticking
+            const overlap = (circle1.radius + circle2.radius) - distance;
+            if (overlap > 0) {
+                circle1.x += nx * overlap;
+                circle1.y += ny * overlap;
+            }
+        }
+
+        // Draw game objects
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw walls
+            ctx.fillStyle = '#666';
+            walls.forEach(wall => {
+                ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
+            });
+
+            // Draw paddle
+            ctx.fillStyle = '#ff4444';
+            ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+
+            // Draw bumpers
+            ctx.fillStyle = '#44ff44';
+            bumpers.forEach(bumper => {
+                ctx.beginPath();
+                ctx.arc(bumper.x, bumper.y, bumper.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Draw ball
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Game loop
+        function gameLoop() {
+            updatePaddle();
+            updateBall();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Restart game
+        function restartGame() {
+            ball.x = 200;
+            ball.y = 100;
+            ball.vx = 2;
+            ball.vy = 4;
+            ball.speed = 5;
+            paddle.x = 150;
+            score = 0;
+            gameActive = true;
+            lastSpeedIncrease = Date.now();
+            statusElement.textContent = `Score: ${score}`;
+        }
+
+        // Event listener for restart
+        restartButton.addEventListener('click', restartGame);
+
+        // Start game loop
+        gameLoop();
+    </script>
+</body>
+</html>

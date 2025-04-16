@@ -1,0 +1,224 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row =>
+                    row.some(cell => cell !== '' && cell !== null && cell !== undefined)
+                );
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오목</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        #game-container {
+            text-align: center;
+        }
+        #board {
+            display: grid;
+            grid-template-columns: repeat(15, 30px);
+            grid-gap: 1px;
+            background-color: #8b4513;
+            padding: 5px;
+            border: 2px solid #333;
+        }
+        .cell {
+            width: 30px;
+            height: 30px;
+            background-color: #deb887;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+        }
+        .cell.black::after {
+            content: '';
+            width: 24px;
+            height: 24px;
+            background-color: black;
+            border-radius: 50%;
+            position: absolute;
+        }
+        .cell.white::after {
+            content: '';
+            width: 24px;
+            height: 24px;
+            background-color: white;
+            border-radius: 50%;
+            position: absolute;
+        }
+        .cell:hover {
+            background-color: #f0d9b5;
+        }
+        #status {
+            font-size: 24px;
+            margin: 20px 0;
+            color: #333;
+        }
+        #restart {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #restart:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>오목</h1>
+    <div id="game-container">
+        <div id="status">흑돌 차례</div>
+        <div id="board"></div>
+        <button id="restart">새 게임</button>
+    </div>
+
+    <script>
+        const SIZE = 15;
+        const board = Array(SIZE).fill().map(() => Array(SIZE).fill(''));
+        const cells = [];
+        let currentPlayer = 'black';
+        let gameActive = true;
+
+        const statusElement = document.getElementById('status');
+        const boardElement = document.getElementById('board');
+        const restartButton = document.getElementById('restart');
+
+        // Initialize board
+        function initBoard() {
+            boardElement.innerHTML = '';
+            for (let i = 0; i < SIZE; i++) {
+                for (let j = 0; j < SIZE; j++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    cell.addEventListener('click', handleCellClick);
+                    boardElement.appendChild(cell);
+                    cells.push(cell);
+                }
+            }
+        }
+
+        // Handle cell click
+        function handleCellClick(event) {
+            if (!gameActive) return;
+            const row = parseInt(event.target.dataset.row);
+            const col = parseInt(event.target.dataset.col);
+            if (board[row][col] !== '') return;
+
+            board[row][col] = currentPlayer;
+            event.target.classList.add(currentPlayer);
+
+            if (checkWin(row, col)) {
+                statusElement.textContent = `${currentPlayer === 'black' ? '흑돌' : '백돌'} 승리!`;
+                gameActive = false;
+                return;
+            }
+
+            if (checkDraw()) {
+                statusElement.textContent = '무승부!';
+                gameActive = false;
+                return;
+            }
+
+            currentPlayer = currentPlayer === 'black' ? 'white' : 'black';
+            statusElement.textContent = `${currentPlayer === 'black' ? '흑돌' : '백돌'} 차례`;
+        }
+
+        // Check for win
+        function checkWin(row, col) {
+            const directions = [
+                [0, 1], [1, 0], [1, 1], [1, -1] // Horizontal, Vertical, Diagonal, Anti-diagonal
+            ];
+            const player = board[row][col];
+
+            for (const [dr, dc] of directions) {
+                let count = 1;
+                // Check in positive direction
+                for (let i = 1; i < 5; i++) {
+                    const newRow = row + dr * i;
+                    const newCol = col + dc * i;
+                    if (newRow < 0 || newRow >= SIZE || newCol < 0 || newCol >= SIZE || board[newRow][newCol] !== player) {
+                        break;
+                    }
+                    count++;
+                }
+                // Check in negative direction
+                for (let i = 1; i < 5; i++) {
+                    const newRow = row - dr * i;
+                    const newCol = col - dc * i;
+                    if (newRow < 0 || newRow >= SIZE || newCol < 0 || newCol >= SIZE || board[newRow][newCol] !== player) {
+                        break;
+                    }
+                    count++;
+                }
+                if (count >= 5) return true;
+            }
+            return false;
+        }
+
+        // Check for draw
+        function checkDraw() {
+            return board.every(row => row.every(cell => cell !== ''));
+        }
+
+        // Restart game
+        function restartGame() {
+            board.forEach(row => row.fill(''));
+            cells.forEach(cell => {
+                cell.classList.remove('black', 'white');
+            });
+            currentPlayer = 'black';
+            gameActive = true;
+            statusElement.textContent = '흑돌 차례';
+        }
+
+        // Event listeners
+        restartButton.addEventListener('click', restartGame);
+
+        // Initialize game
+        initBoard();
+    </script>
+</body>
+</html>
