@@ -1,0 +1,256 @@
+<script type="text/javascript">
+    var gk_isXlsx = false;
+    var gk_xlsxFileLookup = {};
+    var gk_fileData = {};
+    function loadFileData(filename) {
+    if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+        try {
+            var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+            var firstSheetName = workbook.SheetNames[0];
+            var worksheet = workbook.Sheets[firstSheetName];
+
+            // Convert sheet to JSON to filter blank rows
+            var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+            // Filter out blank rows (rows where all cells are empty, null, or undefined)
+            var filteredData = jsonData.filter(row =>
+                row.some(cell => cell !== '' && cell !== null && cell !== undefined)
+            );
+
+            // Convert filtered JSON back to CSV
+            var csv = XLSX.utils.aoa_to_sheet(filteredData); // Create a new sheet from filtered array of arrays
+            csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+            return csv;
+        } catch (e) {
+            console.error(e);
+            return "";
+        }
+    }
+    return gk_fileData[filename] || "";
+    }
+    </script><!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>지뢰찾기</title>
+<style>
+    body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+    }
+    #game-container {
+        margin-top: 20px;
+        text-align: center;
+    }
+    #board {
+        display: inline-block;
+        border: 2px solid #333;
+        background-color: #ccc;
+    }
+    .row {
+        display: flex;
+    }
+    .cell {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #999;
+        background-color: #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        cursor: pointer;
+        user-select: none;
+    }
+    .cell.revealed {
+        background-color: #eee;
+        cursor: default;
+    }
+    .cell.mine {
+        background-color: #ff4444;
+    }
+    .cell.flagged {
+        background-color: #ffff99;
+    }
+    #status {
+        margin-top: 10px;
+        font-size: 18px;
+    }
+    #restart {
+        margin-top: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+<h1>지뢰찾기</h1>
+<div id="game-container">
+    <div id="board"></div>
+    <div id="status">게임 시작!</div>
+    <button id="restart">새 게임</button>
+</div>
+
+<script>
+    const ROWS = 10;
+    const COLS = 10;
+    const MINES = 10;
+    let board = [];
+    let revealed = [];
+    let flags = [];
+    let gameOver = false;
+
+    const boardElement = document.getElementById('board');
+    const statusElement = document.getElementById('status');
+    const restartButton = document.getElementById('restart');
+
+    function initializeBoard() {
+        board = Array(ROWS).fill().map(() => Array(COLS).fill(0));
+        revealed = Array(ROWS).fill().map(() => Array(COLS).fill(false));
+        flags = Array(ROWS).fill().map(() => Array(COLS).fill(false));
+        gameOver = false;
+        statusElement.textContent = `지뢰: ${MINES} | 깃발: ${countFlags()}`;
+        placeMines();
+        calculateNumbers();
+        renderBoard();
+    }
+
+    function placeMines() {
+        let minesPlaced = 0;
+        while (minesPlaced < MINES) {
+            const row = Math.floor(Math.random() * ROWS);
+            const col = Math.floor(Math.random() * COLS);
+            if (board[row][col] !== -1) {
+                board[row][col] = -1;
+                minesPlaced++;
+            }
+        }
+    }
+
+    function calculateNumbers() {
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                if (board[r][c] === -1) continue;
+                board[r][c] = countAdjacentMines(r, c);
+            }
+        }
+    }
+
+    function countAdjacentMines(row, col) {
+        let count = 0;
+        for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+                const nr = row + dr;
+                const nc = col + dc;
+                if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && board[nr][nc] === -1) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    function renderBoard() {
+        boardElement.innerHTML = '';
+        for (let r = 0; r < ROWS; r++) {
+            const rowElement = document.createElement('div');
+            rowElement.className = 'row';
+            for (let c = 0; c < COLS; c++) {
+                const cellElement = document.createElement('div');
+                cellElement.className = 'cell';
+                if (revealed[r][c]) {
+                    cellElement.classList.add('revealed');
+                    if (board[r][c] === -1) {
+                        cellElement.classList.add('mine');
+                        cellElement.textContent = '💣';
+                    } else if (board[r][c] > 0) {
+                        cellElement.textContent = board[r][c];
+                    }
+                } else if (flags[r][c]) {
+                    cellElement.classList.add('flagged');
+                    cellElement.textContent = '🚩';
+                }
+                cellElement.addEventListener('click', () => handleClick(r, c));
+                cellElement.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    handleRightClick(r, c);
+                });
+                rowElement.appendChild(cellElement);
+            }
+            boardElement.appendChild(rowElement);
+        }
+    }
+
+    function handleClick(row, col) {
+        if (gameOver || revealed[row][col] || flags[row][col]) return;
+        revealed[row][col] = true;
+        if (board[row][col] === -1) {
+            gameOver = true;
+            revealAllMines();
+            statusElement.textContent = '게임 오버! 지뢰를 밟았습니다!';
+            renderBoard();
+        } else {
+            if (board[row][col] === 0) {
+                revealEmptyCells(row, col);
+            }
+            renderBoard();
+            checkWin();
+        }
+    }
+
+    function handleRightClick(row, col) {
+        if (gameOver || revealed[row][col]) return;
+        flags[row][col] = !flags[row][col];
+        statusElement.textContent = `지뢰: ${MINES} | 깃발: ${countFlags()}`;
+        renderBoard();
+        checkWin();
+    }
+
+    function countFlags() {
+        return flags.flat().filter(f => f).length;
+    }
+
+    function revealEmptyCells(row, col) {
+        for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+                const nr = row + dr;
+                const nc = col + dc;
+                if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && !revealed[nr][nc] && !flags[nr][nc]) {
+                    revealed[nr][nc] = true;
+                    if (board[nr][nc] === 0) {
+                        revealEmptyCells(nr, nc);
+                    }
+                }
+            }
+        }
+    }
+
+    function revealAllMines() {
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                if (board[r][c] === -1) {
+                    revealed[r][c] = true;
+                }
+            }
+        }
+    }
+
+    function checkWin() {
+        let nonMineCells = ROWS * COLS - MINES;
+        let revealedCount = revealed.flat().filter(r => r).length;
+        if (revealedCount === nonMineCells) {
+            gameOver = true;
+            statusElement.textContent = '축하합니다! 승리하셨습니다!';
+        }
+    }
+
+    restartButton.addEventListener('click', initializeBoard);
+
+    initializeBoard();
+</script>
+</body>
+</html>
