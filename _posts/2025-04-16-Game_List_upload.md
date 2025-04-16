@@ -16,3 +16,20 @@ sidebar:
 1. 지뢰찾기  
 [링크](https://gihak111.github.io/game/MineSweeper.html)  
 
+2. 체스
+[링크](https://gihak111.github.io/game/chess.html)  
+
+3. 유사 마리오
+[링크](https://gihak111.github.io/game/mario2d.html)  
+
+4. 숫자야구
+[링크](https://gihak111.github.io/game/number_baseboll.html)  
+
+5. 오목
+[링크](https://gihak111.github.io/game/omok.html)  
+
+6. 핀볼
+[링크](https://gihak111.github.io/game/pinball.html)  
+
+7. 틱택토
+[링크](https://gihak111.github.io/game/tictactoe.html)  
