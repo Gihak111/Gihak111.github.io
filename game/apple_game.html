@@ -1,0 +1,297 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row =>
+                    row.some(cell => cell !== '' && cell !== null && cell !== undefined)
+                );
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>사과게임</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+      font-family: Arial, sans-serif;
+    }
+    #game-container {
+      text-align: center;
+    }
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(7, 50px);
+       <div id="grid" style="display: none;"></div>
+    }
+    .cell {
+      width: 50px;
+      height: 50px;
+      background-color: #ffcccc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .cell.empty {
+      background-color: #f0f0f0;
+      color: #ccc;
+    }
+    .cell.selected {
+      background-color: #ff9999;
+    }
+    #score, #timer {
+      margin-top: 10px;
+      font-size: 20px;
+    }
+    #start-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #start-button:hover {
+      background-color: #45a049;
+    }
+    #game-over {
+      display: none;
+      margin-top: 20px;
+      font-size: 24px;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <h1>사과게임</h1>
+    <div id="grid" style="display: none;"></div>
+    <div id="score">점수: 0</div>
+    <div id="timer">남은 시간: 60</div>
+    <button id="start-button">게임 시작</button>
+    <div id="game-over"></div>
+  </div>
+  <script>
+    const gridSize = 7;
+    const grid = [];
+    let selectedCells = [];
+    let score = 0;
+    let timeLeft = 60;
+    let gameActive = false;
+    let timerInterval;
+    const gridElement = document.getElementById('grid');
+    const scoreElement = document.getElementById('score');
+    const timerElement = document.getElementById('timer');
+    const startButton = document.getElementById('start-button');
+    const gameOverElement = document.getElementById('game-over');
+
+    // 그리드 초기화
+    function initializeGrid() {
+      for (let i = 0; i < gridSize; i++) {
+        grid[i] = [];
+        for (let j = 0; j < gridSize; j++) {
+          grid[i][j] = Math.floor(Math.random() * 9) + 1;
+        }
+      }
+      renderGrid();
+    }
+
+    // 그리드 렌더링
+    function renderGrid() {
+      gridElement.innerHTML = '';
+      for (let i = 0; i < gridSize; i++) {
+        for (let j = 0; j < gridSize; j++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.dataset.row = i;
+          cell.dataset.col = j;
+          if (grid[i][j] === 0) {
+            cell.classList.add('empty');
+            cell.textContent = '';
+          } else {
+            cell.textContent = grid[i][j];
+          }
+          if (gameActive) {
+            cell.addEventListener('mousedown', startDrag);
+            cell.addEventListener('touchstart', startDrag);
+          }
+          gridElement.appendChild(cell);
+        }
+      }
+    }
+
+    // 드래그 시작
+    function startDrag(e) {
+      if (!gameActive) return;
+      e.preventDefault();
+      selectedCells = [];
+      const cell = e.target;
+      if (cell.classList.contains('empty')) return;
+      selectCell(cell);
+      document.addEventListener('mousemove', drag);
+      document.addEventListener('touchmove', drag);
+      document.addEventListener('mouseup', endDrag);
+      document.addEventListener('touchend', endDrag);
+    }
+
+    // 드래그 중
+    function drag(e) {
+      if (!gameActive) return;
+      e.preventDefault();
+      let clientX, clientY;
+      if (e.type === 'touchmove') {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+      const cell = document.elementFromPoint(clientX, clientY);
+      if (cell && cell.classList.contains('cell') && !cell.classList.contains('empty')) {
+        selectCell(cell);
+      }
+    }
+
+    // 드래그 종료
+    function endDrag() {
+      document.removeEventListener('mousemove', drag);
+      document.removeEventListener('touchmove', drag);
+      document.removeEventListener('mouseup', endDrag);
+      document.removeEventListener('touchend', endDrag);
+      checkSum();
+    }
+
+    // 셀 선택
+    function selectCell(cell) {
+      const row = parseInt(cell.dataset.row);
+      const col = parseInt(cell.dataset.col);
+      const lastCell = selectedCells[selectedCells.length - 1];
+
+      // 인접한 셀 또는 빈 공간을 건너뛴 셀 선택 가능
+      if (selectedCells.length > 0) {
+        const lastRow = lastCell.row;
+        const lastCol = lastCell.col;
+        // 같은 행 또는 같은 열에서 빈 공간을 건너뛰어 선택
+        if (row === lastRow) {
+          const startCol = Math.min(col, lastCol);
+          const endCol = Math.max(col, lastCol);
+          let valid = true;
+          for (let c = startCol + 1; c < endCol; c++) {
+            if (grid[row][c] !== 0) {
+              valid = false;
+              break;
+            }
+          }
+          if (!valid) return;
+        } else if (col === lastCol) {
+          const startRow = Math.min(row, lastRow);
+          const endRow = Math.max(row, lastRow);
+          let valid = true;
+          for (let r = startRow + 1; r < endRow; r++) {
+            if (grid[r][col] !== 0) {
+              valid = false;
+              break;
+            }
+          }
+          if (!valid) return;
+        } else {
+          return; // 대각선 또는 비인접 셀은 선택 불가
+        }
+      }
+
+      // 이미 선택된 셀은 다시 선택 불가
+      if (!selectedCells.some(c => c.row === row && c.col === col)) {
+        selectedCells.push({ row, col });
+        cell.classList.add('selected');
+      }
+    }
+
+    // 합계 확인
+    function checkSum() {
+      if (!gameActive) return;
+      const sum = selectedCells.reduce((acc, { row, col }) => acc + grid[row][col], 0);
+      if (sum === 10) {
+        // 선택된 셀을 빈 공간으로 변경
+        selectedCells.forEach(({ row, col }) => {
+          grid[row][col] = 0;
+        });
+        score += 10;
+        scoreElement.textContent = `점수: ${score}`;
+      }
+      // 선택 해제
+      document.querySelectorAll('.cell').forEach(cell => cell.classList.remove('selected'));
+      selectedCells = [];
+      renderGrid();
+    }
+
+    // 타이머 시작
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerElement.textContent = `남은 시간: ${timeLeft}`;
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+    }
+
+    // 게임 종료
+    function endGame() {
+      gameActive = false;
+      clearInterval(timerInterval);
+      gridElement.style.display = 'none';
+      startButton.style.display = 'block';
+      gameOverElement.style.display = 'block';
+      gameOverElement.textContent = `게임 종료! 최종 점수: ${score}`;
+    }
+
+    // 게임 시작
+    startButton.addEventListener('click', () => {
+      score = 0;
+      timeLeft = 60;
+      gameActive = true;
+      scoreElement.textContent = `점수: ${score}`;
+      timerElement.textContent = `남은 시간: ${timeLeft}`;
+      gridElement.style.display = 'grid';
+      startButton.style.display = 'none';
+      gameOverElement.style.display = 'none';
+      initializeGrid();
+      startTimer();
+    });
+  </script>
+</body>
+</html>
