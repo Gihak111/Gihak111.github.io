@@ -35,4 +35,4 @@ sidebar:
 [링크](https://gihak111.github.io/game/tictactoe.html)  
 
 8. 사과게임  
-[링크](https://gihak111.github.io/game/apple_game.html)
+[링크](https://gihak111.github.io/game/apple_game.html)  
