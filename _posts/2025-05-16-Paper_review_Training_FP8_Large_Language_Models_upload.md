@@ -15,7 +15,7 @@ AI 기본을 이해하기 위한 근본 논문부터, 최신 AI 기술 동향을
 처음 해 보는거기도 하니까, 초심자도 이해할 수 있을 정도로 엄청 풀어서 적어보겠다.  
 
 FP8-LM: Training FP8 Large Language Models  
-논문 링크 : https://arxiv.org/abs/2310.18313  
+논문 링크 : [https://arxiv.org/abs/2310.18313](https://arxiv.org/abs/2310.18313)  
 
 이 논문은, 대규모 언어 모델인 ChatGPT나 Llama 같은 모델을 훈련시킬 때, FP8이라는 매우 작은 숫자 형식을 사용해서 컴퓨터가 더 작은 메모리와 빠른 속도로 모델을 훈련할 수 있는 방법을 제안한다.  
 
