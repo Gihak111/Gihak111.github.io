@@ -1,0 +1,47 @@
+/* Full-screen map */
+html, body, #map {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Sidebar styling */
+.sidebar {
+    width: 350px;
+    height: 100%;
+    overflow-y: auto;
+    background-color: #1f2937;
+    color: #f9fafb;
+}
+
+/* Info window styling */
+.gm-style-iw {
+    background-color: #1f2937 !important;
+    color: #f9fafb !important;
+    border-radius: 0.5rem !important;
+    padding: 1rem !important;
+    max-width: 300px !important;
+}
+
+.gm-style-iw-d {
+    overflow: auto !important;
+}
+
+.gm-style-iw button {
+    filter: invert(1) !important;
+}
+
+/* Custom scrollbar for sidebar */
+.sidebar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: #2d3748;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 4px;
+}

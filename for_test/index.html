@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>가맹점 찾기 - 지역화폐 사용 가능 업소</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Link to external stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-900">
+    <!-- Main container with flex layout -->
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="sidebar p-4 flex flex-col">
+            <h1 class="text-2xl font-bold mb-4 text-center">가맹점 찾기</h1>
+            <p class="text-sm text-gray-400 mb-4 text-center">지역화폐 사용 가능 업소</p>
+            <!-- Province selection -->
+            <select id="provinceSelect" class="w-full p-2 mb-4 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">시/도 선택</option>
+                <option value="Seoul">서울</option>
+                <option value="Busan_Metropolitan_City">부산광역시</option>
+                <option value="Chungcheongnam-do">충청남도</option>
+                <option value="Gangwon_Special_Self-Governing_Province">강원도</option>
+                <option value="Gwangju">광주</option>
+                <option value="Gyeonggi-do">경기도</option>
+                <option value="Gyeongsangbuk-do">경상북도</option>
+                <option value="Gyeongsangnam-do">경상남도</option>
+                <option value="Incheon">인천</option>
+                <option value="Jeollabuk-do">전라북도</option>
+                <option value="Jeollanam-do">전라남도</option>
+                <option value="Jeonbuk">전북</option>
+                <option value="Ulsan">울산</option>
+            </select>
+            <!-- City (District) selection -->
+            <select id="citySelect" class="w-full p-2 mb-4 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
+                <option value="">시군구 선택</option>
+            </select>
+            <!-- Category selection -->
+            <select id="categorySelect" class="w-full p-2 mb-4 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
+                <option value="all">모든 업종</option>
+                <!-- Categories will be populated dynamically from categories.json -->
+            </select>
+            <!-- Search bar -->
+            <input type="text" id="searchInput" placeholder="가맹점 이름 검색..." class="w-full p-2 mb-4 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <!-- Business list -->
+            <div id="businessList" class="space-y-4">
+                <!-- Business items will be populated by JavaScript -->
+            </div>
+        </div>
+        <!-- Map container -->
+        <div id="map" class="flex-1"></div>
+    </div>
+
+    <script type="text/javascript">
+        // Existing loadFileData function (unchanged)
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+            return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+            if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+                try {
+                    var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                    var firstSheetName = workbook.SheetNames[0];
+                    var worksheet = workbook.Sheets[firstSheetName];
+                    var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                    var filteredData = jsonData.filter(row => row.some(filledCell));
+                    var headerRowIndex = filteredData.findIndex((row, index) =>
+                        row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                    );
+                    if (headerRowIndex === -1 || headerRowIndex > 25) {
+                        headerRowIndex = 0;
+                    }
+                    var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+                    csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                    return csv;
+                } catch (e) {
+                    console.error(e);
+                    return "";
+                }
+            }
+            return gk_fileData[filename] || "";
+        }
+
+        // Category mapping (will be populated dynamically)
+        let categoryMap = {};
+
+        // Predefined category options for the dropdown
+        const categoryOptions = [
+            { value: "기타", display: "기타" },
+            { value: "음식점", display: "음식점" },
+            { value: "슈퍼/마트", display: "슈퍼/마트" },
+            { value: "카페/베이커리", display: "카페/베이커리" },
+            { value: "부동산/인테리어", display: "부동산/인테리어" },
+            { value: "학원/교육", display: "학원/교육" },
+            { value: "자동차/자전거", display: "자동차/자전거" },
+            { value: "의류/잡화/안경", display: "의류/잡화/안경" },
+            { value: "스포츠/헬스", display: "스포츠/헬스" },
+            { value: "미용/뷰티/위생", display: "미용/뷰티/위생" },
+            { value: "병원/약국", display: "병원/약국" },
+            { value: "가전/통신", display: "가전/통신" },
+            { value: "도서/문화/공연", display: "도서/문화/공연" },
+            { value: "주유소", display: "주유소" },
+            { value: "숙박/캠핑", display: "숙박/캠핑" }
+        ];
+
+        // Function to populate categories from categories.json
+        async function populateCategories() {
+            const categorySelect = document.getElementById("categorySelect");
+            try {
+                const response = await fetch('./categories.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                if (!data.categories || !Array.isArray(data.categories)) {
+                    throw new Error("Invalid data format: 'categories' array not found");
+                }
+
+                // Populate categoryMap
+                data.categories.forEach(category => {
+                    categoryMap[category.name] = category.items;
+                });
+
+                // Populate category select dropdown with predefined options
+                categoryOptions.forEach(option => {
+                    const opt = document.createElement("option");
+                    opt.value = option.value;
+                    opt.textContent = option.display;
+                    categorySelect.appendChild(opt);
+                });
+
+                // Ensure all predefined options have a mapping, even if not in categories.json
+                categoryOptions.forEach(option => {
+                    if (!categoryMap[option.value]) {
+                        categoryMap[option.value] = categoryMap[option.value] || [];
+                    }
+                });
+
+                // Enable category select if a province is already selected
+                const province = document.getElementById("provinceSelect").value;
+                if (province) {
+                    categorySelect.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                // Fallback to predefined options if JSON fetch fails
+                categoryOptions.forEach(option => {
+                    const opt = document.createElement("option");
+                    opt.value = option.value;
+                    opt.textContent = option.display;
+                    categorySelect.appendChild(opt);
+                });
+            }
+        }
+
+        // Function to get mock coordinates based on city (unchanged)
+        function getMockCoordinates(cityKey) {
+            const cities = {
+                "Seoul_강서구": { lat: 37.5516, lng: 126.8622 },
+                "Seoul_중랑구": { lat: 37.5932, lng: 127.0867 },
+                // ... (rest of the cities object unchanged)
+            };
+            const base = cities[cityKey] || { lat: 36.0, lng: 127.5 };
+            const offset = 0.01 * (Math.random() - 0.5);
+            return { lat: base.lat + offset, lng: base.lng + offset };
+        }
+
+        // Initialize empty map (unchanged)
+        let map;
+        function initEmptyMap() {
+            const defaultCenter = { lat: 36.0, lng: 127.5 };
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 7,
+                center: defaultCenter,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: true,
+                styles: [
+                    {
+                        featureType: "all",
+                        elementType: "all",
+                        stylers: [
+                            { saturation: -20 },
+                            { lightness: 10 },
+                        ],
+                    },
+                    {
+                        featureType: "poi",
+                        elementType: "labels",
+                        stylers: [{ visibility: "simplified" }],
+                    },
+                ],
+            });
+            return map;
+        }
+
+        // Load map with selected city and category data
+        async function loadCityMap(province, city, category) {
+            let businesses = [];
+            if (!city) {
+                console.log("No city selected");
+                return;
+            }
+
+            try {
+                const response = await fetch(`split_json/${province}.json`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log('Fetched data:', data);
+                if (!data.records || !Array.isArray(data.records)) {
+                    throw new Error("Invalid data format: 'records' array not found");
+                }
+                // Filter records by selected city (시군구명) and mapped category
+                businesses = data.records
+                    .filter(record => record["시군구명"] === city && (category === "all" || categoryMap[category].includes(record["업종명"])))
+                    .map(record => ({
+                        name: record["가맹점명"],
+                        category: record["업종명"],
+                        localCurrency: record["사용가능지역화폐"],
+                        address: record["소재지도로명주소"],
+                        lat: getMockCoordinates(`${province}_${city}`).lat,
+                        lng: getMockCoordinates(`${province}_${city}`).lng,
+                        dataDate: record["데이터기준일자"],
+                        provider: record["제공기관명"],
+                        reviews: []
+                    }));
+                if (businesses.length === 0) {
+                    console.log(`No records found for ${city} with category ${category} in ${province}.json`);
+                }
+            } catch (error) {
+                console.error('Error loading city data:', error);
+                return;
+            }
+
+            // Clear existing markers and business list
+            const businessList = document.getElementById("businessList");
+            businessList.innerHTML = "";
+            if (map.markers) map.markers.forEach(marker => marker.setMap(null));
+            map.markers = [];
+
+            // Update map center and zoom
+            map.setCenter({ lat: getMockCoordinates(`${province}_${city}`).lat, lng: getMockCoordinates(`${province}_${city}`).lng });
+            map.setZoom(11);
+
+            // Create new markers and info windows
+            const infoWindows = [];
+            businesses.forEach((business, index) => {
+                const marker = new google.maps.Marker({
+                    position: { lat: business.lat, lng: business.lng },
+                    map: map,
+                    title: business.name,
+                    icon: {
+                        url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                    },
+                });
+                map.markers.push(marker);
+
+                let reviewsHtml = business.reviews.length > 0
+                    ? `<hr class="my-3 border-gray-600"><h3 class="text-md font-semibold mb-2">리뷰</h3>` +
+                      business.reviews.map(review => `
+                        <div class="mb-2">
+                            <div class="flex items-center">
+                                <span class="text-yellow-400">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</span>
+                                <span class="ml-2 text-sm font-medium">${review.rating}.0</span>
+                            </div>
+                            <p class="text-sm text-gray-300">"${review.text}"</p>
+                        </div>
+                      `).join("")
+                    : "";
+
+                const infoContent = `
+                    <div class="text-gray-100">
+                        <h2 class="text-lg font-semibold mb-2">${business.name}</h2>
+                        <p class="text-sm"><strong>주소:</strong> ${business.address}</p>
+                        <p class="text-sm"><strong>업종:</strong> ${business.category}</p>
+                        <p class="text-sm"><strong>사용 가능 지역화폐:</strong> ${business.localCurrency}</p>
+                        <p class="text-sm"><strong>제공기관:</strong> ${business.provider}</p>
+                        <p class="text-sm"><strong>데이터 기준일:</strong> ${business.dataDate}</p>
+                        ${reviewsHtml}
+                    </div>
+                `;
+
+                const infoWindow = new google.maps.InfoWindow({
+                    content: infoContent,
+                });
+                infoWindows.push(infoWindow);
+
+                marker.addListener("click", () => {
+                    infoWindows.forEach(iw => iw.close());
+                    infoWindow.open(map, marker);
+                    map.panTo(marker.getPosition());
+                });
+
+                const businessItem = document.createElement("div");
+                businessItem.className = "p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600";
+                businessItem.innerHTML = `
+                    <h3 class="text-sm font-semibold">${business.name}</h3>
+                    <p class="text-xs text-gray-400">${business.address}</p>
+                    <p class="text-xs text-gray-400">${business.category}</p>
+                `;
+                businessItem.addEventListener("click", () => {
+                    infoWindows.forEach(iw => iw.close());
+                    infoWindow.open(map, marker);
+                    map.panTo(marker.getPosition());
+                });
+                businessList.appendChild(businessItem);
+            });
+
+            // Search functionality
+            document.getElementById("searchInput").addEventListener("input", (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                businessList.innerHTML = "";
+                businesses.forEach((business, index) => {
+                    if (business.name.toLowerCase().includes(searchTerm)) {
+                        const businessItem = document.createElement("div");
+                        businessItem.className = "p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600";
+                        businessItem.innerHTML = `
+                            <h3 class="text-sm font-semibold">${business.name}</h3>
+                            <p class="text-xs text-gray-400">${business.address}</p>
+                            <p class="text-xs text-gray-400">${business.category}</p>
+                        `;
+                        businessItem.addEventListener("click", () => {
+                            infoWindows.forEach(iw => iw.close());
+                            infoWindows[index].open(map, map.markers[index]);
+                            map.panTo(map.markers[index].getPosition());
+                        });
+                        businessList.appendChild(businessItem);
+                    }
+                });
+            });
+        }
+
+        // Initialize empty map on page load
+        window.init = function() {
+            map = initEmptyMap();
+            // Load categories after map initialization
+            populateCategories();
+        };
+
+        // Populate city (district) options based on province
+        async function populateCities(province) {
+            const citySelect = document.getElementById("citySelect");
+            citySelect.innerHTML = "<option value=''>시군구 선택</option>";
+            citySelect.disabled = !province;
+            const categorySelect = document.getElementById("categorySelect");
+            categorySelect.disabled = !province;
+
+            if (!province) return;
+
+            try {
+                const response = await fetch(`split_json/${province}.json`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                if (!data.records || !Array.isArray(data.records)) {
+                    throw new Error("Invalid data format: 'records' array not found");
+                }
+                // Populate city options
+                const uniqueCities = [...new Set(data.records.map(record => record["시군구명"]))].filter(city => city);
+                uniqueCities.forEach(city => {
+                    const option = document.createElement("option");
+                    option.value = city;
+                    option.textContent = city;
+                    citySelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading province data:', error);
+            }
+        }
+
+        // Event listeners
+        document.getElementById("provinceSelect").addEventListener("change", (e) => {
+            const province = e.target.value;
+            populateCities(province);
+            const citySelect = document.getElementById("citySelect");
+            citySelect.value = ""; // Reset city selection
+            const categorySelect = document.getElementById("categorySelect");
+            categorySelect.value = "all"; // Reset category selection
+            categorySelect.disabled = !province;
+            const businessList = document.getElementById("businessList");
+            businessList.innerHTML = ""; // Clear business list
+            if (map.markers) map.markers.forEach(marker => marker.setMap(null));
+            map.markers = [];
+        });
+
+        document.getElementById("citySelect").addEventListener("change", (e) => {
+            const province = document.getElementById("provinceSelect").value;
+            const city = e.target.value;
+            const category = document.getElementById("categorySelect").value;
+            loadCityMap(province, city, category);
+        });
+
+        document.getElementById("categorySelect").addEventListener("change", (e) => {
+            const province = document.getElementById("provinceSelect").value;
+            const city = document.getElementById("citySelect").value;
+            const category = e.target.value;
+            if (province && city) {
+                loadCityMap(province, city, category);
+            }
+        });
+    </script>
+
+    <!-- Load Google Maps JavaScript API with async loading -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkrKNG7uHZAIid7yg1nUnRA4K25PPKubA&callback=init" loading="async"></script>
+</body>
+</html>
