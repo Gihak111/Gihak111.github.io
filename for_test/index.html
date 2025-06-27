@@ -52,7 +52,7 @@
     <!-- Main container with flex layout -->
     <div class="flex h-screen">
         <!-- Sidebar -->
-        <div class="sidebar p-4 flex flex-col w-1/3">
+        <div class="sidebar p-4 flex flex-col w-1/4">
             <h1 class="text-2xl font-bold mb-4 text-center text-white">가맹점 찾기</h1>
             <p class="text-sm text-gray-400 mb-4 text-center">지역화폐 사용 가능 업소</p>
             <!-- Province selection -->
@@ -84,10 +84,35 @@
             <!-- Search bar -->
             <input type="text" id="searchInput" placeholder="가맹점 이름 검색..." class="w-full p-2 mb-4 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             <!-- Business list -->
-            <div id="businessList" class="space-y-4 overflow-y-auto"></div>
+            <div id="businessList" class="space-y-2 overflow-y-auto"></div>
         </div>
         <!-- Map container -->
         <div id="map" class="flex-1"></div>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="reviewModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-gray-800 p-6 rounded-lg w-96">
+            <h2 class="text-lg font-semibold text-white mb-4">리뷰 작성</h2>
+            <div class="mb-4">
+                <label class="block text-sm text-gray-300 mb-2">별점</label>
+                <select id="reviewRating" class="w-full p-2 bg-gray-700 text-white rounded-lg">
+                    <option value="5">★★★★★ 5</option>
+                    <option value="4">★★★★☆ 4</option>
+                    <option value="3">★★★☆☆ 3</option>
+                    <option value="2">★★☆☆☆ 2</option>
+                    <option value="1">★☆☆☆☆ 1</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm text-gray-300 mb-2">리뷰</label>
+                <textarea id="reviewText" class="w-full p-2 bg-gray-700 text-white rounded-lg" rows="4" placeholder="리뷰를 입력하세요 (선택)"></textarea>
+            </div>
+            <div class="flex justify-end space-x-2">
+                <button id="cancelReview" class="px-4 py-2 bg-gray-600 text-white rounded-lg">취소</button>
+                <button id="submitReview" class="px-4 py-2 bg-blue-500 text-white rounded-lg">제출</button>
+            </div>
+        </div>
     </div>
 
     <script type="text/javascript">
@@ -192,6 +217,26 @@
                     }
                 });
             });
+        }
+
+        // Load user reviews from localStorage
+        function loadUserReviews(province, city, businessName) {
+            const key = `reviews_${province}_${city}_${businessName}`;
+            const reviews = localStorage.getItem(key);
+            return reviews ? JSON.parse(reviews) : [];
+        }
+
+        // Save user review to localStorage
+        function saveUserReview(province, city, businessName, review) {
+            const key = `reviews_${province}_${city}_${businessName}`;
+            const existingReviews = loadUserReviews(province, city, businessName);
+            existingReviews.push(review);
+            localStorage.setItem(key, JSON.stringify(existingReviews));
+        }
+
+        // Truncate text for display
+        function truncateText(text, maxLength = 50) {
+            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
         }
 
         // Existing loadFileData function (unchanged)
@@ -418,7 +463,8 @@
                             const address = record["소재지도로명주소"];
                             const coordinates = address ? await geocodeAddress(address) : null;
                             const placeId = address ? await findPlaceId(record["가맹점명"], address, cityCenter) : null;
-                            const reviews = placeId ? await fetchGoogleReviews(placeId) : [];
+                            const googleReviews = placeId ? await fetchGoogleReviews(placeId) : [];
+                            const userReviews = loadUserReviews(province, city, record["가맹점명"]);
                             return {
                                 name: record["가맹점명"],
                                 category: record["업종명"],
@@ -428,7 +474,8 @@
                                 lng: coordinates ? coordinates.lng : getMockCoordinates(`${province}_${city}`).lng,
                                 dataDate: record["데이터기준일자"],
                                 provider: record["제공기관명"],
-                                reviews: reviews
+                                googleReviews: googleReviews,
+                                userReviews: userReviews
                             };
                         })
                 );
@@ -463,17 +510,29 @@
                 });
                 map.markers.push(marker);
 
-                // Prepare reviews HTML with <h5> tags
-                let reviewsHtml = business.reviews.length > 0
-                    ? `<hr class="my-3 border-gray-600"><h3 class="text-md font-semibold mb-2 text-white">리뷰</h3>` +
-                      business.reviews.map(review => `
-                        <h5 class="text-sm text-gray-300 mb-2">
+                // Prepare Google reviews HTML for info window
+                let googleReviewsHtml = business.googleReviews.length > 0
+                    ? `<h3 class="text-md font-semibold mb-2 text-white">Google 리뷰</h3>` +
+                      business.googleReviews.map(review => `
+                        <h5 class="text-sm text-gray-300 mb-1">
                             <span class="text-yellow-400">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</span>
                             <span class="ml-2">${review.rating}.0</span> - 
-                            "${review.text}" (Google - ${review.author})
+                            "${truncateText(review.text)}" (Google - ${review.author})
                         </h5>
                       `).join("")
-                    : `<hr class="my-3 border-gray-600"><p class="text-sm text-gray-300">리뷰가 없습니다.</p>`;
+                    : `<h3 class="text-md font-semibold mb-2 text-white">Google 리뷰</h3><p class="text-sm text-gray-300">Google 리뷰가 없습니다.</p>`;
+
+                // Prepare User reviews HTML for info window
+                let userReviewsHtml = business.userReviews.length > 0
+                    ? `<h3 class="text-md font-semibold mb-2 mt-4 text-white">사용자 리뷰</h3>` +
+                      business.userReviews.map(review => `
+                        <h5 class="text-sm text-gray-300 mb-1">
+                            <span class="text-yellow-400">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</span>
+                            <span class="ml-2">${review.rating}.0</span> - 
+                            "${truncateText(review.text)}" (User - 익명)
+                        </h5>
+                      `).join("")
+                    : `<h3 class="text-md font-semibold mb-2 mt-4 text-white">사용자 리뷰</h3><p class="text-sm text-gray-300">사용자 리뷰가 없습니다.</p>`;
 
                 // Info window content
                 const infoContent = `
@@ -484,7 +543,10 @@
                         <p class="text-sm"><strong>사용 가능 지역화폐:</strong> ${business.localCurrency}</p>
                         <p class="text-sm"><strong>제공기관:</strong> ${business.provider}</p>
                         <p class="text-sm"><strong>데이터 기준일:</strong> ${business.dataDate}</p>
-                        ${reviewsHtml}
+                        <hr class="my-2 border-gray-600">
+                        <button onclick="openReviewModal('${province}', '${city}', '${business.name.replace(/'/g, "\\'")}')" class="px-4 py-1 bg-blue-500 text-white rounded-lg mb-2">리뷰 작성</button>
+                        ${googleReviewsHtml}
+                        ${userReviewsHtml}
                     </div>
                 `;
 
@@ -497,24 +559,21 @@
                     map.panTo(marker.getPosition());
                 });
 
-                // Business item in sidebar
+                // Business item in sidebar with toggle
                 const businessItem = document.createElement("div");
-                businessItem.className = "p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 mb-2";
+                businessItem.className = "p-2 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 mb-1";
+                const reviewId = `reviews_${province}_${city}_${business.name.replace(/[^a-zA-Z0-9]/g, "_")}`;
                 businessItem.innerHTML = `
                     <h3 class="text-sm font-semibold text-white">${business.name}</h3>
                     <p class="text-xs text-gray-400">${business.address}</p>
                     <p class="text-xs text-gray-400">${business.category}</p>
-                    ${business.reviews.length > 0 ? `
-                        <hr class="my-2 border-gray-600">
-                        <h4 class="text-sm font-medium text-white mb-1">리뷰</h4>
-                        ${business.reviews.map(review => `
-                            <h5 class="text-xs text-gray-300 mb-1">
-                                <span class="text-yellow-400">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</span>
-                                <span class="ml-1">${review.rating}.0</span> - 
-                                "${review.text}" (Google - ${review.author})
-                            </h5>
-                        `).join("")}
-                    ` : `<hr class="my-2 border-gray-600"><p class="text-xs text-gray-300">리뷰가 없습니다.</p>`}
+                    <hr class="my-1 border-gray-600">
+                    <button onclick="openReviewModal('${province}', '${city}', '${business.name.replace(/'/g, "\\'")}')" class="px-3 py-1 bg-blue-500 text-white rounded-lg text-xs mb-1">리뷰 작성</button>
+                    <button onclick="toggleReviews('${reviewId}')" class="px-3 py-1 bg-gray-600 text-white rounded-lg text-xs mb-1">리뷰 보기/숨기기</button>
+                    <div id="${reviewId}" class="hidden">
+                        ${googleReviewsHtml}
+                        ${userReviewsHtml}
+                    </div>
                 `;
                 businessItem.addEventListener("click", () => {
                     infoWindows.forEach(iw => iw.close());
@@ -530,23 +589,44 @@
                 businessList.innerHTML = "";
                 businesses.forEach((business, index) => {
                     if (business.name.toLowerCase().includes(searchTerm)) {
+                        // Prepare Google reviews HTML for search
+                        let googleReviewsHtml = business.googleReviews.length > 0
+                            ? `<h3 class="text-md font-semibold mb-2 text-white">Google 리뷰</h3>` +
+                              business.googleReviews.map(review => `
+                                <h5 class="text-sm text-gray-300 mb-1">
+                                    <span class="text-yellow-400">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</span>
+                                    <span class="ml-2">${review.rating}.0</span> - 
+                                    "${truncateText(review.text)}" (Google - ${review.author})
+                                </h5>
+                              `).join("")
+                            : `<h3 class="text-md font-semibold mb-2 text-white">Google 리뷰</h3><p class="text-sm text-gray-300">Google 리뷰가 없습니다.</p>`;
+
+                        // Prepare User reviews HTML for search
+                        let userReviewsHtml = business.userReviews.length > 0
+                            ? `<h3 class="text-md font-semibold mb-2 mt-2 text-white">사용자 리뷰</h3>` +
+                              business.userReviews.map(review => `
+                                <h5 class="text-sm text-gray-300 mb-1">
+                                    <span class="text-yellow-400">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</span>
+                                    <span class="ml-2">${review.rating}.0</span> - 
+                                    "${truncateText(review.text)}" (User - 익명)
+                                </h5>
+                              `).join("")
+                            : `<h3 class="text-md font-semibold mb-2 mt-2 text-white">사용자 리뷰</h3><p class="text-sm text-gray-300">사용자 리뷰가 없습니다.</p>`;
+
+                        const reviewId = `reviews_${province}_${city}_${business.name.replace(/[^a-zA-Z0-9]/g, "_")}`;
                         const businessItem = document.createElement("div");
-                        businessItem.className = "p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 mb-2";
+                        businessItem.className = "p-2 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 mb-1";
                         businessItem.innerHTML = `
                             <h3 class="text-sm font-semibold text-white">${business.name}</h3>
                             <p class="text-xs text-gray-400">${business.address}</p>
                             <p class="text-xs text-gray-400">${business.category}</p>
-                            ${business.reviews.length > 0 ? `
-                                <hr class="my-2 border-gray-600">
-                                <h4 class="text-sm font-medium text-white mb-1">리뷰</h4>
-                                ${business.reviews.map(review => `
-                                    <h5 class="text-xs text-gray-300 mb-1">
-                                        <span class="text-yellow-400">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</span>
-                                        <span class="ml-1">${review.rating}.0</span> - 
-                                        "${review.text}" (Google - ${review.author})
-                                    </h5>
-                                `).join("")}
-                            ` : `<hr class="my-2 border-gray-600"><p class="text-xs text-gray-300">리뷰가 없습니다.</p>`}
+                            <hr class="my-1 border-gray-600">
+                            <button onclick="openReviewModal('${province}', '${city}', '${business.name.replace(/'/g, "\\'")}')" class="px-3 py-1 bg-blue-500 text-white rounded-lg text-xs mb-1">리뷰 작성</button>
+                            <button onclick="toggleReviews('${reviewId}')" class="px-3 py-1 bg-gray-600 text-white rounded-lg text-xs mb-1">리뷰 보기/숨기기</button>
+                            <div id="${reviewId}" class="hidden">
+                                ${googleReviewsHtml}
+                                ${userReviewsHtml}
+                            </div>
                         `;
                         businessItem.addEventListener("click", () => {
                             infoWindows.forEach(iw => iw.close());
@@ -558,6 +638,54 @@
                 });
             });
         }
+
+        // Review modal functions
+        function openReviewModal(province, city, businessName) {
+            const modal = document.getElementById("reviewModal");
+            modal.classList.remove("hidden");
+            document.getElementById("submitReview").dataset.province = province;
+            document.getElementById("submitReview").dataset.city = city;
+            document.getElementById("submitReview").dataset.businessName = businessName;
+        }
+
+        function closeReviewModal() {
+            const modal = document.getElementById("reviewModal");
+            modal.classList.add("hidden");
+            document.getElementById("reviewRating").value = "5";
+            document.getElementById("reviewText").value = "";
+        }
+
+        function submitReview(province, city, businessName) {
+            const rating = parseInt(document.getElementById("reviewRating").value);
+            const text = document.getElementById("reviewText").value.trim() || "리뷰 내용 없음";
+            console.log(`Submitting review: province=${province}, city=${city}, businessName=${businessName}, rating=${rating}, text=${text}`);
+            const review = {
+                rating: rating,
+                text: text,
+                author: "익명",
+                source: "User"
+            };
+            saveUserReview(province, city, businessName, review);
+            closeReviewModal();
+            // Reload map to reflect new review
+            const category = document.getElementById("categorySelect").value;
+            loadCityMap(province, city, category);
+        }
+
+        // Toggle reviews visibility
+        function toggleReviews(reviewId) {
+            const reviewDiv = document.getElementById(reviewId);
+            reviewDiv.classList.toggle("hidden");
+        }
+
+        // Event listeners for modal
+        document.getElementById("cancelReview").addEventListener("click", closeReviewModal);
+        document.getElementById("submitReview").addEventListener("click", () => {
+            const province = document.getElementById("submitReview").dataset.province;
+            const city = document.getElementById("submitReview").dataset.city;
+            const businessName = document.getElementById("submitReview").dataset.businessName;
+            submitReview(province, city, businessName);
+        });
 
         // Initialize empty map and load categories
         window.init = function() {
