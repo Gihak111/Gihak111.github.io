@@ -131,7 +131,7 @@
                 return addressCache[address];
             }
             try {
-                const apiKey = 'AIzaSyDkrKNG7uHZAIid7yg1nUnRA4K25PPKubA';
+                //const apiKey = 'AIzaSyDkrKNG7uHZAIid7yg1nUnRA4K25PPKubA';
                 const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`);
                 if (!response.ok) {
                     throw new Error(`Geocoding HTTP error! status: ${response.status}`);
