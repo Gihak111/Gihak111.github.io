@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>고양이/강아지 이미지 분류기 테스트 (업로드 가능)</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+    <script src="https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v2_100_224/feature_vector/3/default/1/model.json"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8 font-sans">
+
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-3xl font-bold mb-6 text-center">고양이/강아지 분류기 테스트</h1>
+        
+        <div class="mb-6 text-center">
+            <h2 class="text-xl font-semibold mb-2">이미지 업로드</h2>
+            <input type="file" id="image-upload" accept="image/*" class="mb-4"/>
+            <div class="border-2 border-dashed border-gray-300 p-4 rounded-lg">
+                <img id="image-preview" src="#" alt="업로드된 이미지 미리보기" class="mx-auto max-h-80 rounded-lg shadow-sm hidden"/>
+                <p id="upload-placeholder" class="text-gray-500">여기에 이미지를 업로드하면 미리보기가 나타납니다.</p>
+            </div>
+            <div id="prediction-result" class="text-lg font-medium text-gray-700 mt-4">여기에 예측 결과가 표시됩니다.</div>
+        </div>
+
+        <div class="flex justify-center">
+            <button id="predict-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-full shadow-md transition duration-300" disabled>
+                예측하기
+            </button>
+        </div>
+    </div>
+
+
+
+    
+    <script>
+        // Hugging Face 저장소의 모델 URL
+        const CLASSIFIER_MODEL_URL = 'http://seung22.ipdisk.co.kr:92/publist/HDD1/oneclickai/test_model/tfjs-classifier-%EC%9E%85%EB%A0%A5_%EC%82%AC%EC%A7%84%EC%9D%B4_%EA%B3%A0%EC%96%91%EC%9D%B4%EC%9D%B8%EC%A7%80_%EA%B0%95%EC%95%84%EC%A7%80%EC%9D%B8%EC%A7%80_%EA%B5%AC%EB%B6%84%ED%95%B4%EC%A3%BC%EB%8A%94_AI_MobileNet-Finetuned-Classifier.json';
+        const MOBILENET_URL = 'https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v2_100_224/feature_vector/3/default/1';
+        const MODEL_IMAGE_SIZE = 224;
+        const LABELS = ["cat", "dog"]; // 모델 학습 시 사용된 라벨
+        
+        let classifierModel;
+        let baseModel;
+        
+        const imageUploadInput = document.getElementById('image-upload');
+        const imagePreview = document.getElementById('image-preview');
+        const uploadPlaceholder = document.getElementById('upload-placeholder');
+        const predictBtn = document.getElementById('predict-btn');
+        const statusDisplay = document.getElementById('prediction-result');
+
+        async function initialize() {
+            statusDisplay.textContent = '모델 로딩 중...';
+            try {
+                // MobileNetV2 모델 로드 (특징 추출기)
+                baseModel = await tf.loadGraphModel(MOBILENET_URL, { fromTFHub: true });
+                // Hugging Face에서 학습된 분류기 모델 로드
+                classifierModel = await tf.loadLayersModel(CLASSIFIER_MODEL_URL);
+                statusDisplay.textContent = '모델 로드 완료. 이미지를 업로드하세요.';
+            } catch (error) {
+                statusDisplay.textContent = '모델 로드 실패: ' + error.message;
+                console.error('모델 로드 실패:', error);
+            }
+        }
+        
+        // 파일 선택 시 실행되는 함수
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                    imagePreview.classList.remove('hidden');
+                    uploadPlaceholder.classList.add('hidden');
+                    predictBtn.disabled = false; // 이미지 업로드 후 버튼 활성화
+                    statusDisplay.textContent = '예측 버튼을 누르세요.';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.classList.add('hidden');
+                uploadPlaceholder.classList.remove('hidden');
+                predictBtn.disabled = true;
+                statusDisplay.textContent = '이미지를 업로드하세요.';
+            }
+        }
+
+        async function predictImage() {
+            if (!classifierModel || !baseModel) {
+                statusDisplay.textContent = '모델이 아직 로드되지 않았습니다.';
+                return;
+            }
+            if (imagePreview.classList.contains('hidden')) {
+                statusDisplay.textContent = '이미지를 먼저 업로드해주세요.';
+                return;
+            }
+            
+            statusDisplay.textContent = '예측 중...';
+
+            const result = tf.tidy(() => {
+                // 이미지 전처리 (업로드된 이미지 미리보기를 사용)
+                let imageTensor = tf.browser.fromPixels(imagePreview)
+                    .resizeNearestNeighbor([MODEL_IMAGE_SIZE, MODEL_IMAGE_SIZE])
+                    .toFloat()
+                    .div(tf.scalar(255));
+                
+                // RGBA 이미지를 RGB로 변환 (필요한 경우)
+                if (imageTensor.shape[2] === 4) {
+                    imageTensor = imageTensor.slice([0, 0, 0], [MODEL_IMAGE_SIZE, MODEL_IMAGE_SIZE, 3]);
+                }
+                const batchedImage = imageTensor.expandDims(0);
+                
+                // 1단계: MobileNetV2로 특징 추출
+                const embedding = baseModel.predict(batchedImage);
+                
+                // 2단계: 분류기로 최종 예측
+                const prediction = classifierModel.predict(embedding);
+                
+                return prediction.dataSync();
+            });
+
+            const probabilities = Array.from(result);
+            const predictedClassIndex = probabilities.indexOf(Math.max(...probabilities));
+            const predictedLabel = LABELS[predictedClassIndex];
+            const probability = (probabilities[predictedClassIndex] * 100).toFixed(2);
+            
+            statusDisplay.innerHTML = `예측 결과: **${predictedLabel}** (확률: ${probability}%)`;
+
+            // 메모리 정리
+            tf.dispose(result);
+        }
+        
+        imageUploadInput.addEventListener('change', handleImageUpload);
+        predictBtn.addEventListener('click', predictImage);
+
+        // 페이지 로드 시 모델 초기화
+        window.onload = initialize;
+    </script>
+</body>
+</html>
