@@ -30,12 +30,9 @@
         </div>
     </div>
 
-
-
-    
     <script>
         // Hugging Face 저장소의 모델 URL
-        const CLASSIFIER_MODEL_URL = 'http://seung22.ipdisk.co.kr:92/publist/HDD1/oneclickai/test_model/tfjs-classifier-%EC%9E%85%EB%A0%A5_%EC%82%AC%EC%A7%84%EC%9D%B4_%EA%B3%A0%EC%96%91%EC%9D%B4%EC%9D%B8%EC%A7%80_%EA%B0%95%EC%95%84%EC%A7%80%EC%9D%B8%EC%A7%80_%EA%B5%AC%EB%B6%84%ED%95%B4%EC%A3%BC%EB%8A%94_AI_MobileNet-Finetuned-Classifier.json';
+        const CLASSIFIER_MODEL_URL = 'https://huggingface.co/gihakkk/v0_test/resolve/main/tfjs-classifier-%EC%9E%85%EB%A0%A5_%EC%82%AC%EC%A7%84%EC%9D%B4_%EA%B3%A0%EC%96%91%EC%9D%B4%EC%9D%B8%EC%A7%80_%EA%B0%95%EC%95%84%EC%A7%80%EC%9D%B8%EC%A7%80_%EA%B5%AC%EB%B6%84%ED%95%B4%EC%A3%BC%EB%8A%94_AI_MobileNet-Finetuned-Classifier.json';
         const MOBILENET_URL = 'https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v2_100_224/feature_vector/3/default/1';
         const MODEL_IMAGE_SIZE = 224;
         const LABELS = ["cat", "dog"]; // 모델 학습 시 사용된 라벨
