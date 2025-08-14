@@ -36,3 +36,6 @@ sidebar:
 
 8. 사과게임  
 [링크](https://gihak111.github.io/game/apple_game.html)  
+
+8. 둠 팬게임  
+[링크](https://gihak111.github.io/game/doom-slayer.html)  
