@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "AI 아키텍쳐 2. GPT-2"
+title:  "AI 아키텍쳐 3. GPT-2"
 categories: "AI"
 tag: "Architecture"
 toc: true
