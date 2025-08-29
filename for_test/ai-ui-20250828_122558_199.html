@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<!--
+** 매우 중요 **
+이 html 이 가진 모든 기능을 가지고 있는 사이트를 만들고 싶어
+https://oneclickai-s3.s3.ap-northeast-2.amazonaws.com/ai-models/20250828_122558_199/model.json 이건 저장된 모델 s3 경로
+이 html 코드를 전부 포함하게 만들어야 해
+-->
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>고양이, 강아지 사진 분류 AI UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+    :root {
+    --primary-color: #4A90E2;
+    --secondary-color: #50E3C2;
+    --background-color: #F7F9FC;
+    --card-background: #FFFFFF;
+    --text-color: #333333;
+    --border-color: #E0E0E0;
+    --hover-color: #E3F2FD;
+    --active-color: #B3E5FC;
+    --loading-color: #4A90E2;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.card {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.button {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.button:hover {
+    background-color: var(--hover-color);
+}
+
+.button:active {
+    background-color: var(--active-color);
+    transform: scale(0.95);
+}
+
+.loading {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 4px solid var(--loading-color);
+    border-top: 4px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.input {
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 10px;
+    width: 100%;
+    transition: border-color 0.3s ease;
+}
+
+.input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-4 {
+    margin-top: 1rem;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+    body { 
+      margin: 0;
+      padding: 0;
+    }
+    </style>
+</head>
+<body>
+    <div id="ai-ui-root" class="container mx-auto p-4">
+        <div id="model-test-section"></div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
+<script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+<script>
+    // 여기에는 순수하게 React 앱을 구동하는 코드만 남습니다.
+    let tf, use, React, ReactDOM;
+    
+    function waitForLibraries() {
+        return new Promise((resolve) => {
+            const checkLibraries = () => {
+                if (window.tf && window.use && window.React && window.ReactDOM) {
+                    tf = window.tf; use = window.use; React = window.React; ReactDOM = window.ReactDOM;
+                    resolve();
+                } else { setTimeout(checkLibraries, 100); }
+            };
+            checkLibraries();
+        });
+    }
+
+    window.AI_MODEL_INFO = {
+  "success": true,
+  "aiPurpose": "고양이, 강아지 사진 분류",
+  "dataType": "image",
+  "trainerScriptPath": "/scripts/image_trainer.js",
+  "labels": [
+    "cat",
+    "dog"
+  ],
+  "imageSize": [
+    64,
+    64,
+    3
+  ],
+  "feedback": "이미지 분류 모델 학습 정보가 준비되었습니다. 클라이언트에서 학습을 시작합니다.",
+  "initialUserData": {
+    "image": [
+      {
+        "description": "Cat photo 1",
+        "label": "cat"
+      },
+      {
+        "description": "Cat photo 2",
+        "label": "cat"
+      },
+      {
+        "description": "Cat photo 3",
+        "label": "cat"
+      },
+      {
+        "description": "Cat photo 4",
+        "label": "cat"
+      },
+      {
+        "description": "Cat photo 5",
+        "label": "cat"
+      },
+      {
+        "description": "Cat photo 6",
+        "label": "cat"
+      },
+      {
+        "description": "Cat photo 7",
+        "label": "cat"
+      },
+      {
+        "description": "Cat photo 8",
+        "label": "cat"
+      },
+      {
+        "description": "Dog photo 1",
+        "label": "dog"
+      },
+      {
+        "description": "Dog photo 2",
+        "label": "dog"
+      },
+      {
+        "description": "Dog photo 3",
+        "label": "dog"
+      },
+      {
+        "description": "Dog photo 4",
+        "label": "dog"
+      },
+      {
+        "description": "Dog photo 5",
+        "label": "dog"
+      },
+      {
+        "description": "Dog photo 6",
+        "label": "dog"
+      },
+      {
+        "description": "Dog photo 7",
+        "label": "dog"
+      },
+      {
+        "description": "Dog photo 8",
+        "label": "dog"
+      },
+      {
+        "description": "Cat photo 9",
+        "label": "cat"
+      },
+      {
+        "description": "Cat photo 10",
+        "label": "cat"
+      },
+      {
+        "description": "Dog photo 9",
+        "label": "dog"
+      },
+      {
+        "description": "Dog photo 10",
+        "label": "dog"
+      }
+    ]
+  },
+  "modelName": "20250828_122558_199",
+  "modelArchitecture": "MobileNetV2_transfer",
+  "modelFiles": [
+    {
+      "signedUrl": "https://oneclickai-s3.s3.ap-northeast-2.amazonaws.com/ai-models/20250828_122558_199/model.json",
+      "path": "ai-models/20250828_122558_199/model.json"
+    },
+    {
+      "signedUrl": "https://oneclickai-s3.s3.ap-northeast-2.amazonaws.com/ai-models/20250828_122558_199/weights.bin",
+      "path": "ai-models/20250828_122558_199/weights.bin"
+    }
+  ]
+};
+    window.S3_MODEL_FILES = [
+  {
+    "signedUrl": "https://oneclickai-s3.s3.ap-northeast-2.amazonaws.com/ai-models/20250828_122558_199/model.json",
+    "path": "ai-models/20250828_122558_199/model.json"
+  },
+  {
+    "signedUrl": "https://oneclickai-s3.s3.ap-northeast-2.amazonaws.com/ai-models/20250828_122558_199/weights.bin",
+    "path": "ai-models/20250828_122558_199/weights.bin"
+  }
+];
+    window.injectedInitialState = {
+        aiPurpose: window.AI_MODEL_INFO.aiPurpose || "고양이, 강아지 사진 분류",
+        dataType: window.AI_MODEL_INFO.dataType,
+        loadedModelPath: window.S3_MODEL_FILES.length > 0 ? window.S3_MODEL_FILES[0].signedUrl : null,
+        labels: window.AI_MODEL_INFO.labels,
+        gptFeedback: window.AI_MODEL_INFO.feedback || "...",
+        s3BucketName: "oneclickai-s3"
+    };
+
+    async function initializeApp() {
+        try {
+            await waitForLibraries();
+            await tf.ready();
+            const { useState, useEffect, useRef } = React;
+            
+            const loadImage = (file) => new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => resolve(img);
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+            const TextInputComponent = ({ reference, placeholder }) => (React.createElement("div", { className: "mb-4" }, React.createElement("label", { htmlFor: "actual-test-input", className: "block text-gray-700 text-sm font-bold mb-2" }, "테스트할 텍스트를 입력하세요:"), React.createElement("textarea", { id: "actual-test-input", ref: reference, className: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline", rows: 5, placeholder: placeholder })));
+            const ImageInputComponent = ({ onChange, previewUrl }) => (React.createElement("div", { className: "mb-4" }, React.createElement("label", { htmlFor: "test-image-upload", className: "block text-gray-700 text-sm font-bold mb-2" }, "테스트할 이미지를 업로드하세요:"), React.createElement("input", { type: "file", id: "test-image-upload", accept: "image/*", onChange: onChange, className: "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" }), previewUrl && (React.createElement("div", { className: "mt-4" }, React.createElement("img", { src: previewUrl, alt: "Image Preview", className: "max-w-xs h-auto rounded-lg shadow-md" })))));
+            const ModelTestSection = ({ modelLoadStatus, renderInputArea, handleTestPrediction, handleClearTestData, classifierModel, featureExtractor, isPredicting, testOutputResult }) => (React.createElement("div", { className: "bg-white p-6 rounded-lg shadow-md" }, React.createElement("h2", { className: "text-xl font-semibold mb-3" }, "모델 테스트"), React.createElement("div", { className: "mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg" }, React.createElement("h3", { className: "font-semibold text-blue-800" }, "모델 상태"), React.createElement("p", { id: "model-load-status", className: "text-blue-700" }, modelLoadStatus)), renderInputArea(), React.createElement("div", { className: "flex space-x-2 mb-4" }, React.createElement("button", { id: "test-predict-btn", onClick: handleTestPrediction, disabled: !classifierModel || !featureExtractor || isPredicting, className: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-gray-400 disabled:cursor-not-allowed" }, isPredicting ? '예측 중...' : '예측 실행'), React.createElement("button", { id: "clear-test-data-btn", onClick: handleClearTestData, className: "bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" }, "입력 초기화")), React.createElement("div", { className: "mb-4" }, React.createElement("h3", { className: "text-lg font-semibold" }, "예측 결과:"), React.createElement("pre", { id: "test-output-result", className: "mt-2 p-4 bg-gray-100 rounded-md border border-gray-300 whitespace-pre-wrap min-h-[100px]" }, testOutputResult || '이곳에 예측 결과가 표시됩니다.'))));
+            const GptFeedbackSection = ({ gptFeedback }) => (React.createElement("div", { className: "mt-6 bg-green-50 p-6 rounded-lg shadow-md border border-green-200" }, React.createElement("h3", { className: "text-lg font-semibold text-green-800" }, "GPT 피드백:"), React.createElement("p", { className: "mt-2 text-green-700" }, gptFeedback)));
+            const TrainedLabelListSection = ({ labels }) => (Array.isArray(labels) && labels.length > 0 && (React.createElement("div", { className: "mt-6 bg-gray-50 p-6 rounded-lg shadow-md" }, React.createElement("h3", { className: "text-lg font-semibold" }, "학습된 라벨 목록:"), React.createElement("ul", { className: "list-disc list-inside mt-2 space-y-1" }, labels.map((label, index) => React.createElement("li", { key: index }, label))))));
+
+            function App() {
+                const { dataType, loadedModelPath, labels, s3BucketName, gptFeedback } = window.injectedInitialState;
+                const [classifierModel, setClassifierModel] = useState(null);
+                const [featureExtractor, setFeatureExtractor] = useState(null);
+                const [modelLoadStatus, setModelLoadStatus] = useState('모델 로드 대기 중...');
+                const [testImageFile, setTestImageFile] = useState(null);
+                const [testImagePreviewUrl, setTestImagePreviewUrl] = useState(null);
+                const [testOutputResult, setTestOutputResult] = useState('');
+                const [isPredicting, setIsPredicting] = useState(false);
+                const actualTestInputRef = useRef(null);
+                
+                useEffect(() => {
+                    let isMounted = true;
+                    const loadAllModels = async () => {
+                        if (!loadedModelPath || !s3BucketName) { setModelLoadStatus('오류: 모델 정보가 없습니다.'); return; }
+                        try {
+                            setModelLoadStatus('AI 모델 로딩 중...');
+                            const modelJsonFile = window.S3_MODEL_FILES.find(f => f.path.endsWith('.json'));
+                            if (!modelJsonFile) throw new Error("모델 JSON 파일을 찾을 수 없습니다.");
+                            
+                            const loadedClassifier = await tf.loadLayersModel(modelJsonFile.signedUrl); // URL을 직접 사용하도록 수정
+                            if (!isMounted) { loadedClassifier.dispose(); return; }
+                            setClassifierModel(loadedClassifier);
+                            let loadedFeatureExtractor;
+                            if (dataType === 'text') {
+                                loadedFeatureExtractor = await use.load();
+                            } else if (dataType === 'image') {
+                                const MOBILENET_URL = 'https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v2_100_224/feature_vector/3/default/1';
+                                loadedFeatureExtractor = await window.tf.loadGraphModel(MOBILENET_URL, { fromTFHub: true }); // tf 대신 window.tf 사용
+                            }
+                            if (!isMounted) { if (loadedFeatureExtractor?.dispose) loadedFeatureExtractor.dispose(); return; }
+                            setFeatureExtractor(loadedFeatureExtractor);
+                            setModelLoadStatus('🎉 모든 모델 로드 완료! 예측을 시작할 수 있습니다.');
+                        } catch (e) {
+                            console.error('모델 로딩 실패:', e);
+                            if (isMounted) setModelLoadStatus("오류: 모델 로드 실패. (" + e.message + ")");
+                        }
+                    };
+                    loadAllModels();
+                    return () => {
+                        isMounted = false;
+                        if (classifierModel) classifierModel.dispose();
+                        if (featureExtractor && typeof featureExtractor.dispose === 'function') {
+                            featureExtractor.dispose();
+                        }
+                    };
+                }, []);
+                
+                    const handleTestImageUpload = (event) => { const file = event.target.files[0]; if (file) { setTestImageFile(file); setTestImagePreviewUrl(URL.createObjectURL(file)); } else { clearTestImage(); } };
+                    const clearTestImage = () => { if (testImagePreviewUrl) URL.revokeObjectURL(testImagePreviewUrl); setTestImageFile(null); setTestImagePreviewUrl(null); const uploader = window._currentShadowRoot.getElementById('test-image-upload'); if (uploader) uploader.value = ''; };
+                    const handleClearTestData = () => { if (dataType === 'text' && actualTestInputRef.current) { actualTestInputRef.current.value = ''; } if (dataType === 'image') { clearTestImage(); } setTestOutputResult(''); };
+                    const handleTestPrediction = async () => { if (!classifierModel || !featureExtractor) { setTestOutputResult('오류: 모델이 로드되지 않았습니다.'); return; } let inputData; if (dataType === 'text') { const textInput = actualTestInputRef.current ? actualTestInputRef.current.value : ''; if (!textInput.trim()) { setTestOutputResult('텍스트를 입력해주세요.'); return; } inputData = { text: textInput }; } else if (dataType === 'image') { if (!testImageFile) { setTestOutputResult('이미지 파일을 업로드해주세요.'); return; } inputData = { file: testImageFile }; } setIsPredicting(true); setTestOutputResult('예측 중...'); try { let resultText = ''; if (dataType === 'text') { const texts = inputData.text.split(',').map(t => t.trim()).filter(Boolean); if (texts.length === 0) throw new Error("입력 텍스트가 비어있습니다."); const embeddings = await featureExtractor.embed(texts); const prediction = classifierModel.predict(embeddings); const predictionData = await prediction.array(); tf.dispose([embeddings, prediction]); resultText = texts.map((text, i) => { const probabilities = predictionData[i]; const topResultIndex = probabilities.indexOf(Math.max(...probabilities)); const topLabel = labels[topResultIndex] || '알 수 없음'; const topProbability = (probabilities[topResultIndex] * 100).toFixed(2); return `"${text}": ${topLabel} (${topProbability}%)`; }).join('\n'); } else if (dataType === 'image') { const img = await loadImage(inputData.file); const result = tf.tidy(() => { const MODEL_IMAGE_SIZE = 224; let imageTensor = tf.browser.fromPixels(img).resizeNearestNeighbor([MODEL_IMAGE_SIZE, MODEL_IMAGE_SIZE]).toFloat().div(tf.scalar(255)); if (imageTensor.shape[2] === 4) imageTensor = imageTensor.slice([0, 0, 0], [MODEL_IMAGE_SIZE, MODEL_IMAGE_SIZE, 3]); const batchedImage = imageTensor.expandDims(0); const embedding = featureExtractor.predict(batchedImage); return classifierModel.predict(embedding).dataSync(); }); const probabilities = Array.from(result); const predictedClassIndex = probabilities.indexOf(Math.max(...probabilities)); const predictionLabel = labels[predictedClassIndex] || '알 수 없음'; const predictionProb = (probabilities[predictedClassIndex] * 100).toFixed(2); resultText = `예측 결과: ${predictionLabel} (${predictionProb}%)`; const probMap = labels.map((label, i) => `  "${label}": ${(probabilities[i] * 100).toFixed(2)}%`).join(',\n'); resultText += `\n\n- 전체 확률분포 -\n{\n${probMap}\n}`; } setTestOutputResult(resultText); } catch (e) { console.error('예측 중 오류 발생:', e); setTestOutputResult('오류: 예측에 실패했습니다. ' + e.message); } finally { setIsPredicting(false); } };
+                    const renderInputArea = () => { switch (dataType) { case 'text': return React.createElement(TextInputComponent, { reference: actualTestInputRef, placeholder: "텍스트를 입력하세요." }); case 'image': return React.createElement(ImageInputComponent, { onChange: handleTestImageUpload, previewUrl: testImagePreviewUrl }); default: return React.createElement("p", { className: "text-red-500" }, "지원되지 않는 데이터 타입입니다: " + dataType); } };
+    
+                    return (
+                        React.createElement(React.Fragment, null,
+                            React.createElement(ModelTestSection, {
+                                modelLoadStatus, renderInputArea, handleTestPrediction, handleClearTestData,
+                                classifierModel, featureExtractor, isPredicting, testOutputResult
+                            }),
+                            React.createElement(GptFeedbackSection, { gptFeedback }),
+                            React.createElement(TrainedLabelListSection, { labels })
+                        )
+                    );
+                }
+    
+                // ❗️ [핵심 수정] Shadow DOM 대신 iframe의 표준 document를 사용합니다.
+                const rootElement = document.getElementById('model-test-section');
+                if (rootElement) {
+                    const root = ReactDOM.createRoot(rootElement);
+                    root.render(React.createElement(App, null));
+                } else {
+                    console.error("'model-test-section' element not found in the document.");
+                }
+            } catch (error) {
+                console.error('애플리케이션 초기화 실패:', error);
+                window._currentShadowRoot.getElementById('model-test-section').innerHTML = 
+                    '<div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded">' +
+                    '애플리케이션 초기화에 실패했습니다: ' + error.message + '</div>';
+            }
+        }
+    
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        
+        }
+    </script>
+    </body>
+    </html>

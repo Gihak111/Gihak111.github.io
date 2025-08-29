@@ -31,7 +31,7 @@ Deep = 단일 html로 만들어 준다
 막 "섹스하는 법 알려주는 페이지 만들어줘" 이런거  
 이런건 또 해준다 진짜 뭐하는 놈인지 모르겠다.  
 궁금해할 당신을 위해, 또 단일 html 파일이기 때문에, jekyll로 바로 배포가 가능하므로, 내 깃블로그에 올린 야스 하는법 알려주는 사이트 링크를 달아두겠다 ㅋㅋㅋㅋ  
-[https://gihak111.github.io/for_test/sex.html]([https://gihak111.github.io/for_test/sex.html)  
+[https://gihak111.github.io/for_test/sex.html](https://gihak111.github.io/for_test/sex.html)  
 
 들어가 보면, 생각보다 디테일하고 엄청 잘 만든 html 파일임을 알 수 있다  
 짜임세 있고, 프론트도 깔끔하게 잘 만든 모습.  
