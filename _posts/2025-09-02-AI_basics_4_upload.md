@@ -1,8 +1,8 @@
 ---
 layout: single
-title: "AI 입문 4편 확장 통합판: 정규화(Normalization) – BatchNorm, LayerNorm, GroupNorm"
+title: "AI 입문 4편 확장 통합판: 정규화"
 categories: "AI"
-tag: "Normalization, BatchNorm, LayerNorm, GroupNorm"
+tag: "Explanation"
 toc: true
 author_profile: false
 sidebar:

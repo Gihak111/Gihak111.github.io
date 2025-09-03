@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교수님 평가 커뮤니티</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            margin-right: 10px;
+            font-size: 32px;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav li {
+            margin-left: 25px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+        
+        nav a:hover {
+            opacity: 0.8;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            margin-bottom: 40px;
+            border-radius: 10px;
+        }
+        
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+        
+        .cta-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-weight: bold;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+            text-align: center;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+        
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .upload-section {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 50px;
+        }
+        
+        .upload-section h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 32px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: border-color 0.3s;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: #667eea;
+        }
+        
+        .upload-icon {
+            font-size: 64px;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .upload-text {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .rating-section {
+            margin-bottom: 30px;
+        }
+        
+        .rating-section h3 {
+            margin-bottom: 15px;
+            font-size: 20px;
+            color: #333;
+        }
+        
+        .stars {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .star {
+            font-size: 36px;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .star:hover,
+        .star.active {
+            color: #ffc107;
+        }
+        
+        .comment-section {
+            margin-bottom: 30px;
+        }
+        
+        .comment-section h3 {
+            margin-bottom: 15px;
+            font-size: 20px;
+            color: #333;
+        }
+        
+        .comment-textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            resize: vertical;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-weight: bold;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .reviews-section {
+            margin-bottom: 50px;
+        }
+        
+        .reviews-section h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 32px;
+            color: #333;
+        }
+        
+        .review-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .review-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .review-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .review-info {
+            flex: 1;
+        }
+        
+        .review-name {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .review-date {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .review-rating {
+            color: #ffc107;
+            font-size: 20px;
+        }
+        
+        .review-content {
+            line-height: 1.8;
+        }
+        
+        .review-image {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: block;
+        }
+        
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+        
+        .status-message {
+            text-align: center;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav ul {
+                margin-top: 20px;
+                justify-content: center;
+            }
+            
+            nav li {
+                margin: 0 10px;
+            }
+            
+            .hero h1 {
+                font-size: 32px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">👨‍🏫</span>
+                    교수님 평가 커뮤니티
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#" id="homeBtn">홈</a></li>
+                        <li><a href="#" id="evaluateBtn">평가하기</a></li>
+                        <li><a href="#" id="rankingBtn">랭킹</a></li>
+                        <li><a href="#" id="communityBtn">커뮤니티</a></li>
+                        <li><a href="#" id="mypageBtn">마이페이지</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="hero">
+            <h1>교수님을 평가해주세요</h1>
+            <p>강의 사진을 업로드하고 교수님의 강의 스타일과 능력을 솔직하게 평가해주세요. 익명으로 참여할 수 있습니다.</p>
+            <button class="cta-button" id="startEvaluateBtn">지금 평가하기</button>
+        </section>
+
+        <section class="features">
+            <div class="feature-card">
+                <div class="feature-icon">📸</div>
+                <h3>사진 업로드</h3>
+                <p>강의 중인 교수님의 사진을 업로드하여 평가에 참여하세요</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⭐</div>
+                <h3>별점 평가</h3>
+                <p>5단계 별점 시스템으로 교수님의 강의 능력을 평가하세요</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💬</div>
+                <h3>익명 리뷰</h3>
+                <p>익명으로 솔직한 리뷰를 작성하여 다른 학생들에게 도움을 주세요</p>
+            </div>
+        </section>
+
+        <section class="upload-section">
+            <h2>교수님 평가하기</h2>
+            <div id="statusMessage"></div>
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📷</div>
+                <p class="upload-text">교수님의 사진을 여기에 업로드해주세요</p>
+                <p>클릭하거나 파일을 드래그 앤 드롭하세요</p>
+                <input type="file" class="file-input" id="fileInput" accept="image/*">
+            </div>
+            
+            <div class="rating-section">
+                <h3>강의 평가 점수</h3>
+                <div class="stars">
+                    <span class="star" data-rating="1">★</span>
+                    <span class="star" data-rating="2">★</span>
+                    <span class="star" data-rating="3">★</span>
+                    <span class="star" data-rating="4">★</span>
+                    <span class="star" data-rating="5">★</span>
+                </div>
+            </div>
+            
+            <div class="comment-section">
+                <h3>상세 리뷰</h3>
+                <textarea class="comment-textarea" id="reviewText" placeholder="교수님의 강의 스타일, 전달력, 과제 난이도 등에 대해 솔직하게 평가해주세요..."></textarea>
+            </div>
+            
+            <button class="submit-btn" id="submitBtn" disabled>평가 제출하기</button>
+        </section>
+
+        <section class="reviews-section">
+            <h2>최근 평가 리뷰</h2>
+            <div id="reviewsContainer">
+                <!-- Reviews will be loaded here from IndexedDB -->
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 교수님 평가 커뮤니티. 모든 권리 보유.</p>
+            <p>익명성을 보장하며, 부적절한 내용은 삭제됩니다.</p>
+        </div>
+    </footer>
+
+    <script>
+        // IndexedDB setup
+        let db;
+        const DB_NAME = 'ProfessorReviewDB';
+        const STORE_NAME = 'reviews';
+        
+        // Initialize IndexedDB
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, 1);
+                
+                request.onerror = () => {
+                    console.error('IndexedDB error:', request.error);
+                    reject(request.error);
+                };
+                
+                request.onsuccess = () => {
+                    db = request.result;
+                    console.log('IndexedDB connected successfully');
+                    resolve();
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        const objectStore = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                        objectStore.createIndex('timestamp', 'timestamp', { unique: false });
+                        console.log('Object store created');
+                    }
+                };
+            });
+        }
+        
+        // Save review to IndexedDB
+        function saveReview(reviewData) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const objectStore = transaction.objectStore(STORE_NAME);
+                const request = objectStore.add({
+                    ...reviewData,
+                    timestamp: new Date().toISOString()
+                });
+                
+                request.onsuccess = () => {
+                    console.log('Review saved successfully');
+                    resolve(request.result);
+                };
+                
+                request.onerror = () => {
+                    console.error('Error saving review:', request.error);
+                    reject(request.error);
+                };
+            });
+        }
+        
+        // Load reviews from IndexedDB
+        function loadReviews() {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readonly');
+                const objectStore = transaction.objectStore(STORE_NAME);
+                const request = objectStore.getAll();
+                
+                request.onsuccess = () => {
+                    resolve(request.result);
+                };
+                
+                request.onerror = () => {
+                    reject(request.error);
+                };
+            });
+        }
+        
+        // Display reviews
+        async function displayReviews() {
+            try {
+                const reviews = await loadReviews();
+                const container = document.getElementById('reviewsContainer');
+                
+                if (reviews.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #666;">아직 등록된 평가가 없습니다.</p>';
+                    return;
+                }
+                
+                // Sort by timestamp (newest first)
+                reviews.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                container.innerHTML = reviews.map(review => `
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="review-avatar">익명</div>
+                            <div class="review-info">
+                                <div class="review-name">교수님 평가</div>
+                                <div class="review-date">${new Date(review.timestamp).toLocaleDateString('ko-KR')}</div>
+                            </div>
+                            <div class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
+                        </div>
+                        <div class="review-content">
+                            ${review.comment || '리뷰 내용이 없습니다.'}
+                        </div>
+                        ${review.imageData ? `<img src="${review.imageData}" alt="교수님 사진" class="review-image" />` : ''}
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading reviews:', error);
+                document.getElementById('reviewsContainer').innerHTML = '<p style="text-align: center; color: red;">리뷰를 불러오는 중 오류가 발생했습니다.</p>';
+            }
+        }
+        
+        // DOM elements
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const stars = document.querySelectorAll('.star');
+        const reviewText = document.getElementById('reviewText');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        const startEvaluateBtn = document.getElementById('startEvaluateBtn');
+        
+        // State variables
+        let currentRating = 0;
+        let imageData = null;
+        
+        // Initialize the app
+        async function initApp() {
+            try {
+                await initDB();
+                await displayReviews();
+                showStatus('데이터베이스 연결 성공', 'success');
+            } catch (error) {
+                showStatus('데이터베이스 연결 실패: ' + error.message, 'error');
+            }
+        }
+        
+        // Show status message
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message ${type}`;
+            setTimeout(() => {
+                statusMessage.textContent = '';
+                statusMessage.className = '';
+            }, 3000);
+        }
+        
+        // File upload handling
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#667eea';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#ccc';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#ccc';
+            
+            if (e.dataTransfer.files.length) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+        
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length) {
+                handleFile(fileInput.files[0]);
+            }
+        });
+        
+        // Handle file processing
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showStatus('이미지 파일만 업로드할 수 있습니다.', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imageData = e.target.result;
+                uploadArea.innerHTML = `
+                    <div class="upload-icon">✅</div>
+                    <p class="upload-text">파일이 선택되었습니다: ${file.name}</p>
+                    <p>다시 선택하려면 클릭하세요</p>
+                `;
+                checkSubmitButton();
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Star rating functionality
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                currentRating = parseInt(star.getAttribute('data-rating'));
+                updateStars();
+                checkSubmitButton();
+            });
+            
+            star.addEventListener('mouseover', () => {
+                const rating = parseInt(star.getAttribute('data-rating'));
+                highlightStars(rating);
+            });
+            
+            star.addEventListener('mouseout', () => {
+                highlightStars(currentRating);
+            });
+        });
+        
+        function updateStars() {
+            stars.forEach(star => {
+                const rating = parseInt(star.getAttribute('data-rating'));
+                if (rating <= currentRating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+        
+        function highlightStars(rating) {
+            stars.forEach(star => {
+                const starRating = parseInt(star.getAttribute('data-rating'));
+                if (starRating <= rating) {
+                    star.style.color = '#ffc107';
+                } else {
+                    star.style.color = '#ddd';
+                }
+            });
+        }
+        
+        // Check if submit button should be enabled
+        function checkSubmitButton() {
+            if (currentRating > 0 && imageData) {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+        }
+        
+        // Submit review
+        submitBtn.addEventListener('click', async () => {
+            if (currentRating === 0) {
+                showStatus('별점을 선택해주세요!', 'error');
+                return;
+            }
+            
+            if (!imageData) {
+                showStatus('교수님의 사진을 업로드해주세요!', 'error');
+                return;
+            }
+            
+            const reviewData = {
+                rating: currentRating,
+                comment: reviewText.value,
+                imageData: imageData
+            };
+            
+            try {
+                await saveReview(reviewData);
+                showStatus('평가가 성공적으로 제출되었습니다. 감사합니다!', 'success');
+                
+                // Reset form
+                currentRating = 0;
+                imageData = null;
+                reviewText.value = '';
+                updateStars();
+                uploadArea.innerHTML = `
+                    <div class="upload-icon">📷</div>
+                    <p class="upload-text">교수님의 사진을 여기에 업로드해주세요</p>
+                    <p>클릭하거나 파일을 드래그 앤 드롭하세요</p>
+                `;
+                submitBtn.disabled = true;
+                
+                // Refresh reviews display
+                await displayReviews();
+            } catch (error) {
+                showStatus('평가 제출 중 오류가 발생했습니다: ' + error.message, 'error');
+            }
+        });
+        
+        // Navigation buttons
+        document.getElementById('homeBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            showStatus('홈 페이지로 이동', 'success');
+        });
+        
+        document.getElementById('evaluateBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelector('.upload-section').scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        document.getElementById('rankingBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            showStatus('랭킹 페이지로 이동', 'success');
+        });
+        
+        document.getElementById('communityBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            showStatus('커뮤니티 페이지로 이동', 'success');
+        });
+        
+        document.getElementById('mypageBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            showStatus('마이페이지로 이동', 'success');
+        });
+        
+        startEvaluateBtn.addEventListener('click', () => {
+            document.querySelector('.upload-section').scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        // Initialize the application
+        initApp();
+    </script>
+</body>
+</html>

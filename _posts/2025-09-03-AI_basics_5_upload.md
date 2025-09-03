@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "AI 입문 5편: 어텐션(Attention) — Scaled Dot-Product, Self-Attention, Multi-Head (수식·미분·예제·실전 가이드)"
+title:  "AI 입문 5편: 어텐션"
 categories: "AI"
 tag: "Explanation"
 toc: true

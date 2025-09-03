@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "AI 입문 2편: 미분·적분·Dense Layer — 경사하강의 심장부"
+title:  "AI 입문 2편: 미분·적분·Dense Layer"
 categories: "AI"
 tag: "Explanation"
 toc: true

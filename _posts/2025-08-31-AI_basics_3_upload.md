@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "AI 입문 3편: 활성화 함수(Activation Functions) – Sigmoid, Tanh, ReLU, GELU"
+title:  "AI 입문 3편: 활성화 함수"
 categories: "AI"
 tag: "Explanation"
 toc: true
