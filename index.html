@@ -7,7 +7,6 @@ title: Home
 
 {% if site.posts != empty %}
 <div class="container">
-  <h1>Welcome to {{ site.title }}</h1>
   {% include huggingface.html %}
   
   <div class="recent-posts">
@@ -71,3 +70,5 @@ title: Home
     font-size: 1.2em; /* 링크 글자 크기 조정 */
   }
 </style>
+
+{% include footer.html %}
