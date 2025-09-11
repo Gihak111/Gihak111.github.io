@@ -135,5 +135,50 @@
 }
 
 .pagination .btn:hover {
-    background-color: #333; /* 버튼의 호버 배경 색상 */
+    background-color: #555; /* 버튼의 호버 배경 색상 */
+}
+
+
+/* --- 기존 스타일과 통일성을 맞춘 Hero 섹션 스타일 --- */
+
+.hero-section {
+    /* 상자 모양을 없애기 위해 border와 border-radius 속성을 제거했습니다. */
+    padding: 20px 0; /* 상하 여백을 조금 줄여 자연스럽게 만듭니다. */
+    text-align: center;
+    margin-bottom: 30px; /* 아래 'Recent Posts'와의 간격 유지 */
+}
+
+.hero-section h1 {
+    /* 다른 h1 태그와 동일한 글자 크기로 맞춥니다. */
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.hero-section .subtitle {
+    /* 다른 링크들과 비슷한 글자 크기로 맞춥니다. */
+    font-size: 18px;
+    color: #555; /* 기본 텍스트보다 약간 연한 색상 */
+    margin-bottom: 25px;
+}
+
+.hero-links .hero-link {
+    /* 페이지네이션 버튼 스타일과 최대한 유사하게 맞춥니다. */
+    display: inline-block;
+    text-decoration: none;
+    color: #fff;
+    background-color: #333;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 16px;
+    margin: 0 5px;
+    border: none;
+    transition: background-color 0.2s ease-in-out;
+}
+  
+.hero-links .hero-link:hover {
+    /* 떠오르는 효과 대신, 다른 버튼처럼 배경색이 바뀌도록 수정합니다. */
+    background-color: #555;
 }
