@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>고양이 vs 강아지 AI 분류기</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .status-box {
+            padding: 15px;
+            background-color: #dbeafe;
+            border: 1px solid #93c5fd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .status-title {
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 5px;
+        }
+        
+        .status-text {
+            color: #1d4ed8;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        
+        input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background-color: #f9fafb;
+        }
+        
+        .image-preview {
+            margin-top: 15px;
+        }
+        
+        .preview-image {
+            max-width: 300px;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background-color: #2563eb;
+        }
+        
+        .btn-secondary {
+            background-color: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+        
+        .btn:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .result-section h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .result-output {
+            background-color: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 15px;
+            min-height: 100px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            color: #374151;
+        }
+        
+        .info-card {
+            background-color: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .info-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #065f46;
+            margin-bottom: 10px;
+        }
+        
+        .info-text {
+            color: #047857;
+        }
+        
+        .labels-card {
+            background-color: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .labels-list {
+            list-style: disc;
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .labels-list li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>"입력 사진이 고양이인지 강아지인지 구분해주는 AI" AI 모델</h1>
+            <p class="subtitle">데이터 타입: image</p>
+        </header>
+
+        <div class="card">
+            <h2 class="section-title">모델 테스트</h2>
+            
+            <div class="status-box">
+                <h3 class="status-title">모델 상태</h3>
+                <p id="model-load-status" class="status-text">모델 로드 대기 중...</p>
+            </div>
+
+            <div class="form-group">
+                <label for="test-image-upload">테스트할 이미지를 업로드하세요:</label>
+                <input type="file" id="test-image-upload" accept="image/*">
+                <div id="image-preview" class="image-preview" style="display: none;">
+                    <img id="preview-image" class="preview-image" alt="Image Preview">
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button id="test-predict-btn" class="btn btn-primary" disabled>예측 실행</button>
+                <button id="clear-test-data-btn" class="btn btn-secondary">입력 초기화</button>
+            </div>
+
+            <div class="result-section">
+                <h3>예측 결과:</h3>
+                <pre id="test-output-result" class="result-output">이곳에 예측 결과가 표시됩니다.</pre>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <h3 class="info-title">Hugging Face 모델 정보:</h3>
+            <p class="info-text">
+                이 모델은 Hugging Face 저장소 (gihakkk/v0_test)에서 로드되는 MobileNet 기반의 파인튜닝된 분류기입니다.
+                고양이와 강아지 이미지를 구분할 수 있습니다.
+            </p>
+        </div>
+
+        <div class="labels-card">
+            <h3 class="section-title">학습된 라벨 목록:</h3>
+            <ul class="labels-list">
+                <li>고양이 (cat)</li>
+                <li>강아지 (dog)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수
+        let classifierModel = null;
+        let featureExtractor = null;
+        let testImageFile = null;
+        let testImagePreviewUrl = null;
+        let isPredicting = false;
+
+        const labels = ["cat", "dog"];
+        const modelLoadStatus = document.getElementById('model-load-status');
+        const testPredictBtn = document.getElementById('test-predict-btn');
+        const clearTestDataBtn = document.getElementById('clear-test-data-btn');
+        const testOutputResult = document.getElementById('test-output-result');
+        const imageUpload = document.getElementById('test-image-upload');
+        const imagePreview = document.getElementById('image-preview');
+        const previewImage = document.getElementById('preview-image');
+
+        /**
+         * 사용자가 업로드한 이미지 파일을 Image 객체로 변환하는 헬퍼 함수
+         */
+        const loadImage = (file) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => resolve(img);
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        };
+
+        /**
+         * 모든 모델을 로드하는 함수
+         */
+        const loadAllModels = async () => {
+            try {
+                modelLoadStatus.textContent = "AI 모델 로딩 중... (최초 1회 실행)";
+
+                await tf.ready();
+
+                // 1. 학습된 '분류기' 모델 로드 (사용자가 제공한 정확한 파일명 사용)
+                const modelUrl = "https://huggingface.co/gihakkk/v0_test/resolve/main/tfjs-classifier-입력_사진이_고양이인지_강아지인지_구분해주는_AI_MobileNet-Finetuned-Classifier.json";
+                classifierModel = await tf.loadLayersModel(modelUrl);
+                console.log("✅ 분류기 모델 로드 완료.");
+
+                // 2. MobileNetV2 특징 추출기 베이스 모델 로드
+                const MOBILENET_URL = "https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v2_100_224/feature_vector/3/default/1";
+                featureExtractor = await tf.loadGraphModel(MOBILENET_URL, { fromTFHub: true });
+                console.log("✅ MobileNetV2 로드 완료.");
+
+                modelLoadStatus.textContent = "🎉 모든 모델 로드 완료! 예측을 시작할 수 있습니다.";
+                testPredictBtn.disabled = false;
+            } catch (e) {
+                console.error("모델 로딩 실패:", e);
+                modelLoadStatus.textContent = `오류: 모델 로드에 실패했습니다. (${e.message})`;
+            }
+        };
+
+        /**
+         * 이미지 업로드 처리
+         */
+        const handleTestImageUpload = (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                testImageFile = file;
+                if (testImagePreviewUrl) {
+                    URL.revokeObjectURL(testImagePreviewUrl);
+                }
+                testImagePreviewUrl = URL.createObjectURL(file);
+                previewImage.src = testImagePreviewUrl;
+                imagePreview.style.display = 'block';
+            } else {
+                clearTestImage();
+            }
+        };
+
+        /**
+         * 테스트 이미지 초기화
+         */
+        const clearTestImage = () => {
+            if (testImagePreviewUrl) {
+                URL.revokeObjectURL(testImagePreviewUrl);
+            }
+            testImageFile = null;
+            testImagePreviewUrl = null;
+            imageUpload.value = "";
+            imagePreview.style.display = 'none';
+        };
+
+        /**
+         * 테스트 데이터 전체 초기화
+         */
+        const handleClearTestData = () => {
+            clearTestImage();
+            testOutputResult.textContent = "이곳에 예측 결과가 표시됩니다.";
+        };
+
+        /**
+         * 예측 실행
+         */
+        const handleTestPrediction = async () => {
+            if (!classifierModel || !featureExtractor) {
+                testOutputResult.textContent = "오류: 모델이 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.";
+                return;
+            }
+
+            if (!testImageFile) {
+                testOutputResult.textContent = "이미지 파일을 업로드해주세요.";
+                return;
+            }
+
+            isPredicting = true;
+            testPredictBtn.disabled = true;
+            testPredictBtn.textContent = "예측 중...";
+            testOutputResult.textContent = "예측 중...";
+
+            try {
+                const img = await loadImage(testImageFile);
+
+                const result = tf.tidy(() => {
+                    const MODEL_IMAGE_SIZE = 224;
+                    let imageTensor = tf.browser
+                        .fromPixels(img)
+                        .resizeNearestNeighbor([MODEL_IMAGE_SIZE, MODEL_IMAGE_SIZE])
+                        .toFloat()
+                        .div(tf.scalar(255));
+                    
+                    if (imageTensor.shape[2] === 4) {
+                        imageTensor = imageTensor.slice([0, 0, 0], [MODEL_IMAGE_SIZE, MODEL_IMAGE_SIZE, 3]);
+                    }
+                    
+                    const batchedImage = imageTensor.expandDims(0);
+                    const embedding = featureExtractor.predict(batchedImage);
+                    const prediction = classifierModel.predict(embedding);
+                    return prediction.dataSync();
+                });
+
+                const probabilities = Array.from(result);
+                const predictedClassIndex = probabilities.indexOf(Math.max(...probabilities));
+                const predictionLabel = labels[predictedClassIndex] || "알 수 없음";
+                const predictionProb = (probabilities[predictedClassIndex] * 100).toFixed(2);
+
+                let resultText = `예측 결과: ${predictionLabel === "cat" ? "고양이" : "강아지"} (${predictionProb}%)`;
+                const probMap = labels
+                    .map((label, i) => `  "${label === "cat" ? "고양이" : "강아지"}": ${(probabilities[i] * 100).toFixed(2)}%`)
+                    .join(",\n");
+                resultText += `\n\n- 전체 확률분포 -\n{\n${probMap}\n}`;
+
+                testOutputResult.textContent = resultText;
+            } catch (e) {
+                console.error("예측 중 오류 발생:", e);
+                testOutputResult.textContent = "오류: 예측에 실패했습니다. " + e.message;
+            } finally {
+                isPredicting = false;
+                testPredictBtn.disabled = false;
+                testPredictBtn.textContent = "예측 실행";
+            }
+        };
+
+        // 이벤트 리스너 등록
+        imageUpload.addEventListener('change', handleTestImageUpload);
+        testPredictBtn.addEventListener('click', handleTestPrediction);
+        clearTestDataBtn.addEventListener('click', handleClearTestData);
+
+        // 페이지 로드 시 모델 로드 시작
+        window.addEventListener('load', loadAllModels);
+    </script>
+</body>
+</html>
