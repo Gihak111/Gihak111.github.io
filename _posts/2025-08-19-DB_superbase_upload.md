@@ -166,3 +166,7 @@ uploadModel(modelFile, 'YOUR_TEAM_ID');
 Supabase로 TensorFlow 모델을 저장하는 방법을 정리했다.  
 무료 티어는 1GB 스토리지와 월 2GB 대역폭을 제공하니 한도를 주의한다.  
 위 단계를 따라 하면 정책 오류 없이 모델을 저장할 수 있다.  
+
+아래는 내가 올린 내 supabase의 모델을 로드해서 사용하는 html 페이지 이다.  
+진짜 잘 돌아가는 걸 보면, 무료 디비에선 진짜 탑급인 것 같다.  
+[https://gihak111.github.io/plus/supabase_model_load.html](https://gihak111.github.io/plus/supabase_model_load.html)  
