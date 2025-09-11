@@ -3,12 +3,11 @@ layout: default
 title: Home
 ---
 
-{% include greeting.html %}
-
-{% if site.posts != empty %}
+<p><strong>Welcome to my blog</strong></p>
+<p>
+  {% include greeting.html %}and {% include huggingface.html %}
+</p>
 <div class="container">
-  {% include huggingface.html %}
-  
   <div class="recent-posts">
     <h2>Recent Posts</h2>
     <ul>
