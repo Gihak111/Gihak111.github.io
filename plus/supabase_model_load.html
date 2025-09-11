@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Korean AI Name Classifier - Pink Unicorn Edition</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            /* Pink Unicorn Dreamworld Color Palette */
+            --background: oklch(0.98 0.02 320);
+            --foreground: oklch(0.2 0.05 320);
+            --card: oklch(0.99 0.01 320);
+            --card-foreground: oklch(0.2 0.05 320);
+            --primary: oklch(0.65 0.25 320);
+            --primary-foreground: oklch(0.98 0.02 320);
+            --secondary: oklch(0.92 0.05 300);
+            --secondary-foreground: oklch(0.2 0.05 320);
+            --muted: oklch(0.94 0.03 310);
+            --muted-foreground: oklch(0.5 0.03 320);
+            --accent: oklch(0.75 0.15 300);
+            --accent-foreground: oklch(0.2 0.05 320);
+            --border: oklch(0.9 0.03 320);
+            --input: oklch(0.96 0.02 320);
+            --ring: oklch(0.65 0.25 320);
+            --radius: 1rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(
+                135deg,
+                var(--background) 0%,
+                oklch(0.96 0.03 310) 25%,
+                oklch(0.94 0.04 300) 50%,
+                oklch(0.96 0.03 310) 75%,
+                var(--background) 100%
+            );
+            color: var(--foreground);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1024px;
+            margin: 0 auto;
+            padding: 1rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .floating-elements {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-emoji {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.2;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .floating-emoji:nth-child(1) { top: 10%; left: 10%; font-size: 4rem; }
+        .floating-emoji:nth-child(2) { top: 20%; right: 20%; font-size: 3rem; animation-delay: 1s; }
+        .floating-emoji:nth-child(3) { bottom: 20%; left: 20%; font-size: 3rem; animation-delay: 2s; }
+        .floating-emoji:nth-child(4) { bottom: 10%; right: 10%; font-size: 4rem; animation-delay: 0.5s; }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .main-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--muted-foreground);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .data-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--muted-foreground);
+        }
+
+        .card {
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(90deg, oklch(0.65 0.25 320 / 0.1), oklch(0.75 0.15 300 / 0.1), oklch(0.65 0.25 320 / 0.1));
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .status-box {
+            padding: 1.5rem;
+            background: linear-gradient(90deg, oklch(0.65 0.25 320 / 0.05), oklch(0.75 0.15 300 / 0.05), oklch(0.65 0.25 320 / 0.05));
+            border: 2px solid oklch(0.65 0.25 320 / 0.2);
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+        }
+
+        .status-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-text {
+            color: var(--foreground);
+            font-weight: 500;
+        }
+
+        .input-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid oklch(0.65 0.25 320 / 0.2);
+            border-radius: var(--radius);
+            background: var(--input);
+            color: var(--foreground);
+            font-size: 1rem;
+            font-family: inherit;
+            resize: none;
+            min-height: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .textarea:focus {
+            outline: none;
+            border-color: oklch(0.65 0.25 320 / 0.5);
+            box-shadow: 0 0 0 3px oklch(0.65 0.25 320 / 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .button-group {
+                flex-direction: row;
+            }
+        }
+
+        .button {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1.125rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-height: 56px;
+        }
+
+        .button-primary {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            color: var(--primary-foreground);
+        }
+
+        .button-primary:hover:not(:disabled) {
+            background: linear-gradient(90deg, oklch(0.6 0.25 320), oklch(0.7 0.15 300));
+            transform: scale(1.05);
+        }
+
+        .button-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .button-outline {
+            background: transparent;
+            border: 2px solid oklch(0.65 0.25 320 / 0.3);
+            color: var(--foreground);
+        }
+
+        .button-outline:hover {
+            border-color: oklch(0.65 0.25 320 / 0.5);
+            background: oklch(0.65 0.25 320 / 0.05);
+        }
+
+        .results-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .results-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .results-box {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, oklch(0.94 0.03 310 / 0.5), oklch(0.75 0.15 300 / 0.1));
+            border: 2px solid oklch(0.75 0.15 300 / 0.2);
+            border-radius: var(--radius);
+            min-height: 120px;
+        }
+
+        .result-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: oklch(0.65 0.25 320 / 0.1);
+            border: 1px solid oklch(0.65 0.25 320 / 0.2);
+            border-radius: calc(var(--radius) - 4px);
+            margin-bottom: 0.75rem;
+        }
+
+        .result-emoji {
+            font-size: 1.5rem;
+        }
+
+        .result-text {
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            color: var(--foreground);
+        }
+
+        .result-message {
+            font-size: 0.875rem;
+            color: var(--primary);
+            font-weight: 500;
+            margin-top: 0.25rem;
+        }
+
+        .empty-results {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            color: var(--muted-foreground);
+        }
+
+        .empty-results-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .empty-results-icon {
+            font-size: 3rem;
+            opacity: 0.5;
+        }
+
+        .labels-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .label-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: linear-gradient(90deg, oklch(0.65 0.25 320 / 0.05), oklch(0.75 0.15 300 / 0.05));
+            border: 1px solid oklch(0.65 0.25 320 / 0.2);
+            border-radius: calc(var(--radius) - 4px);
+        }
+
+        .label-emoji {
+            font-size: 1.5rem;
+        }
+
+        .label-text {
+            font-weight: 600;
+            font-size: 1.125rem;
+            text-transform: capitalize;
+        }
+
+        .loader {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .spinner {
+            width: 1.5rem;
+            height: 1.5rem;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-10px) rotate(2deg); }
+            66% { transform: translateY(-5px) rotate(-2deg); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .pulse-glow {
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px oklch(0.65 0.25 320 / 0.3); }
+            50% { box-shadow: 0 0 40px oklch(0.65 0.25 320 / 0.6), 0 0 60px oklch(0.75 0.15 300 / 0.3); }
+        }
+
+        .sparkle-effect {
+            position: relative;
+        }
+
+        .sparkle-effect::before {
+            content: "✨";
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            animation: sparkle 2s infinite;
+            pointer-events: none;
+            font-size: 1.2em;
+        }
+
+        .sparkle-effect::after {
+            content: "🌟";
+            position: absolute;
+            top: 20%;
+            right: 15%;
+            animation: sparkle 2s infinite 0.5s;
+            pointer-events: none;
+            font-size: 1em;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1) rotate(180deg); }
+        }
+
+        .heart-pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-elements">
+        <div class="floating-emoji">🦄</div>
+        <div class="floating-emoji">🌟</div>
+        <div class="floating-emoji">✨</div>
+        <div class="floating-emoji">🌈</div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <div class="sparkle-effect">
+                <h1 class="main-title">What's in a Name? 🌈</h1>
+            </div>
+            <p class="subtitle">Let's find out if it's a pup or a primate!</p>
+            <div class="data-info">
+                <span>✨</span>
+                <span>데이터 타입: text</span>
+                <span>✨</span>
+            </div>
+        </header>
+
+        <div class="card pulse-glow">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <span>⭐</span>
+                    <span>마법의 이름 분류기</span>
+                    <span>⭐</span>
+                </h2>
+            </div>
+            <div class="card-content">
+                <div class="status-box">
+                    <div class="status-title">
+                        <span class="heart-pulse">💖</span>
+                        <span>마법 상태</span>
+                    </div>
+                    <p class="status-text" id="modelStatus">모델 로드 대기 중...</p>
+                </div>
+
+                <div class="input-section">
+                    <label class="label" for="textInput">
+                        <span>✨</span>
+                        <span>Enter the Korean name below! ✨</span>
+                    </label>
+                    <textarea 
+                        id="textInput" 
+                        class="textarea sparkle-effect"
+                        placeholder="분류할 한국어 이름을 입력하세요... (쉼표로 여러 개 입력 가능) 🌟"
+                        rows="4"
+                    ></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button id="predictBtn" class="button button-primary" disabled>
+                        <span>✨</span>
+                        <span>Classify Now! ✨</span>
+                    </button>
+                    <button id="clearBtn" class="button button-outline">
+                        <span>💖</span>
+                        <span>Clear Magic</span>
+                    </button>
+                </div>
+
+                <div class="results-section">
+                    <h3 class="results-title">
+                        <span>⭐</span>
+                        <span>Magical Results:</span>
+                    </h3>
+                    <div class="results-box" id="resultsBox">
+                        <div class="empty-results">
+                            <div class="empty-results-content">
+                                <div class="empty-results-icon">✨</div>
+                                <p>이곳에 마법의 결과가 나타날 거예요! ✨</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="border-color: oklch(0.75 0.15 300 / 0.3); background: linear-gradient(90deg, oklch(0.75 0.15 300 / 0.05), oklch(0.65 0.25 320 / 0.05));">
+            <div class="card-header" style="background: linear-gradient(90deg, oklch(0.75 0.15 300 / 0.1), oklch(0.65 0.25 320 / 0.1));">
+                <h2 class="card-title" style="color: var(--accent);">
+                    <span>💖</span>
+                    <span>Magical Wisdom</span>
+                    <span>💖</span>
+                </h2>
+            </div>
+            <div class="card-content">
+                <p style="font-size: 1.125rem; line-height: 1.6;">이 AI는 한국어 이름을 분석하여 강아지 이름인지 고릴라 이름인지 구분합니다.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <span>✨</span>
+                    <span>학습된 마법 라벨</span>
+                </h2>
+            </div>
+            <div class="card-content">
+                <div class="labels-grid">
+                    <div class="label-item">
+                        <span class="label-emoji">🐶✨</span>
+                        <span class="label-text">dog</span>
+                    </div>
+                    <div class="label-item">
+                        <span class="label-emoji">🦍👑</span>
+                        <span class="label-text">gorilla</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // AI Configuration
+        const AI_CONFIG = {
+            aiPurpose: "이 이름이 강아진지 고릴라인지 알려주는 AI",
+            dataType: "text",
+            loadedModelPath: "_AI_that_tells_you_whether_this_name_is_for_a_dog_or_a_gorilla__text_classifier_model",
+            labels: ["dog", "gorilla"],
+            supabaseUrl: "https://ltwvcxmewxifvzzgkcku.supabase.co",
+            supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0d3ZjeG1ld3hpZnZ6emdrY2t1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwNTI4OTcsImV4cCI6MjA3MDYyODg5N30.XP7dWGIbPqrUSQBq7KUoHUXy3YmUg64hAKL2z06oTBI",
+            gptFeedback: "이 AI는 한국어 이름을 분석하여 강아지 이름인지 고릴라 이름인지 구분합니다."
+        };
+
+        // Global variables
+        let classifierModel = null;
+        let featureExtractor = null;
+        let isPredicting = false;
+
+        // DOM elements
+        const modelStatus = document.getElementById('modelStatus');
+        const textInput = document.getElementById('textInput');
+        const predictBtn = document.getElementById('predictBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const resultsBox = document.getElementById('resultsBox');
+
+        // Supabase IO Handler
+        function createSupabaseIOHandler(supabase, modelPath, bucketName) {
+            return {
+                load: async () => {
+                    const { data, error } = await supabase.storage
+                        .from(bucketName)
+                        .download(`${modelPath}/model.json`);
+
+                    if (error) throw new Error(`Failed to load model.json: ${error.message}`);
+
+                    const modelJson = await data.text();
+                    return JSON.parse(modelJson);
+                },
+
+                loadWeights: async (weightsManifest) => {
+                    const weightPromises = weightsManifest.map(async (manifest) => {
+                        const { data, error } = await supabase.storage
+                            .from(bucketName)
+                            .download(`${AI_CONFIG.loadedModelPath}/${manifest.paths[0]}`);
+
+                        if (error) throw new Error(`Failed to load weights: ${error.message}`);
+                        return data.arrayBuffer();
+                    });
+
+                    return Promise.all(weightPromises);
+                }
+            };
+        }
+
+        // Helper functions
+        function getResultEmoji(label) {
+            return label === "dog" ? "🐶✨" : "🦍👑";
+        }
+
+        function getResultMessage(label) {
+            return label === "dog" ? "Paw-sitively adorable! 🌈" : "A strong name for a mighty friend! 💫";
+        }
+
+        function showLoader() {
+            return `
+                <div class="loader">
+                    <div class="spinner"></div>
+                    <span style="color: var(--primary); font-weight: 500;">마법을 부리는 중...</span>
+                </div>
+            `;
+        }
+
+        function displayResults(resultText) {
+            if (!resultText) {
+                resultsBox.innerHTML = `
+                    <div class="empty-results">
+                        <div class="empty-results-content">
+                            <div class="empty-results-icon">✨</div>
+                            <p>이곳에 마법의 결과가 나타날 거예요! ✨</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const lines = resultText.split('\n');
+            let html = '<div style="display: flex; flex-direction: column; gap: 0.75rem;">';
+
+            lines.forEach(line => {
+                if (line.includes('dog') || line.includes('gorilla')) {
+                    const label = line.includes('dog') ? 'dog' : 'gorilla';
+                    html += `
+                        <div class="result-item">
+                            <span class="result-emoji">${getResultEmoji(label)}</span>
+                            <div>
+                                <p class="result-text">${line}</p>
+                                <p class="result-message">${getResultMessage(label)}</p>
+                            </div>
+                        </div>
+                    `;
+                } else if (line.trim()) {
+                    html += `<p style="font-family: 'Courier New', monospace; font-size: 0.875rem; color: var(--muted-foreground);">${line}</p>`;
+                }
+            });
+
+            html += '</div>';
+            resultsBox.innerHTML = html;
+        }
+
+        // Main prediction function
+        async function handlePrediction() {
+            if (!classifierModel || !featureExtractor) {
+                displayResults("오류: 모델이 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.");
+                return;
+            }
+
+            const inputText = textInput.value.trim();
+            if (!inputText) {
+                displayResults("텍스트를 입력해주세요.");
+                return;
+            }
+
+            isPredicting = true;
+            predictBtn.disabled = true;
+            predictBtn.innerHTML = showLoader();
+            displayResults("예측 중...");
+
+            try {
+                const texts = inputText.split(',').map(t => t.trim()).filter(Boolean);
+                if (texts.length === 0) throw new Error("입력 텍스트가 비어있습니다.");
+
+                const embeddings = await featureExtractor.embed(texts);
+                const prediction = classifierModel.predict(embeddings);
+                const predictionData = await prediction.array();
+
+                tf.dispose([embeddings, prediction]);
+
+                const resultText = texts.map((text, i) => {
+                    const probabilities = predictionData[i];
+                    const topResultIndex = probabilities.indexOf(Math.max(...probabilities));
+                    const topLabel = AI_CONFIG.labels[topResultIndex] || "알 수 없음";
+                    const topProbability = (probabilities[topResultIndex] * 100).toFixed(2);
+                    return `"${text}": ${topLabel} (${topProbability}%)`;
+                }).join('\n');
+
+                displayResults(resultText);
+            } catch (e) {
+                console.error('예측 중 오류 발생:', e);
+                displayResults("오류: 예측에 실패했습니다. " + e.message);
+            } finally {
+                isPredicting = false;
+                predictBtn.disabled = false;
+                predictBtn.innerHTML = '<span>✨</span><span>Classify Now! ✨</span>';
+            }
+        }
+
+        function handleClear() {
+            textInput.value = '';
+            displayResults('');
+        }
+
+        // Initialize the application
+        async function initializeApp() {
+            try {
+                modelStatus.textContent = "AI 모델 로딩 중... (최초 1회 실행)";
+                
+                // Wait for TensorFlow.js to be ready
+                await tf.ready();
+
+                // Initialize Supabase client
+                const supabase = window.supabase.createClient(AI_CONFIG.supabaseUrl, AI_CONFIG.supabaseKey);
+
+                // Load classifier model
+                const loader = createSupabaseIOHandler(supabase, AI_CONFIG.loadedModelPath, "models");
+                classifierModel = await tf.loadLayersModel(loader);
+                console.log("✅ 분류기 모델 로드 완료.");
+
+                // Load Universal Sentence Encoder
+                featureExtractor = await window.use.load();
+                console.log("✅ Universal Sentence Encoder 로드 완료.");
+
+                modelStatus.textContent = "🎉 모든 모델 로드 완료! 예측을 시작할 수 있습니다.";
+                predictBtn.disabled = false;
+
+            } catch (e) {
+                console.error("모델 로딩 실패:", e);
+                modelStatus.textContent = `오류: 모델 로드에 실패했습니다. (${e.message})`;
+            }
+        }
+
+        // Event listeners
+        predictBtn.addEventListener('click', handlePrediction);
+        clearBtn.addEventListener('click', handleClear);
+
+        // Initialize when page loads
+        window.addEventListener('load', () => {
+            // Wait a bit for all scripts to load
+            setTimeout(initializeApp, 1000);
+        });
+    </script>
+</body>
+</html>
