@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- 헤더 파일을 포함하여 메타데이터와 스타일시트 링크를 설정 -->
     {% include header.html %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/animations_for_post.css"> <!-- 새 애니메이션 CSS 파일 -->
-    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/code_style.css"> <!-- 분리된 코드 스타일 파일 -->
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/styles.css"> 
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/animations_for_post.css">
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/code_style.css">
 
-    <!-- MathJax 설정 -->
     <script>
         window.MathJax = {
             tex: {
@@ -23,49 +22,53 @@
     <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
-<i class="fa fa-bars fa-2x"></i> Gihak111
-<!-- 네비게이션 파일을 포함하여 메뉴를 설정 -->
-{% include navigation.html %}
+    <div class="site-wrapper">
+        <header>
+            <i class="fa fa-bars fa-2x"></i> Gihak111
+            {% include navigation.html %}
+        </header>
 
-<div id="wrapper">
-    <!-- 각 페이지의 콘텐츠가 이 위치에 삽입됨 -->
-    <div class="container">
-        {{ content }}
+        <main class="main-content">
+            <div id="wrapper">
+                <div class="container">
+                    {{ content }}
+                </div>
+            </div>
+        </main>
+        {% include spacer.html %}
+
+        <footer class="site-footer">
+            {% include footer.html %}
+        </footer>
     </div>
-</div>
-<!-- 여백 역할을 하는 HTML 파일 포함 -->
-{% include spacer.html %}
-<!-- 푸터 파일을 포함하여 페이지 하단에 표시할 내용 설정 -->
-{% include footer.html %}
 
-<!-- 스크립트 파일을 포함하여 추가 JavaScript를 설정 -->
-{% include scripts.html %}
+    {% include scripts.html %}
 
-<!-- 복사 기능을 위한 JavaScript 추가 -->
-<script>
-    // 복사 버튼 생성 및 동작
-    document.addEventListener('DOMContentLoaded', () => {
-        const preBlocks = document.querySelectorAll('pre');
-        
-        preBlocks.forEach(pre => {
-            // 복사 버튼 추가
-            const button = document.createElement('button');
-            button.innerText = 'Copy';
-            button.classList.add('copy-button');
-            pre.appendChild(button);
+    <script>
+        // 복사 버튼 생성 및 동작
+        document.addEventListener('DOMContentLoaded', () => {
+            const preBlocks = document.querySelectorAll('pre');
+            
+            preBlocks.forEach(pre => {
+                const button = document.createElement('button');
+                button.innerText = 'Copy';
+                button.classList.add('copy-button');
+                pre.appendChild(button);
 
-            // 복사 기능 동작
-            button.addEventListener('click', () => {
-                const codeText = pre.innerText;
-                navigator.clipboard.writeText(codeText).then(() => {
-                    button.innerText = 'Copied!';
-                    setTimeout(() => button.innerText = 'Copy', 2000);
-                }).catch(err => {
-                    console.error('Copy failed', err);
+                button.addEventListener('click', () => {
+                    // 버튼 텍스트를 제외하고 복사하도록 수정
+                    const code = pre.querySelector('code');
+                    const codeText = code ? code.innerText : pre.innerText.replace(/\nCopy$/, '');
+                    
+                    navigator.clipboard.writeText(codeText).then(() => {
+                        button.innerText = 'Copied!';
+                        setTimeout(() => button.innerText = 'Copy', 2000);
+                    }).catch(err => {
+                        console.error('Copy failed', err);
+                    });
                 });
             });
         });
-    });
-</script>
+    </script>
 </body>
 </html>
