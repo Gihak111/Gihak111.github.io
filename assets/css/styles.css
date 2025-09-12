@@ -1,3 +1,11 @@
+/* --- 전체적인 파스텔 톤 색상 및 기본 스타일 --- */
+/* --- 전체적인 파스텔 톤 색상 및 기본 스타일 --- */
+body {
+    background-color: #fff8fc !important; /* !important를 추가하여 최우선 적용 */
+    color: #e1e1ff; /* 기본 텍스트 색상을 부드러운 남색으로 */
+}
+
+/* --- 검색 --- */
 #search-container {
     margin: 20px 0;
 }
@@ -5,6 +13,8 @@
     width: 100%;
     padding: 10px;
     font-size: 16px;
+    border: 1px solid #e0e0e6; /* 테두리 색상 변경 */
+    border-radius: 4px;
 }
 #results-container {
     list-style: none;
@@ -12,200 +22,205 @@
 }
 #results-container li {
     padding: 10px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #e0e0e6; /* 구분선 색상 변경 */
 }
 
+/* --- Spacer --- */
 .spacer {
-    height: 300px; /* 원하는 여백 높이 */
+    height: 300px;
 }
 
-/* 스타일을 새로 추가할 CSS 파일 */
+/* --- Recent Posts --- */
 .recent-posts li a {
-    font-size: 20px; /* 원하는 글자 크기로 조정 */
-    color: #333; /* 글자 색상 */
-    text-decoration: none; /* 링크의 기본 밑줄 제거 */
+    font-size: 20px;
+    color: #4a4a5a; /* 링크 색상 변경 */
+    text-decoration: none;
 }
-
 .recent-posts li a:hover {
-    text-decoration: underline; /* 링크에 마우스를 올렸을 때 밑줄 추가 */
+    text-decoration: underline;
+    color: #78909c; /* 호버 시 색상 변경 */
 }
 
-/* Tags 페이지의 제목과 링크 스타일을 정의합니다 */
+/* --- Tags 페이지 --- */
 .tag-list h2 {
-    font-size: 24px; /* 태그 제목의 글자 크기 */
-    color: #333; /* 태그 제목의 색상 */
-    margin-top: 20px; /* 태그 제목의 상단 여백 */
+    font-size: 24px;
+    color: #3e3e4f; /* 제목 색상 변경 */
+    margin-top: 20px;
 }
-
 .tag-list ul {
-    list-style-type: none; /* 기본 리스트 스타일 제거 */
-    padding-left: 0; /* 왼쪽 패딩 제거 */
+    list-style-type: none;
+    padding-left: 0;
 }
-
 .tag-list ul li {
-    margin-bottom: 10px; /* 각 항목 사이의 여백 */
+    margin-bottom: 10px;
 }
-
 .tag-list ul li a { 
-    font-size: 18px; /* 링크의 글자 크기 */
-    color: #333; /* 링크의 색상 */
-    text-decoration: none; /* 링크의 밑줄 제거 */
+    font-size: 18px;
+    color: #5c5c6d; /* 링크 색상 변경 */
+    text-decoration: none;
 }
-
 .tag-list ul li a:hover {
-    text-decoration: underline; /* 마우스를 올렸을 때 밑줄 추가 */
+    text-decoration: underline;
 }
 
-/* Categories 페이지의 제목과 링크 스타일을 정의합니다 */
+/* --- Categories 페이지 --- */
 .category-list h2 {
-    font-size: 24px; /* 카테고리 제목의 글자 크기 */
-    color: #333; /* 카테고리 제목의 색상 */
-    margin-top: 20px; /* 카테고리 제목의 상단 여백 */
+    font-size: 24px;
+    color: #3e3e4f; /* 제목 색상 변경 */
+    margin-top: 20px;
 }
-
 .category-list ul {
-    list-style-type: none; /* 기본 리스트 스타일 제거 */
-    padding-left: 0; /* 왼쪽 패딩 제거 */
+    list-style-type: none;
+    padding-left: 0;
 }
-
 .category-list ul li {
-    margin-bottom: 10px; /* 각 항목 사이의 여백 */
+    margin-bottom: 10px;
 }
-
 .category-list ul li a {
-    font-size: 18px; /* 링크의 글자 크기 */
-    color: #333; /* 링크의 색상 */
-    text-decoration: none; /* 링크의 밑줄 제거 */
+    font-size: 18px;
+    color: #5c5c6d; /* 링크 색상 변경 */
+    text-decoration: none;
 }
-
 .category-list ul li a:hover {
-    text-decoration: underline; /* 마우스를 올렸을 때 밑줄 추가 */
+    text-decoration: underline;
 }
 
-/* Archive 페이지의 제목과 포스트 링크 스타일을 정의합니다 */
+/* --- Archive 페이지 --- */
 .post-list h1 {
-    font-size: 28px; /* 제목의 글자 크기 */
-    color: #333; /* 제목의 색상 */
-    margin-bottom: 20px; /* 제목의 하단 여백 */
+    font-size: 28px;
+    color: #3e3e4f; /* 제목 색상 변경 */
+    margin-bottom: 20px;
 }
-
 .post-list ul {
-    list-style-type: none; /* 기본 리스트 스타일 제거 */
-    padding-left: 0; /* 왼쪽 패딩 제거 */
+    list-style-type: none;
+    padding-left: 0;
 }
-
 .post-list ul li {
-    margin-bottom: 15px; /* 각 포스트 사이의 여백 */
-    border-bottom: 1px solid #ddd; /* 포스트 아래에 경계선 추가 */
-    padding-bottom: 10px; /* 포스트 아래쪽 여백 */
-    overflow: hidden; /* 수평 스크롤 방지 */
+    margin-bottom: 15px;
+    border-bottom: 1px solid #e0e0e6; /* 구분선 색상 변경 */
+    padding-bottom: 10px;
+    overflow: hidden;
 }
-
 .post-list a {
-    font-size: 18px; /* 링크의 글자 크기 */
-    color: #333; /* 링크의 색상 */
-    text-decoration: none; /* 링크의 밑줄 제거 */
+    font-size: 18px;
+    color: #5c5c6d; /* 링크 색상 변경 */
+    text-decoration: none;
 }
-
 .post-list a:hover {
-    text-decoration: underline; /* 마우스를 올렸을 때 밑줄 추가 */
+    text-decoration: underline;
 }
-
 .post-date {
-    font-size: 14px; /* 날짜의 글자 크기 */
-    color: #333; /* 날짜의 색상 */
-    float: right; /* 날짜를 오른쪽으로 정렬 */
+    font-size: 14px;
+    color: #8a8a9e; /* 날짜 색상을 더 연하게 */
+    float: right;
 }
 
-/* 페이지네이션 버튼 스타일 */
+/* --- 페이지네이션 버튼 --- */
 .pagination {
-    margin-top: 20px; /* 상단 여백 */
-    text-align: center; /* 중앙 정렬 */
-}
-
-.pagination .btn {
-    margin: 0 5px; /* 버튼 간의 여백 */
-    padding: 10px 20px; /* 버튼 안쪽 여백 */
-    font-size: 16px; /* 버튼 글자 크기 */
-    color: #fff; /* 버튼 글자 색상 */
-    background-color: #333; /* 버튼 배경 색상 */
-    border: none; /* 버튼 경계선 제거 */
-    border-radius: 4px; /* 버튼 경계선 둥글게 */
-    text-decoration: none; /* 버튼의 텍스트 장식 제거 */
-}
-
-.pagination .btn:hover {
-    background-color: #555; /* 버튼의 호버 배경 색상 */
-}
-
-
-/* --- 기존 스타일과 통일성을 맞춘 Hero 섹션 스타일 --- */
-
-.hero-section {
-    /* 상자 모양을 없애기 위해 border와 border-radius 속성을 제거했습니다. */
-    padding: 20px 0; /* 상하 여백을 조금 줄여 자연스럽게 만듭니다. */
+    margin-top: 20px;
     text-align: center;
-    margin-bottom: 30px; /* 아래 'Recent Posts'와의 간격 유지 */
+}
+.pagination .btn {
+    margin: 0 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #b3cde0; /* 파스텔 블루 */
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.2s ease-in-out;
+}
+.pagination .btn:hover {
+    background-color: #6497b1; /* 호버 시 조금 더 진한 파스텔 블루 */
+}
+
+/* --- Hero Section 수정 --- */
+.hero-section {
+    position: relative; /* 애니메이션 배경을 위한 기준점 */
+    overflow: hidden; /* 애니메이션이 영역 밖으로 나가지 않도록 */
+    padding: 60px 20px; /* 상하 여백을 늘려 배경이 잘 보이게 */
+    text-align: center;
+    margin-bottom: 30px;
+    color: #ffffff; /* 내부 텍스트를 흰색으로 변경 */
+    border-radius: 8px; /* 부드러운 느낌을 위해 모서리 둥글게 */
+}
+
+/* ★★★ 흐르는 그라데이션 배경 애니메이션 추가 ★★★ */
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 200%; height: 100%;
+    z-index: -1; /* 텍스트 뒤로 보내기 */
+    background: linear-gradient(
+        90deg, 
+        #a8e6cf, /* 파스텔 민트 */
+        #dcedc1, /* 파스텔 라임 */
+        #ffecb3, /* 파스텔 옐로우 */
+        #ffcdd2, /* 파스텔 핑크 */
+        #a8e6cf  /* 다시 민트로 돌아와서 자연스럽게 연결 */
+    );
+    background-size: 50% 100%; /* 그라데이션 크기 */
+    animation: flowGradient 15s ease infinite;
+}
+
+@keyframes flowGradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 .hero-section h1 {
-    /* 다른 h1 태그와 동일한 글자 크기로 맞춥니다. */
-    font-size: 28px;
+    font-size: 36px; /* 폰트 크기 약간 증가 */
     font-weight: 700;
-    margin-bottom: 10px;
-    color: #333;
+    margin-bottom: 15px;
+    color: #fff; /* 흰색으로 변경 */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.2); /* 텍스트 가독성을 위한 그림자 */
 }
 
 .hero-section .subtitle {
-    /* 다른 링크들과 비슷한 글자 크기로 맞춥니다. */
-    font-size: 18px;
-    color: #555; /* 기본 텍스트보다 약간 연한 색상 */
+    font-size: 20px; /* 폰트 크기 약간 증가 */
+    color: #f8f8f8; /* 밝은 회색 */
     margin-bottom: 25px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 }
 
 .hero-links .hero-link {
-    /* 페이지네이션 버튼 스타일과 최대한 유사하게 맞춥니다. */
     display: inline-block;
     text-decoration: none;
     color: #fff;
-    background-color: #333;
+    background-color: rgba(0, 0, 0, 0.2); /* 반투명한 배경으로 변경 */
     padding: 10px 20px;
-    border-radius: 4px;
+    border-radius: 20px; /* 버튼을 둥글게 */
     font-weight: bold;
     font-size: 16px;
     margin: 0 5px;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.5); /* 반투명 테두리 추가 */
     transition: background-color 0.2s ease-in-out;
 }
-  
 .hero-links .hero-link:hover {
-    /* 떠오르는 효과 대신, 다른 버튼처럼 배경색이 바뀌도록 수정합니다. */
-    background-color: #555;
+    background-color: rgba(0, 0, 0, 0.4); /* 호버 시 더 진한 반투명 배경 */
 }
 
-
-
 /* --- 푸터 하단 고정 최종 스타일 --- */
-
 html, body {
   height: 100%;
   margin: 0;
 }
-
-/* ★★★★★
-   이 부분이 가장 중요합니다. 
-   전체 컨테이너를 Flexbox로 만들고 화면 전체 높이를 차지하게 합니다.
-★★★★★ */
 .site-wrapper {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
-
-/* 메인 콘텐츠 영역이 남는 공간을 모두 채우도록 설정 */
 .main-content {
   flex: 1;
 }
 
-
-/* 푸터 자체에 대한 스타일 (선택 사항, 예시) */
+/* --- 푸터 스타일 (선택 사항, 예시) 
+.site-footer {
+    text-align: center;
+    padding: 20px 0;
+    background-color: #f8f9fa; /* 푸터 배경색 변경 
+    border-top: 1px solid #e0e0e6; /* 구분선 색상 변경 
+}--- */
