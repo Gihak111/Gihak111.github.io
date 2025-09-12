@@ -6,29 +6,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page.title }}</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/styles.css"> <!-- 새 CSS 파일 추가 -->
-    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/animations.css"> <!-- 새 애니메이션 CSS 파일 -->
-    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/animations_for_post.css"> <!-- 새 애니메이션 CSS 파일 -->
-
-    <!-- MathJax 스크립트 추가 -->
-    <script type="text/javascript" async
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/styles.css"> <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/animations.css"> <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/animations_for_post.css"> <script type="text/javascript" async
         src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
     </script>
 </head>
 <body>
-<div class="nav-toggle">
-    <i class="fa fa-bars fa-2x"></i> Gihak111
-</div>
-<div id="wrapper">
-    <!-- 네비게이션 파일을 포함하여 메뉴를 설정 -->
-    {% include navigation.html %}
-</div>
+    <div class="site-wrapper">
+        <header>
+            <div class="nav-toggle">
+                <i class="fa fa-bars fa-2x"></i> Gihak111
+            </div>
+            <div id="wrapper">
+                {% include navigation.html %}
+            </div>
+        </header>
 
-<div class="container">
-    {{ content }}
-</div>
+        <main class="main-content">
+            <div class="container">
+                {{ content }}
+            </div>
+        </main>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+        <footer class="site-footer">
+            {% include footer.html %}
+        </footer>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </body>
 </html>

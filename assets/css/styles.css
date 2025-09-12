@@ -182,3 +182,32 @@
     /* 떠오르는 효과 대신, 다른 버튼처럼 배경색이 바뀌도록 수정합니다. */
     background-color: #555;
 }
+
+
+
+/* footer 스타일 */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+/* --- 
+/* 전체를 감싸는 wrapper를 Flexbox 컨테이너로 만듭니다. 
+.site-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%; /* 최소 높이를 화면 전체 높이로 설정 
+}
+
+/* 메인 콘텐츠 영역이 남는 공간을 모두 차지하도록 설정 
+.main-content {
+  flex: 1; /* flex-grow: 1 과 동일 
+}
+
+/* 푸터 스타일 (필요에 따라 수정) 
+.site-footer {
+  text-align: center;
+  padding: 20px;
+  background-color: #f2f2f2; /* 예시 배경색 
+}
+--- */
