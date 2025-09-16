@@ -74,6 +74,6 @@ $$\theta_{\text{new}} := \theta_{\text{old}} - \eta \nabla J(\theta_{\text{old}}
 
 결론적으로 경사 하강법은 모델의 성능을 정량화한 비용 함수 $J(\theta)$를 최소화하기 위한 알고리즘이다.  
 이 과정은 모델의 모든 파라미터를 하나의 벡터 $\theta$로 간주하고, 비용 함수의 값이 가장 가파르게 감소하는 방향을 알려주는 그라디언트 벡터 $\nabla J(\theta)$를 계산하여, 현재 위치에서 다음 위치로 이동하는 반복적인 벡터 연산을 통해 수행된다.  
-더 궁금하면, 아래 논문 참고하자
+더 궁금하면, 아래 논문 참고하자  
 [An overview of gradient descent optimization algorithms](https://arxiv.org/abs/1609.04747)  
 [Support Vector Machine Classifier viaL0/1 Soft-Margin Loss](https://arxiv.org/abs/1912.07418)  
