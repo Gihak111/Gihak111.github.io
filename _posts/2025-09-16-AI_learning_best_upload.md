@@ -30,7 +30,7 @@ nav: "docs"
 ## AI Basics  
 [AI 입문 1편](https://gihak111.github.io/ai/2025/08/29/AI_basics_1_upload.html)  
 [AI 입문 2편](https://gihak111.github.io/ai/2025/08/30/AI_basics_2_upload.html)  
-[AI 입문 3편](https://gihak111.github.io/ai/2025/09/01/AI_basics_3_upload.html)  
+[AI 입문 3편](https://gihak111.github.io/ai/2025/08/31/AI_basics_3_upload.html)  
 [AI 입문 4편](https://gihak111.github.io/ai/2025/09/02/AI_basics_4_upload.html)  
 [AI 입문 5편](https://gihak111.github.io/ai/2025/09/03/AI_basics_5_upload.html)  
 [AI 입문 6편](https://gihak111.github.io/ai/2025/09/04/AI_basics_6_upload.html)  
