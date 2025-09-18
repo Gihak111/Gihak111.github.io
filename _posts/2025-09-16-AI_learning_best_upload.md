@@ -44,6 +44,8 @@ nav: "docs"
 [Hadamard Product](https://gihak111.github.io/ai/2025/09/12/Hadamard_product_upload.html)  
 [Gradient Descent method](https://gihak111.github.io/ai/2025/09/16/Gradient_Descent_method_upload.html)  
 [Gradient Explosion](https://gihak111.github.io/ai/2025/09/18/Gradient_explosion_upload.html)  
+[MAE](https://gihak111.github.io/ai/2025/09/18/MAE_upload.html)  
+[MSE](https://gihak111.github.io/ai/2025/09/18/MSE_upload.html)  
 
 ## AI Architecture  
 [다양한 모델 소개](https://gihak111.github.io/ai/2025/08/21/AI_Architecture_start_upload.html)  
