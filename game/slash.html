@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>수박게임 (Single HTML)</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#7be8a8;
+    --bg2:#46b39d;
+    --accent:#ff595e;
+    --panel: rgba(255,255,255,0.15);
+  }
+  html,body{height:100%;margin:0;font-family:Montserrat,system-ui,apple-system,"Segoe UI",Roboto;}
+  body{
+    background: radial-gradient(circle at 15% 10%, rgba(255,255,255,0.06), transparent 10%),
+                linear-gradient(180deg,var(--bg1),var(--bg2));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#063;
+  }
+  .wrap{
+    width:950px;
+    max-width:95%;
+    height:680px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    box-shadow: 0 10px 30px rgba(5,30,20,0.25);
+    border-radius:18px;
+    padding:18px;
+    display:flex;
+    gap:12px;
+  }
+  .left{flex:1; position:relative; display:flex; flex-direction:column; align-items:center;}
+  canvas{background: linear-gradient(180deg,#e6fff2, #d4f7ea); border-radius:12px; width:100%; height:100%; display:block;}
+  .hud{
+    position:absolute; left:18px; top:18px; display:flex; gap:10px; align-items:center;
+  }
+  .panel{
+    padding:8px 12px; background:var(--panel); border-radius:10px; backdrop-filter: blur(4px);
+    color:#023; font-weight:700; display:flex; gap:8px; align-items:center;
+  }
+  .right{width:260px; min-width:200px; display:flex; flex-direction:column; gap:10px;}
+  .title{font-size:20px; font-weight:700; color:#033; margin-bottom:4px}
+  .controls{background:rgba(255,255,255,0.06); border-radius:10px; padding:12px; color:#043}
+  button{cursor:pointer; background:#fff;color:#044;border:0;padding:8px 12px;border-radius:8px;font-weight:700}
+  .big{font-size:28px; color:#053}
+  .small{font-size:12px; color:#024}
+  .trail-dot{position:absolute;width:10px;height:10px;border-radius:50%;pointer-events:none;opacity:0.9}
+  .footer{margin-top:auto; font-size:12px; color:#022; opacity:0.8}
+  @media (max-width:800px){ .wrap{flex-direction:column;height:85vh} .right{width:100%;min-width:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="left">
+    <div class="hud">
+      <div class="panel">Score: <span id="score">0</span></div>
+      <div class="panel">Combo: <span id="combo">0</span></div>
+      <div class="panel">Lives: <span id="lives">3</span></div>
+    </div>
+    <canvas id="game"></canvas>
+    <div style="position:absolute; right:18px; top:18px;">
+      <div class="panel small">Drag to slice — 폭탄은 피하세요!</div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="title">수박게임 — Click & Slice</div>
+    <div class="controls">
+      <div style="margin-bottom:8px;">
+        <button id="startBtn">게임 시작</button>
+        <button id="pauseBtn">일시정지</button>
+        <button id="resetBtn">리셋</button>
+      </div>
+      <div class="small">난이도</div>
+      <input type="range" id="diff" min="1" max="4" value="2" />
+      <div style="display:flex;justify-content:space-between">
+        <div class="small">느림</div><div class="small">빠름</div>
+      </div>
+      <hr />
+      <div>
+        <div class="small">How to play</div>
+        <ol>
+          <li class="small">마우스나 손가락으로 화면을 드래그해서 과일을 베세요.</li>
+          <li class="small">폭탄은 베면 게임오버입니다.</li>
+          <li class="small">콤보로 점수를 더 얻습니다.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="panel" style="flex-direction:column; gap:6px;">
+      <div><span class="big" id="best">Best: 0</span></div>
+      <div class="small">Made by ChatGPT — single file demo</div>
+    </div>
+
+    <div class="footer small">
+      배포/수정 자유 — 원하면 난이도·효과·사운드 더 추가해줄게!
+    </div>
+  </div>
+</div>
+
+<script>
+/* 수박게임 — Canvas 기반 Single HTML
+ - 과일은 원(circle)으로 표시 (수박, 딸기, 오렌지, 폭탄)
+ - 터치/마우스 드래그로 선을 만들고 원과 교차하면 '베기'
+ - 폭탄을 베면 게임오버
+ - 콤보 시스템, 난이도 조절
+*/
+
+// ----- 설정 -----
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize(){ W = canvas.width = canvas.clientWidth * devicePixelRatio; H = canvas.height = canvas.clientHeight * devicePixelRatio; ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
+resize();
+window.addEventListener('resize', resize);
+
+const scoreEl = document.getElementById('score');
+const comboEl = document.getElementById('combo');
+const livesEl = document.getElementById('lives');
+const bestEl = document.getElementById('best');
+
+const startBtn = document.getElementById('startBtn');
+const pauseBtn = document.getElementById('pauseBtn');
+const resetBtn = document.getElementById('resetBtn');
+const diffInput = document.getElementById('diff');
+
+let running = false, paused=false;
+let score = 0, combo = 0, lives = 3, best = 0;
+let particles = [], fruits = [], slices = [];
+
+const FRUIT_TYPES = [
+  {name:'수박', color1:'#2ecc71', color2:'#16a085', score: 10},
+  {name:'딸기', color1:'#ff6b6b', color2:'#ff8787', score: 12},
+  {name:'오렌지', color1:'#ffb347', color2:'#ff8c42', score: 11},
+];
+
+const BOMB_TYPE = {name:'bomb', color:'#111', score:0};
+
+// difficulty affects spawn rate and speed
+function getDifficulty(){ return parseInt(diffInput.value); }
+
+// utility
+function rand(a,b){ return Math.random()*(b-a)+a; }
+function rndInt(a,b){ return Math.floor(rand(a,b+1)); }
+function distance(a,b){ return Math.hypot(a.x-b.x, a.y-b.y); }
+
+// fruit class
+class Fruit{
+  constructor(x,y,vx,vy,r,type){
+    this.x=x; this.y=y; this.vx=vx; this.vy=vy; this.r=r; this.type=type;
+    this.rotation = rand(-0.5,0.5);
+    this.angle = rand(0,Math.PI*2);
+    this.sliced=false;
+  }
+  update(dt){
+    this.vy += 1000 * dt; // gravity
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+    this.angle += this.rotation*dt*60;
+  }
+  draw(ctx){
+    ctx.save();
+    ctx.translate(this.x,this.y);
+    ctx.rotate(this.angle);
+    // draw fruit as simple circle with stripe for watermelon
+    ctx.beginPath();
+    ctx.fillStyle = this.type===BOMB_TYPE? this.type.color : this.type.color1;
+    ctx.arc(0,0,this.r,0,Math.PI*2);
+    ctx.fill();
+    // inner pattern
+    if(this.type!==BOMB_TYPE){
+      ctx.beginPath();
+      ctx.fillStyle = this.type.color2;
+      ctx.ellipse(0,0,this.r*0.7,this.r*0.45,0,0,Math.PI*2);
+      ctx.fill();
+      // seeds for watermelon
+      if(this.type.name==='수박'){
+        ctx.fillStyle='#2b5c3a';
+        for(let i=-2;i<=2;i++){
+          ctx.beginPath();
+          ctx.ellipse((i*6), -4, 3,6, -0.4,0,Math.PI*2);
+          ctx.fill();
+        }
+      }
+    } else {
+      // bomb fuse
+      ctx.fillStyle='#444';
+      ctx.beginPath();
+      ctx.arc(0,-this.r-6,6,0,Math.PI*2);
+      ctx.fill();
+      ctx.strokeStyle='orange';
+      ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(0,-this.r-6); ctx.lineTo(0,-this.r-20); ctx.stroke();
+    }
+    ctx.restore();
+  }
+}
+
+// spawn logic
+let lastSpawn = 0;
+function spawnFruit(){
+  const d = getDifficulty();
+  // spawn multiple or bombs depending on difficulty
+  let chanceBomb = 0.06 * d; // higher diff -> more bombs
+  let isBomb = Math.random() < chanceBomb;
+  const startX = rand(80, canvas.clientWidth-80);
+  const startY = canvas.clientHeight + 30;
+  // give initial upward velocity
+  const speed = rand(620,820) * (1 + d*0.12);
+  const angle = rand(-Math.PI*0.9, -Math.PI*0.1) + rand(-0.2,0.2);
+  const vx = Math.cos(angle) * speed;
+  const vy = Math.sin(angle) * speed;
+  const r = isBomb ? rndInt(20,28) : rndInt(22,34);
+  const type = isBomb ? BOMB_TYPE : FRUIT_TYPES[rndInt(0,FRUIT_TYPES.length-1)];
+  fruits.push(new Fruit(startX, startY, vx, vy, r, type));
+}
+
+// input / slicing
+let pointerDown = false;
+let points = []; // recent pointer points
+const MAX_POINTS = 12;
+const SLICE_TTL = 300; // ms
+
+function addPoint(x,y){
+  points.push({x,y,t:Date.now()});
+  if(points.length>MAX_POINTS) points.shift();
+  // check collision with fruits
+  if(points.length>=2){
+    const a = points[points.length-2];
+    const b = points[points.length-1];
+    checkSliceLine(a,b);
+  }
+}
+
+// line-circle intersection
+function lineIntersectsCircle(p1,p2,cx,cy,r){
+  // translate points
+  const x1=p1.x, y1=p1.y, x2=p2.x, y2=p2.y;
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const fx = x1 - cx;
+  const fy = y1 - cy;
+  const a = dx*dx + dy*dy;
+  const b = 2*(fx*dx + fy*dy);
+  const c = (fx*fx + fy*fy) - r*r;
+  let discriminant = b*b - 4*a*c;
+  if(discriminant < 0) return false;
+  discriminant = Math.sqrt(discriminant);
+  const t1 = (-b - discriminant)/(2*a);
+  const t2 = (-b + discriminant)/(2*a);
+  if((t1>=0 && t1<=1) || (t2>=0 && t2<=1)) return true;
+  return false;
+}
+
+function checkSliceLine(a,b){
+  for(let i=fruits.length-1;i>=0;i--){
+    const f = fruits[i];
+    if(f.sliced) continue;
+    if(lineIntersectsCircle(a,b,f.x,f.y,f.r)){
+      // sliced
+      sliceFruit(i, (a.x+b.x)/2, (a.y+b.y)/2);
+    }
+  }
+}
+
+// slice effects
+function sliceFruit(index, sx, sy){
+  const f = fruits[index];
+  if(!f || f.sliced) return;
+  f.sliced = true;
+  // if bomb -> lose life / game over
+  if(f.type===BOMB_TYPE){
+    // explosion particles
+    for(let i=0;i<20;i++){
+      particles.push({
+        x:f.x, y:f.y, vx: rand(-400,400), vy: rand(-400, -80),
+        life: rand(400,900), t:0, r: rndInt(4,8)
+      });
+    }
+    lives -= 1;
+    combo = 0;
+    updateHUD();
+    if(lives<=0){ gameOver(); return; }
+  } else {
+    // increase score
+    combo += 1;
+    const multi = 1 + Math.floor(combo/5)*0.5;
+    const gain = Math.round(f.type.score * multi);
+    score += gain;
+    // particles
+    for(let i=0;i<14;i++){
+      particles.push({
+        x:f.x, y:f.y, vx: rand(-250,250), vy: rand(-500,-150),
+        life: rand(300,700), t:0, r: rndInt(3,6), color: f.type.color2
+      });
+    }
+    // tiny sliced piece physics (no image, just pieces as particles)
+  }
+  // remove fruit (keep sliced flag for one frame)
+  setTimeout(()=> {
+    const idx = fruits.indexOf(f);
+    if(idx!==-1) fruits.splice(idx,1);
+  }, 0);
+  updateHUD();
+}
+
+// particles update
+function updateParticles(dt){
+  for(let i=particles.length-1;i>=0;i--){
+    const p = particles[i];
+    p.t += dt*1000;
+    p.vy += 1000*dt;
+    p.x += p.vx*dt;
+    p.y += p.vy*dt;
+    if(p.t > p.life) particles.splice(i,1);
+  }
+}
+
+// update HUD
+function updateHUD(){
+  scoreEl.textContent = score;
+  comboEl.textContent = combo;
+  livesEl.textContent = lives;
+  if(score>best){ best=score; bestEl.textContent = 'Best: '+best; }
+}
+
+// main loop
+let lastTime = performance.now();
+function loop(now){
+  if(!running || paused){ lastTime = now; requestAnimationFrame(loop); return; }
+  const dt = Math.min((now-lastTime)/1000, 0.05);
+  lastTime = now;
+
+  // spawn timing
+  lastSpawn += dt*1000;
+  const spawnRate = 900 - getDifficulty()*140; // ms
+  if(lastSpawn > spawnRate){
+    lastSpawn = 0;
+    // spawn a few depending on difficulty
+    const count = Math.random() < 0.2 ? 2 : 1;
+    for(let i=0;i<count;i++) spawnFruit();
+  }
+
+  // update fruits
+  for(let i=fruits.length-1;i>=0;i--){
+    const f = fruits[i];
+    f.update(dt);
+    // if fallen off bottom -> remove and reset combo, lose a life
+    if(f.y - f.r > canvas.clientHeight + 40){
+      fruits.splice(i,1);
+      if(!f.sliced && f.type!==BOMB_TYPE){
+        combo = 0;
+        lives -= 1;
+        updateHUD();
+        if(lives<=0) { gameOver(); return; }
+      }
+    }
+  }
+  updateParticles(dt);
+
+  // draw
+  ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight);
+  // background decoration
+  drawBackground();
+
+  // fruits
+  for(const f of fruits) f.draw(ctx);
+
+  // particles
+  for(const p of particles){
+    ctx.beginPath();
+    ctx.fillStyle = p.color || 'rgba(60,60,60,0.9)';
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  // draw slicing trail
+  drawTrail();
+
+  requestAnimationFrame(loop);
+}
+
+// background draw
+function drawBackground(){
+  // faint ground curve
+  const g = canvas.clientHeight;
+  ctx.save();
+  ctx.globalAlpha = 0.06;
+  ctx.fillStyle = '#000';
+  ctx.beginPath();
+  ctx.ellipse(canvas.clientWidth*0.5, g+80, canvas.clientWidth*0.7, 120, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+
+// draw trail
+function drawTrail(){
+  const pts = points.filter(p=> Date.now()-p.t < SLICE_TTL);
+  if(pts.length<2) return;
+  ctx.lineJoin='round';
+  ctx.lineCap='round';
+  const grad = ctx.createLinearGradient(pts[0].x,pts[0].y, pts[pts.length-1].x, pts[pts.length-1].y);
+  grad.addColorStop(0, 'rgba(255,255,255,0.7)');
+  grad.addColorStop(1, 'rgba(255,255,255,0.1)');
+  ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for(let i=1;i<pts.length;i++){
+    ctx.lineTo(pts[i].x, pts[i].y);
+  }
+  ctx.stroke();
+
+  // fade old points
+  for(let i=0;i<pts.length;i++){
+    const a = 1 - (Date.now()-pts[i].t)/SLICE_TTL;
+    ctx.beginPath();
+    ctx.fillStyle = 'rgba(255,255,255,'+ (0.6*a) +')';
+    ctx.arc(pts[i].x, pts[i].y, 4*a,0,Math.PI*2);
+    ctx.fill();
+  }
+}
+
+// game control
+function startGame(){
+  if(running && !paused) return;
+  running = true; paused=false;
+  score=0; combo=0; lives=3; fruits=[]; particles=[]; points=[];
+  lastSpawn=0; updateHUD();
+  lastTime = performance.now();
+  requestAnimationFrame(loop);
+}
+function pauseGame(){
+  paused = !paused;
+  pauseBtn.textContent = paused ? '재개' : '일시정지';
+}
+function resetGame(){
+  running = false; paused=false;
+  score=0; combo=0; lives=3; fruits=[]; particles=[]; points=[];
+  updateHUD();
+}
+
+// game over
+function gameOver(){
+  running = false;
+  alert('게임오버! 점수: ' + score);
+  if(score>best) best = score;
+  bestEl.textContent = 'Best: '+best;
+}
+
+// input handlers
+let lastPointer = null;
+function onPointerDown(e){
+  pointerDown = true;
+  const rect = canvas.getBoundingClientRect();
+  const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+  const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+  addPoint(x,y);
+  lastPointer = {x,y};
+}
+function onPointerMove(e){
+  if(!pointerDown) return;
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+  const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+  // only add if moved enough
+  if(!lastPointer || Math.hypot(x-lastPointer.x, y-lastPointer.y) > 4){
+    addPoint(x,y);
+    lastPointer = {x,y};
+  }
+}
+function onPointerUp(e){
+  pointerDown = false;
+  points = [];
+  lastPointer = null;
+  // decay combo slowly
+  setTimeout(()=>{ combo = Math.max(0, combo-1); updateHUD(); }, 800);
+}
+
+// attach pointer events (support touch)
+canvas.addEventListener('pointerdown', onPointerDown);
+canvas.addEventListener('pointermove', onPointerMove);
+window.addEventListener('pointerup', onPointerUp);
+canvas.addEventListener('touchstart', onPointerDown, {passive:false});
+canvas.addEventListener('touchmove', onPointerMove, {passive:false});
+window.addEventListener('touchend', onPointerUp);
+
+// buttons
+startBtn.addEventListener('click', startGame);
+pauseBtn.addEventListener('click', pauseGame);
+resetBtn.addEventListener('click', resetGame);
+
+// keep canvas sized correctly on first load
+setTimeout(resize,50);
+
+// optional: keyboard controls for quick testing
+window.addEventListener('keydown', e=>{
+  if(e.key===' '){ pauseGame(); }
+  if(e.key==='r'){ resetGame(); }
+  if(e.key==='Enter'){ startGame(); }
+});
+
+</script>
+</body>
+</html>
