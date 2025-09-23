@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "Loss Function MSE"
+title:  "Flatten Layer"
 categories: "AI"
 tag: "linear algebra"
 toc: true
