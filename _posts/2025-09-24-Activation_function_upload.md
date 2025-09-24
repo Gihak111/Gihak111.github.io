@@ -9,7 +9,7 @@ sidebar:
     nav: "docs"
 ---
 
-## ## 활성화 함수
+## 활성화 함수
 
 신경망의 각 층은 기본적으로 선형 변환(Linear Transformation)과 비선형 변환(Non-linear Transformation)의 연속이다.  
 
