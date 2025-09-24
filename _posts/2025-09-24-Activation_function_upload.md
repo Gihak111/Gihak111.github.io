@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "Loss Function MSE"
+title:  "Activation Function"
 categories: "AI"
 tag: "linear algebra"
 toc: true
