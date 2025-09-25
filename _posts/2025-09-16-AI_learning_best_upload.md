@@ -46,6 +46,12 @@ nav: "docs"
 [Gradient Explosion](https://gihak111.github.io/ai/2025/09/18/Gradient_explosion_upload.html)  
 [MAE](https://gihak111.github.io/ai/2025/09/18/MAE_upload.html)  
 [MSE](https://gihak111.github.io/ai/2025/09/18/MSE_upload.html)  
+[Overfitting](https://gihak111.github.io/ai/2025/09/23/overfitting_upload.html)  
+[Acrivation Function](https://gihak111.github.io/ai/2025/09/24/Activation_function_upload.html)  
+[Conv Layer](https://gihak111.github.io/ai/2025/09/24/ConV_upload.html)  
+[Maxpooling Layer](https://gihak111.github.io/ai/2025/09/25/Maxpooling_upload.html)  
+[Flatten Layer](https://gihak111.github.io/ai/2025/09/23/Flatten_layer_upload.html)  
+
 
 ## AI Architecture  
 [다양한 모델 소개](https://gihak111.github.io/ai/2025/08/21/AI_Architecture_start_upload.html)  
