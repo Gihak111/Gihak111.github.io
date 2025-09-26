@@ -54,7 +54,7 @@ nav: "docs"
 
 
 ## AI 강의
-
+[링크](https://gihak111.github.io/ai/2025/09/26/AI_class_best_upload.html)  
 
 ## AI Architecture  
 [다양한 모델 소개](https://gihak111.github.io/ai/2025/08/21/AI_Architecture_start_upload.html)  
