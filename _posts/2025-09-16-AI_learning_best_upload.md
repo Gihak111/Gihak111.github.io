@@ -53,6 +53,9 @@ nav: "docs"
 [Flatten Layer](https://gihak111.github.io/ai/2025/09/23/Flatten_layer_upload.html)  
 
 
+## AI 강의
+
+
 ## AI Architecture  
 [다양한 모델 소개](https://gihak111.github.io/ai/2025/08/21/AI_Architecture_start_upload.html)  
 [1. BERT](https://gihak111.github.io/ai/2025/08/22/AI_Architecture_BERT_upload.html)  
