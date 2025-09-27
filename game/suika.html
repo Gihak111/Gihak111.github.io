@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>수박게임 (Suika Game)</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #87CEEB, #98FB98);
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        
+        .game-header {
+            margin-bottom: 20px;
+        }
+        
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .next-fruit {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        #gameCanvas {
+            border: 3px solid #8B4513;
+            border-radius: 10px;
+            background: #FFF8DC;
+            cursor: crosshair;
+        }
+        
+        .controls {
+            margin-top: 20px;
+        }
+        
+        button {
+            background: #FF6B6B;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #FF5252;
+        }
+        
+        .game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>🍉 수박게임</h1>
+            <div class="score">점수: <span id="score">0</span></div>
+            <div class="next-fruit">다음 과일: <span id="nextFruit">🍒</span></div>
+        </div>
+        
+        <canvas id="gameCanvas" width="400" height="600"></canvas>
+        
+        <div class="controls">
+            <button onclick="resetGame()">새 게임</button>
+            <button onclick="togglePause()">일시정지</button>
+        </div>
+    </div>
+    
+    <div class="game-over" id="gameOver">
+        <h2>게임 오버!</h2>
+        <p>최종 점수: <span id="finalScore">0</span></p>
+        <button onclick="resetGame()">다시 시작</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 게임 상태
+        let score = 0;
+        let gameRunning = true;
+        let isPaused = false;
+        let fruits = [];
+        let nextFruitType = 0;
+        let dropPosition = canvas.width / 2;
+        
+        // 과일 정보 (크기, 이모지, 점수)
+        const fruitTypes = [
+            { size: 15, emoji: '🍒', score: 1 },    // 체리
+            { size: 20, emoji: '🍓', score: 3 },    // 딸기
+            { size: 25, emoji: '🍇', score: 6 },    // 포도
+            { size: 30, emoji: '🍊', score: 10 },   // 오렌지
+            { size: 35, emoji: '🍎', score: 15 },   // 사과
+            { size: 40, emoji: '🍐', score: 21 },   // 배
+            { size: 45, emoji: '🍑', score: 28 },   // 복숭아
+            { size: 50, emoji: '🍍', score: 36 },   // 파인애플
+            { size: 55, emoji: '🍈', score: 45 },   // 멜론
+            { size: 60, emoji: '🍉', score: 55 }    // 수박
+        ];
+        
+        // 과일 클래스
+        class Fruit {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                this.size = fruitTypes[type].size;
+                this.emoji = fruitTypes[type].emoji;
+                this.vx = 0;
+                this.vy = 0;
+                this.merged = false;
+            }
+            
+            update() {
+                if (this.merged) return;
+                
+                // 중력 적용
+                this.vy += 0.5;
+                
+                // 위치 업데이트
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                // 벽 충돌
+                if (this.x - this.size < 0) {
+                    this.x = this.size;
+                    this.vx *= -0.5;
+                }
+                if (this.x + this.size > canvas.width) {
+                    this.x = canvas.width - this.size;
+                    this.vx *= -0.5;
+                }
+                
+                // 바닥 충돌
+                if (this.y + this.size > canvas.height) {
+                    this.y = canvas.height - this.size;
+                    this.vy *= -0.3;
+                    this.vx *= 0.8;
+                }
+                
+                // 마찰력
+                this.vx *= 0.99;
+                this.vy *= 0.99;
+            }
+            
+            draw() {
+                if (this.merged) return;
+                
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.font = `${this.size * 1.5}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(this.emoji, 0, 0);
+                ctx.restore();
+            }
+            
+            collidesWith(other) {
+                if (this.merged || other.merged) return false;
+                const dx = this.x - other.x;
+                const dy = this.y - other.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                return distance < (this.size + other.size) * 0.8;
+            }
+        }
+        
+        // 게임 초기화
+        function initGame() {
+            fruits = [];
+            score = 0;
+            gameRunning = true;
+            isPaused = false;
+            nextFruitType = Math.floor(Math.random() * 5); // 처음 5개 과일만
+            updateUI();
+            document.getElementById('gameOver').style.display = 'none';
+        }
+        
+        // UI 업데이트
+        function updateUI() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('nextFruit').textContent = fruitTypes[nextFruitType].emoji;
+        }
+        
+        // 과일 떨어뜨리기
+        function dropFruit() {
+            if (!gameRunning || isPaused) return;
+            
+            const fruit = new Fruit(dropPosition, 50, nextFruitType);
+            fruits.push(fruit);
+            
+            // 다음 과일 타입 결정 (처음 5개 중에서)
+            nextFruitType = Math.floor(Math.random() * 5);
+            updateUI();
+        }
+        
+        // 충돌 및 합치기 처리
+        function handleCollisions() {
+            for (let i = 0; i < fruits.length; i++) {
+                for (let j = i + 1; j < fruits.length; j++) {
+                    const fruit1 = fruits[i];
+                    const fruit2 = fruits[j];
+                    
+                    if (fruit1.collidesWith(fruit2)) {
+                        // 같은 타입이면 합치기
+                        if (fruit1.type === fruit2.type && fruit1.type < fruitTypes.length - 1) {
+                            // 새로운 과일 생성
+                            const newX = (fruit1.x + fruit2.x) / 2;
+                            const newY = (fruit1.y + fruit2.y) / 2;
+                            const newFruit = new Fruit(newX, newY, fruit1.type + 1);
+                            
+                            // 점수 추가
+                            score += fruitTypes[fruit1.type + 1].score;
+                            
+                            // 기존 과일 제거 표시
+                            fruit1.merged = true;
+                            fruit2.merged = true;
+                            
+                            fruits.push(newFruit);
+                        } else {
+                            // 다른 타입이면 물리적 충돌만
+                            const dx = fruit2.x - fruit1.x;
+                            const dy = fruit2.y - fruit1.y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            
+                            if (distance > 0) {
+                                const overlap = (fruit1.size + fruit2.size) - distance;
+                                const separationX = (dx / distance) * overlap * 0.5;
+                                const separationY = (dy / distance) * overlap * 0.5;
+                                
+                                fruit1.x -= separationX;
+                                fruit1.y -= separationY;
+                                fruit2.x += separationX;
+                                fruit2.y += separationY;
+                                
+                                // 속도 교환
+                                const tempVx = fruit1.vx;
+                                const tempVy = fruit1.vy;
+                                fruit1.vx = fruit2.vx * 0.8;
+                                fruit1.vy = fruit2.vy * 0.8;
+                                fruit2.vx = tempVx * 0.8;
+                                fruit2.vy = tempVy * 0.8;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // 합쳐진 과일 제거
+            fruits = fruits.filter(fruit => !fruit.merged);
+        }
+        
+        // 게임 오버 체크
+        function checkGameOver() {
+            // 과일이 3초 이상 게임 오버 라인 위에 있을 때만 게임 오버
+            let fruitsAboveLine = 0;
+            for (let fruit of fruits) {
+                if (fruit.y - fruit.size < 80 && Math.abs(fruit.vy) < 1) {
+                    fruitsAboveLine++;
+                }
+            }
+            
+            // 여러 과일이 라인 위에 정지해 있을 때만 게임 오버
+            if (fruitsAboveLine >= 3) {
+                gameRunning = false;
+                document.getElementById('finalScore').textContent = score;
+                document.getElementById('gameOver').style.display = 'block';
+            }
+        }
+        
+        // 게임 루프
+        function gameLoop() {
+            if (!gameRunning || isPaused) {
+                requestAnimationFrame(gameLoop);
+                return;
+            }
+            
+            // 화면 지우기
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = '#FF6B6B';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(0, 80);
+            ctx.lineTo(canvas.width, 80);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // 과일 업데이트 및 그리기
+            for (let fruit of fruits) {
+                fruit.update();
+                fruit.draw();
+            }
+            
+            // 충돌 처리
+            handleCollisions();
+            
+            // 게임 오버 체크
+            checkGameOver();
+            
+            // UI 업데이트
+            updateUI();
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // 이벤트 리스너
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            dropPosition = e.clientX - rect.left;
+            dropPosition = Math.max(30, Math.min(canvas.width - 30, dropPosition));
+        });
+        
+        canvas.addEventListener('click', dropFruit);
+        
+        // 키보드 이벤트
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                dropFruit();
+            }
+        });
+        
+        // 게임 제어 함수
+        function resetGame() {
+            initGame();
+        }
+        
+        function togglePause() {
+            isPaused = !isPaused;
+        }
+        
+        // 게임 시작
+        initGame();
+        gameLoop();
+    </script>
+</body>
+</html>
