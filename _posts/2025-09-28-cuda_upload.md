@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "CUDA, cuDNN 설치했는데도 ㅅㅂ 글카가 안잡혀서 좆같을 떄"
+title:  "CUDA, cuDNN 설치했는데도 글카가 안잡혀서 화가날 떄"
 categories: "pynb"
 tag: "code"
 toc: true
