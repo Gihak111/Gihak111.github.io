@@ -25,3 +25,5 @@ AI 강의를 진행하게 되어, 여기에 링크와 자료를 정리해 두었
 ### 3. RNN과 LSTM  
 [유튜브 링크](https://www.youtube.com/watch?v=zK3cDOqP_tw)  
 [PDF 다운로드]( {{ "/file/3._RNN과_LSTM.pdf" | relative_url }} )  
+
+### 4. Dropout과 Yolo  
