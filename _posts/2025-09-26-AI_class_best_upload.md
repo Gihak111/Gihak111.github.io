@@ -28,4 +28,4 @@ AI 강의를 진행하게 되어, 여기에 링크와 자료를 정리해 두었
 
 ### 4. Dropout과 Yolo  
 유튜브는 아직  
-[PDF 다운로드]( {{ "/file/4._Dropout과_Yolo .pdf" | relative_url }} )  
+[PDF 다운로드]( {{ "/file/4._Dropout과_Yolo.pdf" | relative_url }} )  

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Challenge Map Racing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            background: #1a1a1a;
+        }
+        #gameCanvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 24px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            z-index: 10;
+        }
+        #instructions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 100;
+        }
+        #instructions h1 {
+            color: #ff6ec7;
+            margin-bottom: 20px;
+        }
+        #instructions button {
+            background: #00d4ff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        #instructions button:hover {
+            background: #00a8cc;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="ui">
+        <div>체크포인트: <span id="checkpoint">0</span>/<span id="totalCheckpoints"></span></div>
+        <div>속도: <span id="speed">0</span> km/h</div>
+        <div>시간: <span id="time">0:00</span></div>
+    </div>
+    <div id="instructions">
+        <h1>🏁 WINDING ROAD 🏁</h1>
+        <p style="font-size: 18px; margin: 10px 0;">화살표 키로 운전하세요!</p>
+        <p>↑ 가속 | ↓ 브레이크 | ← → 조향</p>
+        <button onclick="startGame()">게임 시작</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let scene, camera, renderer, car, gameStarted = false;
+        let keys = {};
+        let carSpeed = 0;
+        let carRotation = 0;
+        
+        let startTime = 0;
+        let checkpoints = [];
+        let nextCheckpointIndex = 0;
+        let finishLine;
+
+        // 구불구불한 트랙 경로 정의
+        const trackPath = [
+            { x: 0, z: -10 },
+            { x: 0, z: -50 },
+            { x: 30, z: -80 },
+            { x: 30, z: -120 },
+            { x: -20, z: -160 },
+            { x: -20, z: -200 },
+            { x: 20, z: -230 },
+            { x: 60, z: -230 }
+        ];
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a2a3a);
+            scene.fog = new THREE.Fog(0x1a2a3a, 100, 250);
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 20, -5);
+            camera.lookAt(0, 0, -10);
+
+            renderer = new THREE.WebGLRenderer({canvas: document.getElementById('gameCanvas'), antialias: true});
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(50, 50, 50);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.camera.left = -100;
+            directionalLight.shadow.camera.right = 100;
+            directionalLight.shadow.camera.top = 100;
+            directionalLight.shadow.camera.bottom = -100;
+            scene.add(directionalLight);
+
+            const floorGeometry = new THREE.PlaneGeometry(500, 500);
+            const floorMaterial = new THREE.MeshLambertMaterial({color: 0x4a9d5f});
+            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+            floor.rotation.x = -Math.PI / 2;
+            floor.position.y = -0.1;
+            floor.receiveShadow = true;
+            scene.add(floor);
+            
+            createWindingTrack();
+            createLighthouse(40, 0, -100);
+            createTree(-15, 0, -60);
+            createTree(40, 0, -150);
+            createTree(-35, 0, -180);
+            createCheckpoints();
+            createCar();
+            createFinishLine();
+
+            document.addEventListener('keydown', (e) => keys[e.key] = true);
+            document.addEventListener('keyup', (e) => keys[e.key] = false);
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function createWindingTrack() {
+            const trackWidth = 8;
+            const trackMaterial = new THREE.MeshLambertMaterial({color: 0x4a4a5a});
+
+            for (let i = 0; i < trackPath.length - 1; i++) {
+                const start = new THREE.Vector3(trackPath[i].x, 0, trackPath[i].z);
+                const end = new THREE.Vector3(trackPath[i+1].x, 0, trackPath[i+1].z);
+                
+                const length = start.distanceTo(end);
+                const center = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+                
+                const trackGeometry = new THREE.BoxGeometry(trackWidth, 0.2, length);
+                const trackSegment = new THREE.Mesh(trackGeometry, trackMaterial);
+                
+                trackSegment.position.copy(center);
+                trackSegment.lookAt(end);
+                trackSegment.receiveShadow = true;
+                scene.add(trackSegment);
+
+                const lineCount = Math.floor(length / 2);
+                 for (let j = 0; j < lineCount; j++) {
+                     if (j % 2 === 0) continue;
+                     const lineGeometry = new THREE.BoxGeometry(0.15, 0.25, 1);
+                     const lineMaterial = new THREE.MeshBasicMaterial({color: 0xffffff});
+                     const line = new THREE.Mesh(lineGeometry, lineMaterial);
+                     
+                     const progress = j / lineCount;
+                     const linePos = new THREE.Vector3().lerpVectors(start, end, progress);
+                     line.position.copy(linePos).y += 0.15;
+                     line.lookAt(end);
+                     scene.add(line);
+                 }
+            }
+        }
+        
+        function createLighthouse(x, y, z) {
+            const group = new THREE.Group();
+            const baseGeometry = new THREE.CylinderGeometry(1, 1.4, 8, 8);
+            const baseMaterial = new THREE.MeshLambertMaterial({color: 0x2b5aa0});
+            const base = new THREE.Mesh(baseGeometry, baseMaterial);
+            base.position.y = 4;
+            base.castShadow = true;
+            group.add(base);
+
+            const topGeometry = new THREE.CylinderGeometry(1.2, 1, 2, 8);
+            const topMaterial = new THREE.MeshLambertMaterial({color: 0xffffff});
+            const top = new THREE.Mesh(topGeometry, topMaterial);
+            top.position.y = 9;
+            top.castShadow = true;
+            group.add(top);
+
+            const lightGeometry = new THREE.CylinderGeometry(1.4, 1.2, 1, 8);
+            const lightMaterial = new THREE.MeshBasicMaterial({color: 0xffff00});
+            const light = new THREE.Mesh(lightGeometry, lightMaterial);
+            light.position.y = 10.5;
+            group.add(light);
+            
+            group.position.set(x, y, z);
+            scene.add(group);
+        }
+
+        function createTree(x, y, z) {
+            const group = new THREE.Group();
+            const trunkGeometry = new THREE.CylinderGeometry(0.3, 0.4, 2, 8);
+            const trunkMaterial = new THREE.MeshLambertMaterial({color: 0x6b4423});
+            const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+            trunk.position.y = 1;
+            trunk.castShadow = true;
+            group.add(trunk);
+
+            const leavesGeometry = new THREE.SphereGeometry(1.5, 8, 8);
+            const leavesMaterial = new THREE.MeshLambertMaterial({color: 0x2d5016});
+            const leaves = new THREE.Mesh(leavesGeometry, leavesMaterial);
+            leaves.position.y = 2.8;
+            leaves.castShadow = true;
+            group.add(leaves);
+
+            group.position.set(x, y, z);
+            scene.add(group);
+        }
+        
+        function createCheckpoints() {
+            const checkpointPositions = trackPath.slice(1, -1);
+
+            checkpointPositions.forEach((pos, index) => {
+                const geometry = new THREE.BoxGeometry(10, 0.1, 2);
+                const material = new THREE.MeshBasicMaterial({
+                    color: 0xff00ff,
+                    transparent: true,
+                    opacity: 0.4
+                });
+                const checkpoint = new THREE.Mesh(geometry, material);
+                checkpoint.position.set(pos.x, 0.5, pos.z);
+
+                if (index < checkpointPositions.length - 1) {
+                   checkpoint.lookAt(new THREE.Vector3(checkpointPositions[index+1].x, 0.5, checkpointPositions[index+1].z));
+                } else {
+                    const finalPoint = trackPath[trackPath.length - 1];
+                    checkpoint.lookAt(new THREE.Vector3(finalPoint.x, 0.5, finalPoint.z));
+                }
+
+                checkpoint.userData.id = index;
+                checkpoints.push(checkpoint);
+                scene.add(checkpoint);
+            });
+            document.getElementById('totalCheckpoints').textContent = checkpoints.length;
+        }
+
+        function createCar() {
+            const carGroup = new THREE.Group();
+
+            const bodyGeometry = new THREE.BoxGeometry(1.2, 0.5, 2.2);
+            const bodyMaterial = new THREE.MeshLambertMaterial({color: 0xffffff});
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            body.position.y = 0.5;
+            body.castShadow = true;
+            carGroup.add(body);
+
+            const topGeometry = new THREE.BoxGeometry(1, 0.4, 1.2);
+            const topMaterial = new THREE.MeshLambertMaterial({color: 0xcccccc});
+            const top = new THREE.Mesh(topGeometry, topMaterial);
+            top.position.y = 0.95;
+            top.position.z = -0.2;
+            top.castShadow = true;
+            carGroup.add(top);
+
+            const wheelGeometry = new THREE.CylinderGeometry(0.3, 0.3, 0.3, 16);
+            const wheelMaterial = new THREE.MeshLambertMaterial({color: 0x333333});
+            
+            const wheelPositions = [
+                {x: -0.7, y: 0.3, z: 0.7}, {x: 0.7, y: 0.3, z: 0.7},
+                {x: -0.7, y: 0.3, z: -0.7}, {x: 0.7, y: 0.3, z: -0.7}
+            ];
+
+            wheelPositions.forEach(pos => {
+                const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+                wheel.rotation.z = Math.PI / 2;
+                wheel.position.set(pos.x, pos.y, pos.z);
+                wheel.castShadow = true;
+                carGroup.add(wheel);
+            });
+            
+            const startPos = trackPath[0];
+            carGroup.position.set(startPos.x, 0.3, startPos.z);
+            
+            const nextPos = trackPath[1];
+            carGroup.lookAt(new THREE.Vector3(nextPos.x, 0.3, nextPos.z));
+            carRotation = carGroup.rotation.y;
+
+            car = carGroup;
+            scene.add(car);
+        }
+
+        function createFinishLine() {
+            const finishPos = trackPath[trackPath.length - 1];
+            const prevPos = trackPath[trackPath.length - 2];
+
+            const finishGeometry = new THREE.BoxGeometry(8, 0.25, 2);
+            const canvas = document.createElement('canvas');
+            canvas.width = 64; canvas.height = 16;
+            const ctx = canvas.getContext('2d');
+            for (let i = 0; i < 8; i++) {
+                for (let j = 0; j < 2; j++) {
+                    ctx.fillStyle = (i + j) % 2 === 0 ? '#ffffff' : '#000000';
+                    ctx.fillRect(i * 8, j * 8, 8, 8);
+                }
+            }
+            const texture = new THREE.CanvasTexture(canvas);
+            const finishMaterial = new THREE.MeshBasicMaterial({map: texture});
+
+            finishLine = new THREE.Mesh(finishGeometry, finishMaterial);
+            finishLine.position.set(finishPos.x, 0.15, finishPos.z);
+            finishLine.lookAt(new THREE.Vector3(prevPos.x, 0.15, prevPos.z));
+            scene.add(finishLine);
+        }
+
+        function startGame() {
+            document.getElementById('instructions').classList.add('hidden');
+            gameStarted = true;
+            startTime = Date.now();
+        }
+
+        function resetGame() {
+            const startPos = trackPath[0];
+            const nextPos = trackPath[1];
+            car.position.set(startPos.x, 0.3, startPos.z);
+            car.lookAt(new THREE.Vector3(nextPos.x, 0.3, nextPos.z));
+            carRotation = car.rotation.y;
+            carSpeed = 0;
+            nextCheckpointIndex = 0;
+            startTime = Date.now();
+            updateUI();
+        }
+        
+        function updateCar() {
+            if (!gameStarted) return;
+
+            const maxSpeed = 0.6;
+            const acceleration = 0.012;
+            const friction = 0.985;
+            const turnSpeed = 0.03;
+
+            // 가속 & 감속
+            if (keys['ArrowUp']) carSpeed = Math.min(carSpeed + acceleration, maxSpeed);
+            if (keys['ArrowDown']) carSpeed = Math.max(carSpeed - acceleration * 1.5, -maxSpeed * 0.5);
+
+            // 마찰
+            carSpeed *= friction;
+            if (Math.abs(carSpeed) < 0.001) carSpeed = 0;
+
+            // --- 여기가 수정된 부분 ---
+            // 조향 (차가 움직일 때만 작동)
+            if (carSpeed !== 0) {
+                const turnDirection = carSpeed > 0 ? 1 : -1;
+                // 왼쪽 키를 누르면 차가 왼쪽으로 돌도록 수정 (값을 뺌)
+                if (keys['ArrowLeft']) {
+                    carRotation += turnSpeed * turnDirection;
+                }
+                // 오른쪽 키를 누르면 차가 오른쪽으로 돌도록 수정 (값을 더함)
+                if (keys['ArrowRight']) {
+                    carRotation -= turnSpeed * turnDirection;
+                }
+            }
+            // --- 여기까지 수정된 부분 ---
+
+            // 차 이동
+            car.position.x -= Math.sin(carRotation) * carSpeed;
+            car.position.z -= Math.cos(carRotation) * carSpeed;
+            car.rotation.y = carRotation;
+
+            // 체크포인트 및 결승선 로직
+            if (nextCheckpointIndex < checkpoints.length) {
+                const checkpoint = checkpoints[nextCheckpointIndex];
+                if (car.position.distanceTo(checkpoint.position) < 6) {
+                    nextCheckpointIndex++;
+                    checkpoint.material.color.set(0x00ff00);
+                    setTimeout(() => { checkpoint.material.color.set(0xff00ff); }, 500);
+                }
+            } else {
+                if (car.position.distanceTo(finishLine.position) < 6) {
+                    alert('🏁 레이스 완료! 기록: ' + document.getElementById('time').textContent);
+                    resetGame();
+                }
+            }
+
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('checkpoint').textContent = nextCheckpointIndex;
+            document.getElementById('speed').textContent = Math.round(Math.abs(carSpeed) * 100);
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            document.getElementById('time').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateCamera() {
+            if (!car) return;
+            const cameraOffset = new THREE.Vector3(
+                Math.sin(carRotation) * 10,
+                7,
+                Math.cos(carRotation) * 10
+            );
+            const cameraTargetPosition = car.position.clone().add(cameraOffset);
+            camera.position.lerp(cameraTargetPosition, 0.08);
+            camera.lookAt(car.position);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            updateCar();
+            updateCamera();
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        init();
+        animate();
+    </script>
+</body>
+</html>
