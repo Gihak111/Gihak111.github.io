@@ -2,7 +2,7 @@
 layout: single
 title:  "RMSProp"
 categories: "AI"
-tag: ["optimizer", "deep learning"]
+tag: "linear algebra"
 toc: true
 author_profile: false
 sidebar:
