@@ -13,9 +13,9 @@ sidebar:
 ## Adam
 가장 먼저 사용해 보는 그런 옵티이저 이다.  
 두 가지 옵티마이저, 모멘텀(Momentum)과 RMSProp의 핵심 장점을 성공적으로 결합한 것이 제일 큰 특징이다.  
-한 줄로 한번 정리하지면,
+한 줄로 한번 정리하지면,  
 [모멘텀 : 관성처럼 과거에 이동했던 방향을 기억, 학습을 가속하고 진동 줄인다](https://gihak111.github.io/ai/2025/10/14/momentum_upload.html)  
-[RMSProp : 각 파라미터마다 학습 경험에 맞춰 학습률을 개별적으로 조절](https://gihak111.github.io/ai/2025/10/14/Adagrad_upload.html)  
+[RMSProp : 각 파라미터마다 학습 경험에 맞춰 학습률을 개별적으로 조절](https://gihak111.github.io/ai/2025/10/16/RMSProp_upload.html)  
 
 둘의 결합이므로,  
 각 파라미터마다 학습률을 조절하면서 동시에 관성을 이용해 빠르고 안정적으로 최적점을 찾아가게 된다.  
