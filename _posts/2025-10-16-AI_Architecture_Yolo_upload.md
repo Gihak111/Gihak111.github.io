@@ -188,14 +188,14 @@ $$W_{new} = W_{old} - \eta \cdot \frac{\partial L}{\partial W}$$
 헤드의 최종 연산은 선형 변환 $Y = WX+b$와 같다.  
 이 식을 기반으로 역전파를 수행한다.  
 
-1.  가중치($W$)에 대한 기울기 계산:  
+1. 가중치($W$)에 대한 기울기 계산:  
     - 목표: 손실에 대한 가중치의 영향력, 즉 $\frac{\partial L}{\partial W}$ 를 구한다.  
     - 연쇄 법칙: $\frac{\partial L}{\partial W} = \frac{\partial L}{\partial Y} \cdot \frac{\partial Y}{\partial W}$
     - 미분: 순전파 식 $Y=WX+b$를 $W$에 대해 미분하면 $\frac{\partial Y}{\partial W} = X^T$ 이다.  
     - 결과: $\frac{\partial L}{\partial W} = \frac{\partial L}{\partial Y} \cdot X^T$
     - 의미: 가중치의 기울기는 '출력 오차'에 그 출력을 만드는 데 사용된 '입력 데이터'를 곱한 값이다. 이 기울기는 가중치 업데이트에 직접 사용된다.    
 
-2.  이전 레이어 입력($X$)으로 오차 전파:  
+2. 이전 레이어 입력($X$)으로 오차 전파:  
     - 목표: 이전 레이어(넥)로 전달할 오차 신호, 즉 $\frac{\partial L}{\partial X}$ 를 구한다.  
     - 연쇄 법칙: $\frac{\partial L}{\partial X} = \frac{\partial L}{\partial Y} \cdot \frac{\partial Y}{\partial X}$
     - 미분: 순전파 식 $Y=WX+b$를 $X$에 대해 미분하면 $\frac{\partial Y}{\partial X} = W^T$ 이다.  
