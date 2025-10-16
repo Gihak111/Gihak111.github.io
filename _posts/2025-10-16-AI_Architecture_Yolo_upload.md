@@ -1,12 +1,12 @@
 ---
 layout: single
-title:  "Yolo모델 아키텍쳐"
+title:  "Yolo모델 아키텍쳐"
 categories: "AI"
 tag: "Architecture"
 toc: true
 author_profile: false
 sidebar:
-    nav: "docs"
+    nav: "docs"
 ---
 
 ## 간단하게, 욜로 모델의 흐름을 정리했다
