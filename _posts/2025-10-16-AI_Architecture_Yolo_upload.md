@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "AI 아키텍쳐 4. GPT-oss-20B"
+title:  "Yolo모델 아키텍쳐"
 categories: "AI"
 tag: "Architecture"
 toc: true
