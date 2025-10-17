@@ -15,7 +15,7 @@ nav: "docs"
 
 
 ## AI 책 추천  
-[책 추천 1편](https://gihak111.github.io/ai/2025/09/14/Best_Ai_Book_upload.html)  
+  [책 추천 1편](https://gihak111.github.io/ai/2025/09/14/Best_Ai_Book_upload.html)  
 
 
 ## AI 논문 리뷰  
@@ -43,7 +43,7 @@ nav: "docs"
 
 
 ## AI 강의
-[링크](https://gihak111.github.io/ai/2025/09/26/AI_class_best_upload.html)  
+  [링크](https://gihak111.github.io/ai/2025/09/26/AI_class_best_upload.html)  
 
 
 ## AI Architecture  
@@ -55,5 +55,5 @@ nav: "docs"
 
 
 ## AI 직접 구현  
-[Bert](https://huggingface.co/gihakkk/bert_nupy_model)  
-[MLP](https://huggingface.co/gihakkk/MLP_test)
+  [Bert](https://huggingface.co/gihakkk/bert_nupy_model)  
+  [MLP](https://huggingface.co/gihakkk/MLP_test)
