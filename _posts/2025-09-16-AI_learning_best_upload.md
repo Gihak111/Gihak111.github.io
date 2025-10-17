@@ -19,7 +19,7 @@ nav: "docs"
 
 
 ## AI 논문 리뷰  
-<ul>
+<ul style="list-style-type: none;">
 {% for post in site.tags.review %}
   <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
 {% endfor %}
@@ -27,7 +27,7 @@ nav: "docs"
 
 
 ## AI Basics  
-<ul>
+<ul style="list-style-type: none;">
 {% for post in site.tags.Explanation %}
   <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
 {% endfor %}
@@ -35,7 +35,7 @@ nav: "docs"
 
 
 ## Linear Algebra  
-<ul>
+<ul style="list-style-type: none;">
 {% for post in site.tags.['linear algebra'] %}
   <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
 {% endfor %}
@@ -47,7 +47,7 @@ nav: "docs"
 
 
 ## AI Architecture  
-<ul>
+<ul style="list-style-type: none;">
 {% for post in site.tags.Architecture %}
   <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
 {% endfor %}
