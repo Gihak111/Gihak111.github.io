@@ -29,7 +29,7 @@ nav: "docs"
 ## AI Basics  
 <ul style="list-style-type: none;">
 {% for post in site.tags.Explanation %}
-    <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
+  <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
 {% endfor %}
 </ul>  
 
