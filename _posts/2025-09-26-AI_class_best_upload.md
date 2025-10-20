@@ -27,5 +27,5 @@ AI 강의를 진행하게 되어, 여기에 링크와 자료를 정리해 두었
 [PDF 다운로드]( {{ "/file/3._RNN과_LSTM.pdf" | relative_url }} )  
 
 ### 4. Dropout과 Yolo  
-유튜브는 아직  
+[유튜브 링크](https://youtu.be/M6ia3f8Ao9s)  
 [PDF 다운로드]( {{ "/file/4._Dropout과_Yolo.pdf" | relative_url }} )  
