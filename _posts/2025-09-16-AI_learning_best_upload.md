@@ -21,7 +21,7 @@ nav: "docs"
 ## AI 논문 리뷰  
 <ul style="list-style-type: none;">
 {% for post in site.tags.review %}
-  <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
+<li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
 {% endfor %}
 </ul>  
 
