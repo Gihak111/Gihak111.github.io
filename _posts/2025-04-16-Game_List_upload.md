@@ -39,3 +39,6 @@ sidebar:
 
 8. 둠 팬게임  
 [링크](https://gihak111.github.io/game/doom-slayer.html)  
+
+9. 수박 게임
+[링크](https://gihak111.github.io/game/suika.html)  
