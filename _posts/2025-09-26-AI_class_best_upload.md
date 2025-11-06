@@ -29,3 +29,8 @@ AI 강의를 진행하게 되어, 여기에 링크와 자료를 정리해 두었
 ### 4. Dropout과 Yolo  
 [유튜브 링크](https://youtu.be/M6ia3f8Ao9s)  
 [PDF 다운로드]( {{ "/file/4._Dropout과_Yolo.pdf" | relative_url }} )  
+
+
+### 5. 정규화와 U-Net  
+[유튜브 링크](https://youtu.be/M6ia3f8Ao9s)  
+[PDF 다운로드]( {{ "/file/5._정규화와_UNet.pdf" | relative_url }} )  
