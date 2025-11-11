@@ -1,0 +1,15 @@
+---
+layout: single
+title:  "L1, L2 Norm"
+categories: "AI"
+tag: "linear algebra"
+toc: true
+author_profile: false
+sidebar:
+    nav: "docs"
+---
+
+## AI 신경망 그리기
+아래의 사이트에서 간단하게 인공신경망을 그릴 수 있다.  
+사이트가 깔끔해 자주사용한다.  
+[https://alexlenail.me/NN-SVG/index.html](https://alexlenail.me/NN-SVG/index.html)  
