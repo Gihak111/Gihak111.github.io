@@ -34,3 +34,8 @@ AI 강의를 진행하게 되어, 여기에 링크와 자료를 정리해 두었
 ### 5. 정규화와 U-Net  
 [유튜브 링크](https://youtu.be/4CTphvuRqzA)  
 [PDF 다운로드]( {{ "/file/5._정규화와_UNet.pdf" | relative_url }} )  
+
+
+### 6. Attention과 AutoEncoder  
+유튜브는 아직  
+[PDF 다운로드]( {{ "/file/6._Attention과_AutoEncoder.pdf" | relative_url }} )  
