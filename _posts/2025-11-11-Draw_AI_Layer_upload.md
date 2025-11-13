@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "L1, L2 Norm"
+title:  "AI 신경망 그려주는 사이트 모음"
 categories: "AI"
 tag: "linear algebra"
 toc: true
