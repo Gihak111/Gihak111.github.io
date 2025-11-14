@@ -37,5 +37,5 @@ AI 강의를 진행하게 되어, 여기에 링크와 자료를 정리해 두었
 
 
 ### 6. Attention과 AutoEncoder  
-유튜브는 아직  
+[유튜브 링크](https://youtu.be/wcZ-Pk7ykn4)  
 [PDF 다운로드]( {{ "/file/6._Attention과_AutoEncoder.pdf" | relative_url }} )  
