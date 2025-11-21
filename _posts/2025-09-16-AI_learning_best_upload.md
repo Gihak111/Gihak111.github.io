@@ -15,7 +15,11 @@ nav: "docs"
 
 
 ## AI 책 추천  
-  [책 추천 1편](https://gihak111.github.io/ai/2025/09/14/Best_Ai_Book_upload.html) 
+<ul style="list-style-type: none;">
+{% for post in site.tags.Explanation_books %}
+<li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
+{% endfor %}
+</ul> 
 
 
 ## AI 논문 리뷰  
@@ -43,12 +47,32 @@ nav: "docs"
 
 
 ## AI 강의
-  [링크](https://gihak111.github.io/ai/2025/09/26/AI_class_best_upload.html)  
+<ul style="list-style-type: none;">
+{% for post in site.tags.Explanation_best %}
+  <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
+{% endfor %}
+</ul>  
 
 
 ## AI Architecture  
 <ul style="list-style-type: none;">
 {% for post in site.tags.Architecture %}
+  <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
+{% endfor %}
+</ul>  
+
+
+## PINN  
+<ul style="list-style-type: none;">
+{% for post in site.tags.PINN %}
+  <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
+{% endfor %}
+</ul>  
+
+
+## AI Tool  
+<ul style="list-style-type: none;">
+{% for post in site.tags.AI_Tool %}
   <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
 {% endfor %}
 </ul>  

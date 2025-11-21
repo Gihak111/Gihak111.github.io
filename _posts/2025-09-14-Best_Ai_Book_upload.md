@@ -2,7 +2,7 @@
 layout: single
 title:  "AI 입문? 번외 1편 : AI 와 수학, 책 추천"
 categories: "AI"
-tag: "Explanation"
+tag: "Explanation_books"
 toc: true
 author_profile: false
 sidebar:

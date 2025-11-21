@@ -2,7 +2,7 @@
 layout: single
 title:  "AI 강의"
 categories: "AI"
-tag: "Explanation"
+tag: "Explanation_best"
 toc: true
 author_profile: false
 sidebar:
