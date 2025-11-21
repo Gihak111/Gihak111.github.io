@@ -10,11 +10,12 @@ nav: "docs"
 ---
 
 ## AI YEAH  
-최근 들어서, AI 기초에 대한 글을 정말 많이 만들었다.  
-이 글들을 누구나 한 눈에 볼 수 있게 정리해 두었다.  
+최근 들어서, AI 기초에 대한 글을 정말 많이 만들었다.  
+
+이 글들을 누구나 한 눈에 볼 수 있게 정리해 두었다.  
 
 
-## AI 책 추천  
+#### AI 책 추천  
 <ul style="list-style-type: none;">
 {% for post in site.tags.Explanation_books %}
 <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
@@ -22,7 +23,7 @@ nav: "docs"
 </ul> 
 
 
-## AI 논문 리뷰  
+#### AI 논문 리뷰  
 <ul style="list-style-type: none;">
 {% for post in site.tags.review %}
 <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
@@ -30,7 +31,7 @@ nav: "docs"
 </ul>  
 
 
-## AI Basics  
+#### AI Basics  
 <ul style="list-style-type: none;">
 {% for post in site.tags.Explanation %}
   <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
@@ -38,7 +39,7 @@ nav: "docs"
 </ul>  
 
 
-## Linear Algebra  
+#### Linear Algebra  
 <ul style="list-style-type: none;">
 {% for post in site.tags.['linear algebra'] %}
   <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
@@ -46,7 +47,7 @@ nav: "docs"
 </ul>  
 
 
-## AI 강의
+#### AI 강의
 <ul style="list-style-type: none;">
 {% for post in site.tags.Explanation_best %}
   <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
@@ -54,7 +55,7 @@ nav: "docs"
 </ul>  
 
 
-## AI Architecture  
+#### AI Architecture  
 <ul style="list-style-type: none;">
 {% for post in site.tags.Architecture %}
   <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
@@ -62,7 +63,7 @@ nav: "docs"
 </ul>  
 
 
-## PINN  
+#### PINN  
 <ul style="list-style-type: none;">
 {% for post in site.tags.PINN %}
   <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
@@ -70,7 +71,7 @@ nav: "docs"
 </ul>  
 
 
-## AI Tool  
+#### AI Tool  
 <ul style="list-style-type: none;">
 {% for post in site.tags.AI_Tool %}
   <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
@@ -78,6 +79,6 @@ nav: "docs"
 </ul>  
 
 
-## AI 직접 구현  
+#### AI 직접 구현  
   [Bert](https://huggingface.co/gihakkk/bert_nupy_model)  
   [MLP](https://huggingface.co/gihakkk/MLP_test)  
