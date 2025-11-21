@@ -1,0 +1,80 @@
+
+/* Custom styles for TaskMaster KR */
+custom-calendar {
+    display: block;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.filter-btn.active {
+    background-color: #6366f1;
+    color: white;
+}
+
+.due-date {
+    white-space: nowrap;
+}
+
+.date-input {
+    width: 150px;
+}
+
+@media (max-width: 640px) {
+    .date-input {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+.task-item {
+    transition: all 0.2s ease;
+}
+
+.task-item:hover {
+    background-color: #f9fafb;
+}
+
+.task-item.completed {
+    opacity: 0.7;
+}
+.task-item.completed .task-title {
+    text-decoration: line-through;
+    color: #9ca3af;
+}
+
+.task-item.completed .task-description {
+    opacity: 0.7;
+}
+.task-item.editing {
+    background-color: #eef2ff;
+}
+
+/* Drag and drop styles */
+.task-item.dragging {
+    opacity: 0.5;
+    background-color: #e0e7ff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    #task-form {
+        flex-direction: column;
+    }
+    
+    #task-form input {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    #task-form button {
+        width: 100%;
+    }
+    
+    .filter-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}

@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아주 행복하구먼</title>
+<link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-3xl">
+        <!-- Header -->
+<header class="mb-8 text-center">
+            <h1 class="text-4xl font-bold text-indigo-600 mb-2">할일 참 많다</h1>
+            <p class="text-gray-600">아주 행복하구먼</p>
+</header>
+
+        <!-- Calendar -->
+        <custom-calendar class="mb-8"></custom-calendar>
+<!-- Main Content -->
+        <main class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <!-- Add Task Form -->
+            <div class="p-6 border-b border-gray-200">
+            <form id="task-form">
+                <div class="flex flex-col gap-3">
+                    <input 
+                        type="text" 
+                        id="task-title"
+                        placeholder="할 일 제목" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        required
+                    >
+                    <textarea
+                        id="task-description"
+                        placeholder="상세 설명 (선택)"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[100px]"
+                    ></textarea>
+                    <div class="flex gap-2">
+                        <input 
+                            type="text" 
+                            id="task-date"
+                            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            required
+                        >
+<button 
+                            type="submit" 
+                            class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2 flex-1"
+                        >
+                            <i data-feather="plus"></i> 추가
+                        </button>
+                    </div>
+                </div>
+</form>
+            </div>
+
+            <!-- Task Filters -->
+            <div class="px-6 py-3 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+                <div class="text-sm text-gray-500">
+                <span id="task-count">0</span>개 남음
+</div>
+                <div class="flex gap-2">
+                    <button class="filter-btn active px-3 py-1 rounded text-sm" data-filter="all">전체</button>
+                    <button class="filter-btn px-3 py-1 rounded text-sm" data-filter="active">진행중</button>
+                    <button class="filter-btn px-3 py-1 rounded text-sm" data-filter="completed">완료</button>
+</div>
+            </div>
+
+            <!-- Task List -->
+            <ul id="task-list" class="divide-y divide-gray-200">
+                <!-- Tasks will be added here dynamically -->
+                <li class="p-4 text-center text-gray-500">
+                    할 일이 없습니다. 위에서 추가해보세요!
+</li>
+            </ul>
+
+            <!-- Clear Completed -->
+            <div class="p-4 bg-gray-50 text-right">
+                <button id="clear-completed" class="text-sm text-indigo-600 hover:text-indigo-800">
+                    완료된 항목 삭제
+</button>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-gray-500 text-sm">
+            <p>드래그 앤 드롭으로 순서 변경</p>
+            <p class="mt-2">더블 클릭으로 수정</p>
+</footer>
+    </div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+    <script src="components/calendar.js"></script>
+    <script src="script.js"></script>
+<script>
+        feather.replace();
+    </script>
+<script src="https://huggingface.co/deepsite/deepsite-badge.js"></script>
+</body>
+</html>
