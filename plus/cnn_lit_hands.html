@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>경량화 CNN 손동작 인식기 (MobileNet V2)</title>
     <style>
-        /* 스타일 정의 (이전과 동일) */
+        /* 스타일 정의 */
         body {
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
             background-color: #e0f2f1; 
@@ -141,10 +141,12 @@
     <script type="module">
         import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.2';
 
-        // 설정: 로컬 모델 사용 안 함
+        // 설정: 로컬 모델 사용 안 함 (서버에서 다운로드)
         env.allowLocalModels = false;
+        // 캐시 문제 방지를 위해 로컬 모델 사용 금지 설정 강화
+        env.useBrowserCache = false; 
 
-        // 12개 클래스
+        // 12개 클래스 리스트
         const GESTURE_CLASSES = [
             "call", "dislike", "fist", "four", 
             "like", "mute", "ok", "one", 
@@ -158,6 +160,7 @@
         const video = document.getElementById('webcam');
         const classListContainer = document.getElementById('classList');
 
+        // 캔버스 설정 (비디오 -> 이미지 변환용)
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
 
@@ -176,27 +179,30 @@
             });
         }
 
+        // 1. 모델 로드 함수
         async function loadModel() {
             createClassList();
-            statusEl.innerText = "⏳ MobileNet V2 다운로드 중... (원본 모델 로드)";
+            statusEl.innerText = "⏳ MobileNet V2 모델 다운로드 중...";
             
             try {
-                // ★ 핵심 수정: dtype: 'fp32'를 추가하여 model.onnx를 강제로 읽게 함
+                // ★ 핵심 수정 부분: dtype: 'fp32' 추가 ★
+                // 이 설정이 없으면 model_quantized.onnx를 찾으려다 404 에러가 납니다.
                 classifier = await pipeline('image-classification', 'gihakkk/hand_seperate_cnn_lit', {
-                    dtype: 'fp32',    // q8(양자화) 대신 fp32(원본) 사용 설정
-                    device: 'webgpu', // (선택사항) WebGPU 지원 시 가속, 안되면 자동으로 wasm 사용
+                    dtype: 'fp32',   // 원본 모델(model.onnx)을 사용하도록 강제
                 });
 
-                statusEl.innerText = "✅ 경량화 모델 준비 완료!";
+                statusEl.innerText = "✅ 모델 준비 완료! (MobileNet V2)";
                 statusEl.style.color = "#00695c";
                 statusEl.style.backgroundColor = "#e0f2f1";
                 startBtn.disabled = false;
             } catch (err) {
                 console.error(err);
-                statusEl.innerText = "❌ 모델 로드 실패: " + err.message;
+                statusEl.innerText = "❌ 오류 발생: " + err.message;
+                alert("모델 로드 실패! 콘솔(F12)을 확인하세요.");
             }
         }
 
+        // 2. 웹캠 시작
         async function startWebcam() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -208,17 +214,18 @@
                     canvas.height = video.videoHeight;
                 };
 
-                statusEl.innerText = "👀 분석 중 (MobileNet V2)...";
+                statusEl.innerText = "👀 실시간 분석 중...";
                 startBtn.innerText = "분석 중";
                 startBtn.disabled = true;
                 isRunning = true;
                 
                 predictLoop();
             } catch (err) {
-                alert("카메라 권한을 허용해주세요!");
+                alert("카메라 접근 권한을 허용해주세요!");
             }
         }
 
+        // 3. 결과 UI 업데이트
         function updateUI(label, score) {
             gestureEl.innerText = label;
             confEl.innerText = `정확도: ${(score * 100).toFixed(1)}%`;
@@ -236,19 +243,23 @@
             lastLabel = label;
         }
 
+        // 4. 예측 루프
         async function predictLoop() {
             if (!isRunning) return;
 
             if (video.readyState === video.HAVE_ENOUGH_DATA) {
                 try {
+                    // 캔버스 크기 동기화
                     if (canvas.width !== video.videoWidth) {
                          canvas.width = video.videoWidth;
                          canvas.height = video.videoHeight;
                     }
                     
+                    // 비디오 -> 캔버스 -> 데이터 URL 변환
                     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                     const imageUrl = canvas.toDataURL('image/jpeg', 0.8);
 
+                    // 추론 실행
                     const results = await classifier(imageUrl);
                     
                     if (results.length > 0) {
