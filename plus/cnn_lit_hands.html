@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>경량화 CNN 손동작 인식기 (MobileNet V2)</title>
+    <style>
+        /* 스타일 정의 (MobileNet 버전은 청록색/Teal 테마) */
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background-color: #e0f2f1; /* 아주 연한 청록색 배경 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 { margin-top: 0; color: #00695c; } /* 짙은 청록색 */
+        
+        #video-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+            border-radius: 15px;
+            overflow: hidden;
+            background-color: #000;
+            aspect-ratio: 4/3;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* 거울 모드 */
+        }
+
+        #result-box {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e0f2f1;
+            border-radius: 12px;
+            border: 2px solid #26a69a;
+        }
+        #current-gesture {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #00897b;
+            margin: 5px 0;
+        }
+        #confidence { font-size: 1.1rem; color: #555; }
+
+        .class-grid-title { margin-top: 30px; font-weight: bold; color: #666; }
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .class-item {
+            padding: 10px;
+            background-color: #f1f3f5;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #868e96;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        /* 활성화된 클래스 스타일 (청록색 강조) */
+        .class-item.active {
+            background-color: #009688;
+            color: white;
+            transform: scale(1.05);
+            border-color: #004d40;
+            box-shadow: 0 4px 10px rgba(0, 150, 136, 0.3);
+        }
+
+        button {
+            background-color: #00897b;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover { background-color: #00695c; }
+        button:disabled { background-color: #b0bec5; cursor: not-allowed; }
+        
+        #status {
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #e65100;
+            background: #fff3e0;
+            padding: 10px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>📱 경량화 CNN 손동작 인식기</h1>
+        <p>MobileNet V2 (9MB) 모델을 사용하여<br>빠르고 효율적으로 동작을 분류합니다.</p>
+
+        <div id="status">📥 모델 다운로드 대기 중...</div>
+
+        <div id="video-wrapper">
+            <video id="webcam" autoplay playsinline muted></video>
+        </div>
+
+        <div id="result-box">
+            <div>현재 인식된 동작</div>
+            <div id="current-gesture">-</div>
+            <div id="confidence">정확도: 0%</div>
+        </div>
+
+        <button id="startBtn" disabled>카메라 켜기</button>
+
+        <div class="class-grid-title">감지 가능한 동작 리스트 (12개)</div>
+        <div class="class-grid" id="classList"></div>
+    </div>
+
+    <script type="module">
+        import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
+
+        // 설정: 로컬 모델 사용 안 함
+        env.allowLocalModels = false;
+
+        // 12개 클래스 (학습된 순서)
+        const GESTURE_CLASSES = [
+            "call", "dislike", "fist", "four", 
+            "like", "mute", "ok", "one", 
+            "palm", "peace", "peace_inverted", "rock"
+        ];
+
+        // UI 요소
+        const statusEl = document.getElementById('status');
+        const gestureEl = document.getElementById('current-gesture');
+        const confEl = document.getElementById('confidence');
+        const startBtn = document.getElementById('startBtn');
+        const video = document.getElementById('webcam');
+        const classListContainer = document.getElementById('classList');
+
+        // 캔버스 설정
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let classifier = null;
+        let isRunning = false;
+        let lastLabel = "";
+
+        // 클래스 목록 UI 생성
+        function createClassList() {
+            classListContainer.innerHTML = '';
+            GESTURE_CLASSES.forEach(cls => {
+                const div = document.createElement('div');
+                div.className = 'class-item';
+                div.id = `cls-${cls}`;
+                div.innerText = cls.toUpperCase();
+                classListContainer.appendChild(div);
+            });
+        }
+
+        // 1. MobileNet 모델 로드
+        async function loadModel() {
+            createClassList();
+            statusEl.innerText = "⏳ MobileNet V2 다운로드 중... (약 9MB, 매우 빠름)";
+            
+            try {
+                // ★ 핵심 수정 사항: 새로운 MobileNet 모델 ID 적용
+                classifier = await pipeline('image-classification', 'gihakkk/hand_seperate_cnn_lit', {
+                    quantized: false 
+                });
+
+                statusEl.innerText = "✅ 경량화 모델 준비 완료!";
+                statusEl.style.color = "#00695c";
+                statusEl.style.backgroundColor = "#e0f2f1";
+                startBtn.disabled = false;
+            } catch (err) {
+                console.error(err);
+                statusEl.innerText = "❌ 모델 로드 실패. 개발자 도구를 확인하세요.";
+            }
+        }
+
+        // 2. 웹캠 시작
+        async function startWebcam() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                await video.play();
+
+                video.onloadedmetadata = () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                };
+
+                statusEl.innerText = "👀 분석 중 (MobileNet V2)...";
+                startBtn.innerText = "분석 중";
+                startBtn.disabled = true;
+                isRunning = true;
+                
+                predictLoop();
+            } catch (err) {
+                alert("카메라 권한을 허용해주세요!");
+            }
+        }
+
+        // 3. 결과 업데이트 (UI)
+        function updateUI(label, score) {
+            gestureEl.innerText = label;
+            confEl.innerText = `정확도: ${(score * 100).toFixed(1)}%`;
+
+            if (lastLabel) {
+                const prevItem = document.getElementById(`cls-${lastLabel}`);
+                if (prevItem) prevItem.classList.remove('active');
+            }
+
+            const currentItem = document.getElementById(`cls-${label}`);
+            if (currentItem) {
+                currentItem.classList.add('active');
+            }
+
+            lastLabel = label;
+        }
+
+        // 4. 예측 루프
+        async function predictLoop() {
+            if (!isRunning) return;
+
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                try {
+                    if (canvas.width !== video.videoWidth) {
+                         canvas.width = video.videoWidth;
+                         canvas.height = video.videoHeight;
+                    }
+                    
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const imageUrl = canvas.toDataURL('image/jpeg', 0.8);
+
+                    const results = await classifier(imageUrl);
+                    
+                    if (results.length > 0) {
+                        const top = results[0];
+                        updateUI(top.label, top.score);
+                    }
+                } catch (e) {
+                    console.error("Prediction Error:", e);
+                }
+            }
+
+            requestAnimationFrame(predictLoop);
+        }
+
+        startBtn.addEventListener('click', startWebcam);
+        loadModel();
+    </script>
+</body>
+</html>
