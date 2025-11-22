@@ -178,11 +178,13 @@
 
         async function loadModel() {
             createClassList();
-            statusEl.innerText = "⏳ MobileNet V2 다운로드 중... (최신 라이브러리 적용)";
+            statusEl.innerText = "⏳ MobileNet V2 다운로드 중... (원본 모델 로드)";
             
             try {
+                // ★ 핵심 수정: dtype: 'fp32'를 추가하여 model.onnx를 강제로 읽게 함
                 classifier = await pipeline('image-classification', 'gihakkk/hand_seperate_cnn_lit', {
-                    quantized: false 
+                    dtype: 'fp32',    // q8(양자화) 대신 fp32(원본) 사용 설정
+                    device: 'webgpu', // (선택사항) WebGPU 지원 시 가속, 안되면 자동으로 wasm 사용
                 });
 
                 statusEl.innerText = "✅ 경량화 모델 준비 완료!";
