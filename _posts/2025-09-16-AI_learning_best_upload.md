@@ -82,3 +82,10 @@ nav: "docs"
 #### AI 직접 구현  
   [Bert](https://huggingface.co/gihakkk/bert_nupy_model)  
   [MLP](https://huggingface.co/gihakkk/MLP_test)  
+  [CNN](https://huggingface.co/gihakkk/CNN_test)  
+  [LSTM](https://huggingface.co/gihakkk/LSTM_test)  
+  [Yolo](https://huggingface.co/gihakkk/Yolo_test)  
+  [U-Net](https://huggingface.co/gihakkk/U-Net)  
+  [Autoencoder](https://huggingface.co/gihakkk/AutoEncoder)  
+  [Trnasformer](https://huggingface.co/gihakkk/Transformer)  
+  
