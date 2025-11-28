@@ -17,3 +17,17 @@ sidebar:
 **내가 원하는 사이트 next.js로 만들어준다**  
 [V0](https://v0.app/)  
 
+**내가 원하는 3D Mesh 파일 만들어 주는 사이트**  
+[Mesh](https://www.meshy.ai/)  
+
+
+
+
+#### 그 외 자주쓰는 사이트
+
+**AI 신경망 그려주는 사이트. 강의 자료 만들때 자주 사용한다**  
+[NN-SVG](https://alexlenail.me/NN-SVG/index.html)  
+
+**라텍스 사이트**  
+[codecogs](https://editor.codecogs.com/)  
+
