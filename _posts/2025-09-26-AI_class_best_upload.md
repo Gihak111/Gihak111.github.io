@@ -46,3 +46,6 @@ AI 강의를 진행하게 되어, 여기에 링크와 자료를 정리해 두었
 [유튜브 링크](https://www.youtube.com/watch?v=tQMVREwxJv4)  
 [PDF 다운로드]( {{ "/file/7._Transformer.pdf" | relative_url }} )  
 
+### 8. PINN
+유튜브 준비중
+[PDF 다운로드]( {{ "/file/8._PINN.pdf" | relative_url }} )  
