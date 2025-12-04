@@ -21,6 +21,7 @@ expo install expo-task-manager expo-background-fetch
 
 이어서, 백그라운드 작업 하면 된다.  
 taskManager.js
+{% raw %}
 ```javascript
 import * as TaskManager from 'expo-task-manager';
 import * as BackgroundFetch from 'expo-background-fetch';
@@ -54,8 +55,9 @@ const unregisterBackgroundFetchAsync = async () => {
 
 export { registerBackgroundFetchAsync, unregisterBackgroundFetchAsync };
 ```
-
+{% endraw %}
 App.js  
+{% raw %}
 ```javascript
 import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
@@ -78,13 +80,14 @@ export default function App() {
 }
 
 ```  
-
+{% endraw %}
 이왕 만드는거 상단 바도 만들어 보자.  
 백그라운드에서 실행중임을 알리기 위해 다음 패키지를 추가하자  
 ```sh
 expo install expo-notifications
 ```
 notifications.js  
+{% raw %}
 ```javascript
 import * as Notifications from 'expo-notifications';
 import * as Permissions from 'expo-permissions';
@@ -111,8 +114,9 @@ const scheduleNotification = async () => {
 export { scheduleNotification };
 
 ```  
-
+{% endraw %}
 이어서, 앞서 만들었던 taskManager.js 코들르 업데이트 해 주면 된다.  
+{% raw %}
 ```javascript
 import * as TaskManager from 'expo-task-manager';
 import * as BackgroundFetch from 'expo-background-fetch';
@@ -136,6 +140,6 @@ TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
   }
 });
 ```
-
+{% endraw %}
 이제, 이 앱은 백그라운드에서 실행될 수 있으며, 상단에 알림으로 알려준다.  
 주석이 들어가 있는곳에 로직을 구현해 주는 것으로 간단하게 만들 수 있다.  

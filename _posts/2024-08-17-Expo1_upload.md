@@ -56,7 +56,7 @@ https://expo.dev/
 이어서, 핸드폰으로도 Expo 앱이 있으니 다운 받도록 하자.  
 
 이어서 밑의 코드를 통해서, 프로젝트를 만들자.  이는 엑스포 프로젝트를 만드는 것이다.  
-```cmd
+```bash
 npm install -g expo-cli
 npx creat-expo-app my-app
 ```
@@ -65,15 +65,15 @@ npx creat-expo-app my-app
 cmd에서 cd 파일위치, 위의 코드를 통해 프로젝트를 만들고, vscode로 폴더를 열자.  
 
 이어서, 설치가 도니 cmd에 다음을 입력해서 설치하자.  
-```cmd
+```bash
 npm install -g eas-cli
 ```
 이어서, eas를 통해 로그인 하자.  
-```cmd
+```bash
 eas login
 ```
 자신의 계정을 집어넣으면 된다.  
-```cmd
+```bash
 eas build:configure
 ```
 위 코드를 통해서 설정한다.  
@@ -89,7 +89,7 @@ https://docs.expo.dev/build-reference/apk/
 expo가 공식 문서가 잘 되어 있는게 참 좋다.  
 
 시키는대로, eas.json에 다음의 코드를 추가하자.  
-```
+```json
 {
   "build": {
     "preview": {
@@ -127,7 +127,8 @@ https://docs.expo.dev/versions/latest/sdk/webview/
 먼저, ```npx expo install reat-native-webview``` 를 설치하자.  
 과정은 항상 앱 안의 위치에서 실행되어야 한다.  
 이어서, 조건에 맞게 수정하여 밑의 코드를 변경하면 된다.  
-```
+{% raw %}
+```js
 import { WebView } from 'react-native-webview';
 import Constants from 'expo-constants';
 import { StyleSheet } from 'react-native';
@@ -149,6 +150,7 @@ const styles = StyleSheet.create({
 });
 
 ```
+{% endraw %}
 누가 봐도 변경하면 될 것 같은 부분이 있다.
 App.js 파일을 열러서 니용을 전부 날리고, https://expo.dev 를 원하는 웹뷰 링크로 바꿔서 수정하자.  
 css는 날려도 된다.  

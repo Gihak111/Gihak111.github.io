@@ -19,7 +19,7 @@ Flask 서버를 사용하여 AI 모델을 REST API로 노출하고, Expo 앱에�
 아래의 코드로 모델을 불러와 서버를 열어보자.  
 간단한 예제로 MNIST 숫자 분류 모델을 사용해 보았다.  
 Flask 서버 코드 
-```
+```python
 from flask import Flask, request, jsonify
 import torch
 from torchvision import datasets, transforms
@@ -90,7 +90,9 @@ npx expo install expo-image-picker
 npm install axios
 ```
 
+  
 Expo  앱 코드는 다음과 같이 하자.  
+{% raw %}
 ```javascript
 import React, { useState } from 'react';
 import { Button, Image, View } from 'react-native';
@@ -148,7 +150,7 @@ export default function App() {
   );
 }
 ```
-
+{% endraw %}
 ## 실행
 먼저, Flask 서버를 실행하자.  
 기본적으로 http://localhost:5000 에서 실행된다.  
