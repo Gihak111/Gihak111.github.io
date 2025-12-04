@@ -41,7 +41,7 @@ nav: "docs"
 
 #### Linear Algebra  
 <ul style="list-style-type: none;">
-{% for post in site.tags.['linear algebra'] %}
+{% for post in site.tags['linear algebra'] %}
   <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
 {% endfor %}
 </ul>  
