@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "AI 아키텍쳐 1. BERT"
+title: "AI 아키텍쳐 1. BERT"
 categories: "AI"
 tag: "Architecture"
 toc: true

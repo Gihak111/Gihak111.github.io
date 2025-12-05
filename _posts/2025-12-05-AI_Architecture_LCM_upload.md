@@ -1,6 +1,6 @@
 ---
 layout: single
-title: "AI 아키텍쳐 3. LCM"
+title: "AI 아키텍쳐 6. LCM"
 categories: "AI"
 tag: "Architecture"
 toc: true

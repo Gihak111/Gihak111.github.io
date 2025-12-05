@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "GPT oss 모델을 사용해 보자"
+title: "GPT oss 모델을 사용해 보자"
 categories: "AI"
 tag: "code"
 toc: true
