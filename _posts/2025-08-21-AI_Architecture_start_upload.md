@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "다양한 AI의 아키텍텨를 알아보자"
+title: "다양한 AI의 아키텍텨를 알아보자"
 categories: "AI"
 tag: "Architecture"
 toc: true
