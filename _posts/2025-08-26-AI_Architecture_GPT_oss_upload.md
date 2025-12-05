@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "AI 아키텍쳐 4. GPT-oss-20B"
+title: "AI 아키텍쳐 4. GPT-oss-20B"
 categories: "AI"
 tag: "Architecture"
 toc: true
