@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "AI 입문용 글 모음"
+title: "AI 입문용 글 모음"
 categories: "AI"
 tag: "Explanation"
 toc: true
