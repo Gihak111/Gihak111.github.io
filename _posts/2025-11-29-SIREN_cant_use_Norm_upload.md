@@ -2,7 +2,7 @@
 layout: single
 title:  "PINN에서 add&Norm을 사용하지 못하는 이유"
 categories: "AI"
-tag: "review"
+tag: "PINN"
 toc: true
 author_profile: false
 sidebar:
