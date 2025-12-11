@@ -1,6 +1,6 @@
 ---
 layout: single
-title: "AI 아키텍쳐 7. HLM"
+title: "AI 아키텍쳐 6. HLM"
 categories: "AI"
 tag: "Architecture"
 toc: true

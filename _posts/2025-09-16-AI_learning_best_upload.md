@@ -69,7 +69,7 @@ nav: "docs"
   <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
 {% endfor %}
 </ul>  
-Framework
+
 
 #### PINN  
 <ul style="list-style-type: none;">
