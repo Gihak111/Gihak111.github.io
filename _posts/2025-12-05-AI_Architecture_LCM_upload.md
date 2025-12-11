@@ -1,8 +1,8 @@
 ---
 layout: single
-title: "AI 아키텍쳐 6. LCM"
+title: "LCM"
 categories: "AI"
-tag: "Architecture"
+tag: "Framework"
 toc: true
 author_profile: false
 sidebar:

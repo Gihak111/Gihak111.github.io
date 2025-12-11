@@ -63,6 +63,14 @@ nav: "docs"
 </ul>  
 
 
+#### AI Framework  
+<ul style="list-style-type: none;">
+{% for post in site.tags.Framework %}
+  <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
+{% endfor %}
+</ul>  
+Framework
+
 #### PINN  
 <ul style="list-style-type: none;">
 {% for post in site.tags.PINN %}
