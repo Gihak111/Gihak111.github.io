@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Markdown to PDF Converter (with LaTeX & Images)</title>
+    <title>Markdown to PDF Converter (Fixed LaTeX)</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,9 +21,9 @@
             color: #333;
         }
 
-        /* 컨트롤 패널 (파일 업로드 및 버튼) */
+        /* 컨트롤 패널 */
         .controls {
-            max-width: 210mm; /* A4 폭 */
+            max-width: 210mm;
             margin: 0 auto 20px auto;
             padding: 20px;
             background: white;
@@ -37,7 +37,7 @@
 
         .file-input-wrapper {
             display: flex;
-            flex-direction: column; /* 안내 문구를 위해 세로 정렬로 살짝 변경 */
+            flex-direction: column; 
             gap: 5px;
         }
 
@@ -76,7 +76,7 @@
             width: 210mm;
             min-height: 297mm;
             margin: 0 auto;
-            padding: 20mm; /* 일반적인 문서 여백 */
+            padding: 20mm;
             box-sizing: border-box;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             line-height: 1.6;
@@ -102,7 +102,7 @@
             overflow-x: auto;
             padding: 1em;
             font-size: 90%;
-            background-color: #f6f8fa; /* 코드 블록 배경 */
+            background-color: #f6f8fa;
         }
 
         .markdown-body blockquote {
@@ -122,7 +122,7 @@
             font-size: 110% !important;
         }
 
-        /* 인쇄 설정 (PDF 저장 시 적용됨) */
+        /* 인쇄 설정 */
         @media print {
             body {
                 background: none;
@@ -130,13 +130,13 @@
                 padding: 0;
             }
             .controls {
-                display: none !important; /* 버튼 숨김 */
+                display: none !important;
             }
             .page-container {
                 width: 100%;
                 margin: 0;
                 box-shadow: none;
-                padding: 0; /* 브라우저 인쇄 설정의 여백을 따름 */
+                padding: 0;
             }
             @page {
                 size: A4;
@@ -146,7 +146,6 @@
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
     <script>
@@ -190,7 +189,7 @@
             const files = Array.from(event.target.files);
             if (files.length === 0) return;
 
-            // 1. Markdown 파일 식별 (.md 또는 .txt)
+            // 1. Markdown 파일 식별
             const mdFile = files.find(file => file.name.endsWith('.md') || file.name.endsWith('.txt'));
             
             if (!mdFile) {
@@ -198,11 +197,10 @@
                 return;
             }
 
-            // 2. 이미지 파일 매핑 (파일명 -> Blob URL)
+            // 2. 이미지 파일 매핑
             const imageMap = new Map();
             files.forEach(file => {
                 if (file.type.startsWith('image/')) {
-                    // 브라우저 보안상 로컬 경로는 차단되므로, Blob URL 생성
                     imageMap.set(file.name, URL.createObjectURL(file));
                 }
             });
@@ -212,39 +210,51 @@
             reader.onload = (e) => {
                 let markdownText = e.target.result;
                 
-                // 3. Markdown 텍스트 내 이미지 경로 치환
-                // 예: ![alt](./5.png) -> ![alt](blob:http://...)
+                // 3. 이미지 경로 치환
                 imageMap.forEach((blobUrl, fileName) => {
-                    // 정규식 설명: 
-                    // \(: Markdown 이미지 문법 시작 괄호
-                    // ([^)]*\/)?: 경로 앞에 폴더명이 있을 수도 있고 없을 수도 있음 (예: images/5.png 또는 그냥 5.png)
-                    // fileName: 실제 파일명
-                    // \): 닫는 괄호
-                    // 'g': 문서 전체에서 찾기
-                    
-                    // 특수문자 이스케이프 처리
                     const escapedFileName = fileName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                    
-                    // (./파일명), (파일명), (폴더/파일명) 등을 모두 찾아서 Blob URL로 교체
                     const regex = new RegExp(`\\(([^)]*\\/)?${escapedFileName}\\)`, 'g');
                     markdownText = markdownText.replace(regex, `(${blobUrl})`);
                 });
 
-                // 4. Markdown을 HTML로 변환
+                // ============================================================
+                // [수정된 로직] LaTeX 보호 (Pre-processing)
+                // 중요: 마크다운 문법(_, *)과 겹치지 않는 순수 영문 문자열 사용
+                // ============================================================
+                const mathExpressions = [];
+                
+                // LaTeX 구문 추출 ($$...$$ 또는 $...$)
+                const protectedText = markdownText.replace(/\$\$([\s\S]*?)\$\$|\$((?!\$)[\s\S]*?)\$/gm, (match) => {
+                    mathExpressions.push(match);
+                    // underscores(_)를 사용하지 않고 숫자와 영문자만 사용
+                    return `TEMPMATHPLACEHOLDER${mathExpressions.length - 1}END`;
+                });
+
+                // 4. Markdown -> HTML 변환
                 marked.setOptions({
                     breaks: true,
                     gfm: true
                 });
 
-                const rawHtml = marked.parse(markdownText);
+                let rawHtml = marked.parse(protectedText);
+
+                // ============================================================
+                // [수정된 로직] LaTeX 복구 (Post-processing)
+                // ============================================================
+                mathExpressions.forEach((math, index) => {
+                    // 저장해둔 안전한 키값으로 다시 찾아서 원래 수식으로 교체
+                    const placeholder = `TEMPMATHPLACEHOLDER${index}END`;
+                    rawHtml = rawHtml.replace(placeholder, math);
+                });
+
                 contentDiv.innerHTML = rawHtml;
 
-                // 5. 코드 하이라이팅 적용
+                // 5. 코드 하이라이팅
                 document.querySelectorAll('pre code').forEach((el) => {
                     hljs.highlightElement(el);
                 });
 
-                // 6. LaTeX 수식 렌더링 (MathJax)
+                // 6. MathJax 렌더링
                 if (window.MathJax) {
                     MathJax.typesetPromise([contentDiv]).then(() => {
                         console.log('MathJax rendering complete');
