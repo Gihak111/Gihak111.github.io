@@ -2,215 +2,161 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Markdown to PDF Converter (with LaTeX)</title>
+    <title>Markdown to PDF (이미지 포함)</title>
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        window.PagedConfig = { auto: false };
+    </script>
 
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
-
-    <style>
-        /* 기본 스타일 */
-        body {
-            background-color: #f0f2f5;
-            font-family: 'Noto Sans KR', sans-serif;
-            margin: 0;
-            padding: 20px;
-            color: #333;
-        }
-
-        /* 컨트롤 패널 (파일 업로드 및 버튼) */
-        .controls {
-            max-width: 210mm; /* A4 폭 */
-            margin: 0 auto 20px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .file-input-wrapper {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        input[type="file"] {
-            padding: 5px;
-        }
-
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        /* A4 용지 미리보기 영역 */
-        .page-container {
-            background: white;
-            width: 210mm;
-            min-height: 297mm;
-            margin: 0 auto;
-            padding: 20mm; /* 일반적인 문서 여백 */
-            box-sizing: border-box;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            line-height: 1.6;
-        }
-
-        /* 마크다운 콘텐츠 스타일링 */
-        .markdown-body h1, .markdown-body h2, .markdown-body h3 {
-            border-bottom: 1px solid #eaecef;
-            padding-bottom: 0.3em;
-            margin-top: 24px;
-        }
-        
-        .markdown-body code {
-            font-family: 'Roboto Mono', monospace;
-            background-color: #f6f8fa;
-            padding: 0.2em 0.4em;
-            border-radius: 3px;
-            font-size: 85%;
-        }
-
-        .markdown-body pre code {
-            display: block;
-            overflow-x: auto;
-            padding: 1em;
-            font-size: 90%;
-            background-color: #f6f8fa; /* 코드 블록 배경 */
-        }
-
-        .markdown-body blockquote {
-            margin: 0;
-            padding: 0 1em;
-            color: #6a737d;
-            border-left: 0.25em solid #dfe2e5;
-        }
-        
-        .markdown-body img {
-            max-width: 100%;
-            box-sizing: border-box;
-        }
-
-        /* 수식 스타일 보정 */
-        mjx-container {
-            font-size: 110% !important;
-        }
-
-        /* 인쇄 설정 (PDF 저장 시 적용됨) */
-        @media print {
-            body {
-                background: none;
-                margin: 0;
-                padding: 0;
-            }
-            .controls {
-                display: none !important; /* 버튼 숨김 */
-            }
-            .page-container {
-                width: 100%;
-                margin: 0;
-                box-shadow: none;
-                padding: 0; /* 브라우저 인쇄 설정의 여백을 따름 */
-            }
-            @page {
-                size: A4;
-                margin: 20mm;
-            }
-        }
-    </style>
-
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
+    <script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-
+    
     <script>
         window.MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']],
-                displayMath: [['$$', '$$'], ['\\[', '\\]']],
-                processEscapes: true
-            },
-            svg: {
-                fontCache: 'global'
-            }
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] },
+            svg: { fontCache: 'global' }
         };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+            @top-left { content: none; }
+            @top-right { content: none; }
+            @bottom-right {
+                content: counter(page);
+                font-family: 'Roboto Mono', monospace;
+                font-size: 10pt;
+                color: #888;
+            }
+        }
+
+        body { margin: 0; font-family: 'Noto Sans KR', sans-serif; background: #555; }
+        
+        #controls {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: #222; color: white; padding: 15px;
+            display: flex; gap: 20px; align-items: center; justify-content: center;
+            z-index: 9999; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        
+        .input-group { display: flex; flex-direction: column; gap: 5px; font-size: 0.9em; }
+        
+        button {
+            background: #007bff; color: white; border: none; padding: 10px 25px;
+            border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; height: fit-content;
+        }
+        button:hover { background: #0056b3; }
+
+        .pagedjs_pages {
+            width: 100%; display: flex; flex-direction: column; align-items: center;
+            padding-top: 100px; padding-bottom: 50px;
+        }
+        
+        .pagedjs_page {
+            background: white; margin-bottom: 20px; box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
+
+        /* 콘텐츠 스타일 */
+        .markdown-body { font-size: 10.5pt; line-height: 1.6; text-align: justify; }
+        .markdown-body h1 { border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-top: 0; }
+        .markdown-body h2 { border-bottom: 1px solid #eee; margin-top: 30px; }
+        .markdown-body img { 
+            max-width: 100%; 
+            display: block; 
+            margin: 10px auto; /* 이미지 가운데 정렬 */
+            border: 1px solid #eee;
+        }
+        .markdown-body pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .markdown-body code { font-family: 'Roboto Mono', monospace; background: #eee; padding: 2px 4px; border-radius: 3px; font-size: 0.9em;}
+        .markdown-body pre code { background: transparent; padding: 0; }
+
+        @media print {
+            #controls { display: none !important; }
+            body { background: white; }
+            .pagedjs_pages { padding: 0; }
+            .pagedjs_page { margin: 0; box-shadow: none; }
+        }
+    </style>
 </head>
 <body>
 
-    <div class="controls">
-        <div class="file-input-wrapper">
-            <h3>Markdown to PDF</h3>
-            <input type="file" id="fileInput" accept=".md,.txt">
+    <div id="controls">
+        <div class="input-group">
+            <label>1. .md 파일 선택</label>
+            <input type="file" id="mdInput" accept=".md,.txt">
         </div>
-        <button onclick="window.print()">PDF로 저장 / 인쇄</button>
+        <div class="input-group">
+            <label>2. 이미지 파일들 (여러개 선택)</label>
+            <input type="file" id="imgInput" multiple accept="image/*">
+        </div>
+        <button onclick="processFiles()">변환 시작</button>
+        <button onclick="window.print()" style="background:#28a745;">PDF 저장</button>
     </div>
 
-    <div id="content" class="page-container markdown-body">
-        <p style="color: #666; text-align: center; margin-top: 100px;">
-            상단의 '파일 선택' 버튼을 눌러 .md 파일을 불러오세요.<br>
-            수식(LaTeX)과 코드가 자동으로 렌더링됩니다.
-        </p>
-    </div>
+    <div id="render-output"></div>
+    <div id="source-hidden" style="display:none;"></div>
 
     <script>
-        const fileInput = document.getElementById('fileInput');
-        const contentDiv = document.getElementById('content');
+        async function processFiles() {
+            const mdInput = document.getElementById('mdInput');
+            const imgInput = document.getElementById('imgInput');
 
-        fileInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
+            if (!mdInput.files.length) {
+                alert("Markdown(.md) 파일을 선택해주세요.");
+                return;
+            }
 
-            const reader = new FileReader();
+            // 1. Markdown 읽기
+            const mdFile = mdInput.files[0];
+            const text = await mdFile.text();
+
+            // 2. Markdown -> HTML 변환
+            marked.setOptions({ breaks: true, gfm: true });
+            let htmlContent = marked.parse(text);
             
-            reader.onload = (e) => {
-                const markdownText = e.target.result;
+            const sourceDiv = document.getElementById('source-hidden');
+            sourceDiv.innerHTML = `<div class="markdown-body">${htmlContent}</div>`;
+
+            // 3. 이미지 경로 매칭 및 교체 (로컬 파일 처리)
+            if (imgInput.files.length > 0) {
+                const images = sourceDiv.querySelectorAll('img');
+                const uploadedFiles = Array.from(imgInput.files);
+
+                images.forEach(img => {
+                    const src = img.getAttribute('src');
+                    // 경로에서 파일명만 추출 (예: ./assets/image.png -> image.png)
+                    const filename = src.split('/').pop();
+
+                    // 업로드된 파일 중 이름이 같은 파일 찾기
+                    const match = uploadedFiles.find(f => f.name === filename);
+                    if (match) {
+                        // 브라우저 내부 임시 URL로 교체
+                        img.src = URL.createObjectURL(match);
+                    }
+                });
+            }
+
+            // 4. 코드 하이라이팅
+            sourceDiv.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+
+            // 5. MathJax 및 Paged.js 실행
+            MathJax.typesetPromise([sourceDiv]).then(() => {
+                const outputDiv = document.getElementById('render-output');
+                outputDiv.innerHTML = ''; // 초기화
                 
-                // 1. Markdown을 HTML로 변환
-                // marked 설정: 마크다운 파싱 시 줄바꿈 등 처리
-                marked.setOptions({
-                    breaks: true,
-                    gfm: true
+                let paged = new Paged.Previewer();
+                paged.preview(sourceDiv.innerHTML, [], outputDiv).then(() => {
+                    console.log("변환 완료");
                 });
-
-                // HTML 변환
-                const rawHtml = marked.parse(markdownText);
-                contentDiv.innerHTML = rawHtml;
-
-                // 2. 코드 하이라이팅 적용
-                document.querySelectorAll('pre code').forEach((el) => {
-                    hljs.highlightElement(el);
-                });
-
-                // 3. LaTeX 수식 렌더링 (MathJax)
-                // 내용이 변경되었으므로 MathJax에게 다시 스캔하도록 요청
-                if (window.MathJax) {
-                    MathJax.typesetPromise([contentDiv]).then(() => {
-                        console.log('MathJax rendering complete');
-                    }).catch((err) => console.log('MathJax error:', err));
-                }
-            };
-
-            reader.readAsText(file);
-        });
+            });
+        }
     </script>
 </body>
 </html>
