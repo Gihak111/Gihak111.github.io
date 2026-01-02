@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Markdown to PDF Converter (with LaTeX)</title>
+    <title>Markdown to PDF Converter (with LaTeX & Images)</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,8 +37,17 @@
 
         .file-input-wrapper {
             display: flex;
-            gap: 10px;
-            align-items: center;
+            flex-direction: column; /* 안내 문구를 위해 세로 정렬로 살짝 변경 */
+            gap: 5px;
+        }
+
+        .file-input-wrapper h3 {
+            margin: 0;
+        }
+
+        .file-input-wrapper small {
+            color: #666;
+            font-size: 0.85em;
         }
 
         input[type="file"] {
@@ -159,7 +168,8 @@
     <div class="controls">
         <div class="file-input-wrapper">
             <h3>Markdown to PDF</h3>
-            <input type="file" id="fileInput" accept=".md,.txt">
+            <small>Tip: .md 파일과 이미지 파일들을 <strong>함께(다중) 선택</strong>하세요.</small>
+            <input type="file" id="fileInput" accept=".md,.txt,.png,.jpg,.jpeg,.gif,.webp,.svg" multiple>
         </div>
         <button onclick="window.print()">PDF로 저장 / 인쇄</button>
     </div>
@@ -167,6 +177,7 @@
     <div id="content" class="page-container markdown-body">
         <p style="color: #666; text-align: center; margin-top: 100px;">
             상단의 '파일 선택' 버튼을 눌러 .md 파일을 불러오세요.<br>
+            문서 내 이미지가 있다면, <strong>이미지 파일도 함께 선택</strong>해야 보입니다.<br>
             수식(LaTeX)과 코드가 자동으로 렌더링됩니다.
         </p>
     </div>
@@ -176,32 +187,64 @@
         const contentDiv = document.getElementById('content');
 
         fileInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
+            const files = Array.from(event.target.files);
+            if (files.length === 0) return;
+
+            // 1. Markdown 파일 식별 (.md 또는 .txt)
+            const mdFile = files.find(file => file.name.endsWith('.md') || file.name.endsWith('.txt'));
+            
+            if (!mdFile) {
+                alert("Markdown (.md) 파일을 선택해야 합니다.");
+                return;
+            }
+
+            // 2. 이미지 파일 매핑 (파일명 -> Blob URL)
+            const imageMap = new Map();
+            files.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    // 브라우저 보안상 로컬 경로는 차단되므로, Blob URL 생성
+                    imageMap.set(file.name, URL.createObjectURL(file));
+                }
+            });
 
             const reader = new FileReader();
             
             reader.onload = (e) => {
-                const markdownText = e.target.result;
+                let markdownText = e.target.result;
                 
-                // 1. Markdown을 HTML로 변환
-                // marked 설정: 마크다운 파싱 시 줄바꿈 등 처리
+                // 3. Markdown 텍스트 내 이미지 경로 치환
+                // 예: ![alt](./5.png) -> ![alt](blob:http://...)
+                imageMap.forEach((blobUrl, fileName) => {
+                    // 정규식 설명: 
+                    // \(: Markdown 이미지 문법 시작 괄호
+                    // ([^)]*\/)?: 경로 앞에 폴더명이 있을 수도 있고 없을 수도 있음 (예: images/5.png 또는 그냥 5.png)
+                    // fileName: 실제 파일명
+                    // \): 닫는 괄호
+                    // 'g': 문서 전체에서 찾기
+                    
+                    // 특수문자 이스케이프 처리
+                    const escapedFileName = fileName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    
+                    // (./파일명), (파일명), (폴더/파일명) 등을 모두 찾아서 Blob URL로 교체
+                    const regex = new RegExp(`\\(([^)]*\\/)?${escapedFileName}\\)`, 'g');
+                    markdownText = markdownText.replace(regex, `(${blobUrl})`);
+                });
+
+                // 4. Markdown을 HTML로 변환
                 marked.setOptions({
                     breaks: true,
                     gfm: true
                 });
 
-                // HTML 변환
                 const rawHtml = marked.parse(markdownText);
                 contentDiv.innerHTML = rawHtml;
 
-                // 2. 코드 하이라이팅 적용
+                // 5. 코드 하이라이팅 적용
                 document.querySelectorAll('pre code').forEach((el) => {
                     hljs.highlightElement(el);
                 });
 
-                // 3. LaTeX 수식 렌더링 (MathJax)
-                // 내용이 변경되었으므로 MathJax에게 다시 스캔하도록 요청
+                // 6. LaTeX 수식 렌더링 (MathJax)
                 if (window.MathJax) {
                     MathJax.typesetPromise([contentDiv]).then(() => {
                         console.log('MathJax rendering complete');
@@ -209,7 +252,7 @@
                 }
             };
 
-            reader.readAsText(file);
+            reader.readAsText(mdFile);
         });
     </script>
 </body>
