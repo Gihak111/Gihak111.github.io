@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Markdown to Clean PDF</title>
+    
+    <script>
+        window.PagedConfig = {
+            auto: false, // 페이지 로드 시 자동 실행 끔
+        };
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    
+    <script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* PDF 페이지 설정 (@page) */
+        @page {
+            size: A4;
+            margin: 20mm 20mm 20mm 20mm;
+
+            /* 브라우저 기본 머리글/바닥글 제거하고 아래 내용으로 대체 */
+            @top-left { content: none; }
+            @top-right { content: none; }
+            
+            /* 우측 하단 페이지 번호 */
+            @bottom-right {
+                content: counter(page);
+                font-family: 'Roboto Mono', monospace;
+                font-size: 10pt;
+                color: #888;
+            }
+        }
+
+        /* 화면 스타일 */
+        body { margin: 0; font-family: 'Noto Sans KR', sans-serif; background: #555; }
+        
+        /* 컨트롤 패널 */
+        #controls {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: #222; color: white; padding: 15px;
+            display: flex; gap: 15px; align-items: center; justify-content: center;
+            z-index: 9999; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        
+        button {
+            background: #007bff; color: white; border: none; padding: 8px 20px;
+            border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px;
+        }
+        button:hover { background: #0056b3; }
+
+        /* 미리보기 영역 (화면 중앙에 A4처럼 보이게) */
+        .pagedjs_pages {
+            width: 100%; display: flex; flex-direction: column; align-items: center;
+            padding-top: 80px; padding-bottom: 50px;
+            transform-origin: top center; /* 축소 시 기준점 */
+        }
+        
+        .pagedjs_page {
+            background: white; margin-bottom: 20px; box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
+
+        /* 콘텐츠 스타일 */
+        .markdown-body { font-size: 10.5pt; line-height: 1.6; text-align: justify; }
+        .markdown-body h1 { border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-top: 0; }
+        .markdown-body h2 { border-bottom: 1px solid #eee; margin-top: 30px; }
+        .markdown-body pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .markdown-body code { font-family: 'Roboto Mono', monospace; background: #eee; padding: 2px 4px; border-radius: 3px; font-size: 0.9em;}
+        .markdown-body pre code { background: transparent; padding: 0; }
+        .markdown-body img { max-width: 100%; }
+        
+        /* 인쇄 시 컨트롤 패널 숨김 */
+        @media print {
+            #controls { display: none !important; }
+            body { background: white; }
+            .pagedjs_pages { padding: 0; }
+            .pagedjs_page { margin: 0; box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="controls">
+        <span>Markdown PDF 변환기</span>
+        <input type="file" id="fileInput" accept=".md,.txt">
+        <button onclick="window.print()">PDF로 저장</button>
+        <span style="font-size:0.8em; color:#aaa;">(인쇄 설정에서 '머리글/바닥글' 체크 해제 필수)</span>
+    </div>
+
+    <div id="render-output"></div>
+    
+    <div id="source-hidden" style="display:none;"></div>
+
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const mdText = e.target.result;
+                
+                // 1. Markdown -> HTML 변환
+                marked.setOptions({ breaks: true, gfm: true });
+                const htmlContent = marked.parse(mdText);
+                
+                // 임시 div에 넣기
+                const sourceDiv = document.getElementById('source-hidden');
+                sourceDiv.innerHTML = `<div class="markdown-body">${htmlContent}</div>`;
+                
+                // 2. 코드 하이라이팅
+                sourceDiv.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+
+                // 3. MathJax (수식) 렌더링
+                MathJax.typesetPromise([sourceDiv]).then(() => {
+                    // 수식 렌더링이 끝나면 Paged.js 실행
+                    runPagedJs(sourceDiv.innerHTML);
+                }).catch(err => console.error(err));
+            };
+            reader.readAsText(file);
+        });
+
+        function runPagedJs(contentHTML) {
+            // 기존 렌더링 결과 초기화
+            const outputDiv = document.getElementById('render-output');
+            outputDiv.innerHTML = '';
+
+            // Paged.js 수동 실행
+            let paged = new Paged.Previewer();
+            
+            // preview 함수: (HTML내용, [CSS파일배열], 렌더링할DOM요소)
+            paged.preview(contentHTML, [], outputDiv).then((flow) => {
+                console.log("PDF 렌더링 완료");
+            });
+        }
+    </script>
+</body>
+</html>
