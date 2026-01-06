@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Markdown to PDF (이미지 포함)</title>
+    
+    <script>
+        window.PagedConfig = { auto: false };
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    
+    <script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+            @top-left { content: none; }
+            @top-right { content: none; }
+            @bottom-right {
+                content: counter(page);
+                font-family: 'Roboto Mono', monospace;
+                font-size: 10pt;
+                color: #888;
+            }
+        }
+
+        body { margin: 0; font-family: 'Noto Sans KR', sans-serif; background: #555; }
+        
+        #controls {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: #222; color: white; padding: 15px;
+            display: flex; gap: 20px; align-items: center; justify-content: center;
+            z-index: 9999; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        
+        .input-group { display: flex; flex-direction: column; gap: 5px; font-size: 0.9em; }
+        
+        button {
+            background: #007bff; color: white; border: none; padding: 10px 25px;
+            border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; height: fit-content;
+        }
+        button:hover { background: #0056b3; }
+
+        .pagedjs_pages {
+            width: 100%; display: flex; flex-direction: column; align-items: center;
+            padding-top: 100px; padding-bottom: 50px;
+        }
+        
+        .pagedjs_page {
+            background: white; margin-bottom: 20px; box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
+
+        /* 콘텐츠 스타일 */
+        .markdown-body { font-size: 10.5pt; line-height: 1.6; text-align: justify; }
+        .markdown-body h1 { border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-top: 0; }
+        .markdown-body h2 { border-bottom: 1px solid #eee; margin-top: 30px; }
+        .markdown-body img { 
+            max-width: 100%; 
+            display: block; 
+            margin: 10px auto; /* 이미지 가운데 정렬 */
+            border: 1px solid #eee;
+        }
+        .markdown-body pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .markdown-body code { font-family: 'Roboto Mono', monospace; background: #eee; padding: 2px 4px; border-radius: 3px; font-size: 0.9em;}
+        .markdown-body pre code { background: transparent; padding: 0; }
+
+        @media print {
+            #controls { display: none !important; }
+            body { background: white; }
+            .pagedjs_pages { padding: 0; }
+            .pagedjs_page { margin: 0; box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="controls">
+        <div class="input-group">
+            <label>1. .md 파일 선택</label>
+            <input type="file" id="mdInput" accept=".md,.txt">
+        </div>
+        <div class="input-group">
+            <label>2. 이미지 파일들 (여러개 선택)</label>
+            <input type="file" id="imgInput" multiple accept="image/*">
+        </div>
+        <button onclick="processFiles()">변환 시작</button>
+        <button onclick="window.print()" style="background:#28a745;">PDF 저장</button>
+    </div>
+
+    <div id="render-output"></div>
+    <div id="source-hidden" style="display:none;"></div>
+
+    <script>
+        async function processFiles() {
+            const mdInput = document.getElementById('mdInput');
+            const imgInput = document.getElementById('imgInput');
+
+            if (!mdInput.files.length) {
+                alert("Markdown(.md) 파일을 선택해주세요.");
+                return;
+            }
+
+            // 1. Markdown 읽기
+            const mdFile = mdInput.files[0];
+            const text = await mdFile.text();
+
+            // 2. Markdown -> HTML 변환
+            marked.setOptions({ breaks: true, gfm: true });
+            let htmlContent = marked.parse(text);
+            
+            const sourceDiv = document.getElementById('source-hidden');
+            sourceDiv.innerHTML = `<div class="markdown-body">${htmlContent}</div>`;
+
+            // 3. 이미지 경로 매칭 및 교체 (로컬 파일 처리)
+            if (imgInput.files.length > 0) {
+                const images = sourceDiv.querySelectorAll('img');
+                const uploadedFiles = Array.from(imgInput.files);
+
+                images.forEach(img => {
+                    const src = img.getAttribute('src');
+                    // 경로에서 파일명만 추출 (예: ./assets/image.png -> image.png)
+                    const filename = src.split('/').pop();
+
+                    // 업로드된 파일 중 이름이 같은 파일 찾기
+                    const match = uploadedFiles.find(f => f.name === filename);
+                    if (match) {
+                        // 브라우저 내부 임시 URL로 교체
+                        img.src = URL.createObjectURL(match);
+                    }
+                });
+            }
+
+            // 4. 코드 하이라이팅
+            sourceDiv.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+
+            // 5. MathJax 및 Paged.js 실행
+            MathJax.typesetPromise([sourceDiv]).then(() => {
+                const outputDiv = document.getElementById('render-output');
+                outputDiv.innerHTML = ''; // 초기화
+                
+                let paged = new Paged.Previewer();
+                paged.preview(sourceDiv.innerHTML, [], outputDiv).then(() => {
+                    console.log("변환 완료");
+                });
+            });
+        }
+    </script>
+</body>
+</html>
