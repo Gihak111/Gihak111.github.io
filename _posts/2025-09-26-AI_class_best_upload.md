@@ -54,3 +54,11 @@ AI 강의를 진행하게 되어, 여기에 링크와 자료를 정리해 두었
 ### 8. PINN  
 [유튜브 링크](https://youtu.be/3y16DFWeFpY)  
 [PDF 다운로드]( {{ "/file/8._PINN.pdf" | relative_url }} )  
+
+
+## 번외 + PINN
+### 1. PINN으로 해석한 Laplace & poisson 문제 해결
+[PDF 다운로드]( {{ "/file/PINN_plus/Laplace_poisson_PINN.pdf" | relative_url }} )  
+
+### 2. PINN 해석 결과와 FEKO 해석 결과가 서로 다른 이유
+[PDF 다운로드]( {{ "/file/PINN_plus/reflector with_FEKO.pdf" | relative_url }} )   
