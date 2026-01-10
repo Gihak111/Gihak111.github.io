@@ -54,3 +54,8 @@ AI 강의를 진행하게 되어, 여기에 링크와 자료를 정리해 두었
 ### 8. PINN  
 [유튜브 링크](https://youtu.be/3y16DFWeFpY)  
 [PDF 다운로드]( {{ "/file/8._PINN.pdf" | relative_url }} )  
+
+
+### 9. Vit
+[유튜브 링크](https://youtu.be/5V0YNrdTmRo)  
+[PDF 다운로드]( {{ "/file/9._Vit.pdf" | relative_url }} )  
