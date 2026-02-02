@@ -9,66 +9,66 @@ sidebar:
     nav: "docs"
 ---
 
-### **PINN 실험 환경 구축 (Windows/myenv 기준)**
+### PINN 실험 환경 구축 (Windows/myenv 기준)
 
-#### **1. Python 설치**
+#### 1. Python 설치
 
-* **다운로드:** [Python 공식 홈페이지](https://www.python.org/downloads/)에서 **3.10.x** 또는 **3.11.x** 버전을 다운로드한다. (최신 3.12+는 호환성 문제가 있을 수 있다.)
-* **주의사항:** 설치 초기 화면 하단의 **`Add Python to PATH`** 옵션을 **반드시 체크**하고 설치한다.
-* **확인:** `cmd`(명령 프롬프트)에서 `python --version`을 입력해 버전이 나오면 성공이다.
+- 다운로드: [Python 공식 홈페이지](https://www.python.org/downloads/)에서 3.10.x 또는 3.11.x 버전을 다운로드한다.  
+- 주의사항: 설치 초기 화면 하단의 `Add Python to PATH` 옵션을 반드시 체크하고 설치한다.  
+- 확인: `cmd`(명령 프롬프트)에서 `python --version`을 입력해 버전이 나오면 성공이다.  
 
-#### **2. 가상환경(myenv) 구성**
+#### 2. 가상환경(myenv) 구성
 
-* **생성:** 프로젝트 폴더로 이동한 뒤 아래 명령어로 가상환경을 만든다.
+- 생성: 프로젝트 폴더로 이동한 뒤 아래 명령어로 가상환경을 만든다.  
 ```bash
 python -m venv myenv
 
 ```
 
 
-* **활성화:** 아래 명령어로 가상환경을 켠다. (프롬프트 앞에 `(myenv)`가 떠야 한다.)
+- 활성화: 아래 명령어로 가상환경을 켠다. (프롬프트 앞에 `(myenv)`가 떠야 한다.)  
 ```bash
 myenv\Scripts\activate
 
 ```
 
 
-* **업그레이드:** `pip`를 최신화한다.
+* 업그레이드: `pip`를 최신화한다.  
 ```bash
 python -m pip install --upgrade pip
 
 ```
 
 
+#### 3. CUDA 및 cuDNN 설정 (버전 매칭 필수)
 
-#### **3. CUDA 및 cuDNN 설정 (버전 매칭 필수)**
+- 버전 확인: [PyTorch 홈페이지](https://pytorch.org/get-started/locally/)에서 지원하는 CUDA 버전(예: **11.8**)을 먼저 확인한다.  
+- CUDA 설치: [NVIDIA 아카이브](https://developer.nvidia.com/cuda-toolkit-archive)에서 위에서 확인한 버전(11.8)을 다운로드하여 설치한다.  
+- cuDNN 설정: [cuDNN 아카이브](https://developer.nvidia.com/rdp/cudnn-archive)에서 CUDA 버전과 맞는 파일을 받는다. 압축을 푼 뒤 `bin`, `include`, `lib` 폴더 안의 파일들을 CUDA 설치 경로(`C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8`)에 덮어씌운다.  
+물론, 최신 버전은 cuDNN도 exe 이기 때문에, 그냥 설치하면 끝이다.  
 
-* **버전 확인:** [PyTorch 홈페이지](https://pytorch.org/get-started/locally/)에서 지원하는 CUDA 버전(예: **11.8**)을 먼저 확인한다.
-* **CUDA 설치:** [NVIDIA 아카이브](https://developer.nvidia.com/cuda-toolkit-archive)에서 위에서 확인한 버전(11.8)을 다운로드하여 설치한다.
-* **cuDNN 설정:** [cuDNN 아카이브](https://developer.nvidia.com/rdp/cudnn-archive)에서 CUDA 버전과 맞는 파일을 받는다. 압축을 푼 뒤 `bin`, `include`, `lib` 폴더 안의 파일들을 **CUDA 설치 경로**(`C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8`)에 덮어씌운다.
+#### 4. PyTorch 및 라이브러리 설치
 
-#### **4. PyTorch 및 라이브러리 설치**
-
-* **PyTorch 설치:** 가상환경이 켜진 상태에서 CUDA 버전에 맞는 명령어를 입력한다. (CUDA 11.8 예시)
+- PyTorch 설치: 가상환경이 켜진 상태에서 CUDA 버전에 맞는 명령어를 입력한다.  
 ```bash
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
 ```
 
 
-* **필수 패키지:** 수치 계산과 시각화를 위한 라이브러리를 설치한다.
+- 필수 패키지: 수치 계산과 시각화를 위한 라이브러리를 설치한다.  
 ```bash
 pip install numpy matplotlib scipy
 
 ```
 
 
-* **검증:** 파이썬 실행 후 `import torch; print(torch.cuda.is_available())` 입력 시 `True`가 나오면 GPU 연동 성공이다.
+- 검증: 파이썬 실행 후 `import torch; print(torch.cuda.is_available())` 입력 시 `True`가 나오면 GPU 연동 성공이다.  
 
-#### **5. 라플라스(Laplace) 방정식 정의**
+#### 5. 라플라스(Laplace) 방정식 정의
 
-* PINN의 핵심인 자동 미분을 이용해 $\nabla^2 u = u_{xx} + u_{yy}$를 정의하고 테스트한다.
-* `test.py` 파일을 만들고 아래 코드를 실행해 본다.
+- PINN의 핵심인 자동 미분을 이용해 $\nabla^2 u = u_{xx} + u_{yy}$를 정의하고 테스트한다.  
+- `test.py` 파일을 만들고 아래 코드를 실행해 본다.  
 
 ```python
 import torch
