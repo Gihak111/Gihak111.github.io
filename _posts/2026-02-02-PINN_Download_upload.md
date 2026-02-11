@@ -22,21 +22,18 @@ sidebar:
 - 생성: 프로젝트 폴더로 이동한 뒤 아래 명령어로 가상환경을 만든다.  
 ```bash
 python -m venv myenv
-
 ```
 
 
 - 활성화: 아래 명령어로 가상환경을 켠다. (프롬프트 앞에 `(myenv)`가 떠야 한다.)  
 ```bash
 myenv\Scripts\activate
-
 ```
 
 
 * 업그레이드: `pip`를 최신화한다.  
 ```bash
 python -m pip install --upgrade pip
-
 ```
 
 
@@ -52,14 +49,12 @@ python -m pip install --upgrade pip
 - PyTorch 설치: 가상환경이 켜진 상태에서 CUDA 버전에 맞는 명령어를 입력한다.  
 ```bash
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-
 ```
 
 
 - 필수 패키지: 수치 계산과 시각화를 위한 라이브러리를 설치한다.  
 ```bash
 pip install numpy matplotlib scipy
-
 ```
 
 
@@ -99,5 +94,4 @@ if __name__ == "__main__":
     # 잔차 계산
     f = laplace_residual(u, x, y)
     print("계산된 잔차 f:\n", f.detach().cpu().numpy())
-
 ```
