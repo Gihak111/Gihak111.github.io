@@ -164,7 +164,6 @@ sudo smbpasswd -a chulsoo  <-- 본인 아이디 입력
 sudo systemctl restart smbd
 ```
 
----
 
 ### 우분투만의 주의점: 방화벽
 
