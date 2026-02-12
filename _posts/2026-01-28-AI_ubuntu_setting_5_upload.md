@@ -22,7 +22,6 @@ Smaba는 리눅스 자체를 윈도우의 폴더처럼 인식시켜서 파일을
 이거 우분투 뿐 만 아니라 라즈베리파이도 된다.  
 사실 우분투보다 라파에서 진짜 꿀이다.  
 
----
 
 먼저, 라즈베리 파이 기준으로 설명하겠다.  
 
@@ -36,7 +35,6 @@ sudo apt update
 
 # 삼바 패키지 설치 (설치 중 'Y' 입력)
 sudo apt install samba samba-common-bin
-
 ```
 
 ### 2. 공유 폴더 설정하기
@@ -47,7 +45,6 @@ sudo apt install samba samba-common-bin
 1. **설정 파일 열기**
 ```bash
 sudo nano /etc/samba/smb.conf
-
 ```
 
 2. **내용 추가하기**
@@ -78,7 +75,6 @@ force user = pi
 
 ```bash
 sudo smbpasswd -a pi
-
 ```
 
 * `New SMB password:` 라고 뜨면 원하는 비밀번호를 입력하고 엔터를 자. (화면에 안 보입니다)  
@@ -90,7 +86,6 @@ sudo smbpasswd -a pi
 
 ```bash
 sudo systemctl restart smbd
-
 ```
 
 
@@ -113,7 +108,6 @@ sudo systemctl restart smbd
 4. 이제 윈도우 폴더 쓰듯이 파일을 드래그해서 넣고 빼고 하면 된다.  
 
 
----
 이어서, 우분투 기준으로 설명하겠다.  
 
 
@@ -123,7 +117,6 @@ sudo systemctl restart smbd
 ```bash
 sudo apt update
 sudo apt install samba
-
 ```
 
 ### 2. 사용자 이름(ID) 확인하기
@@ -131,7 +124,6 @@ sudo apt install samba
 
 ```bash
 whoami
-
 ```
 
 (여기서 나온 결과가 `chulsoo`라고 가정하고 설명하겠다.  
@@ -155,7 +147,6 @@ create mask = 0777
 directory mask = 0777
 public = no
 force user = chulsoo       <-- 여기도 내 아이디로 변경
-
 ```
 
 * `[myshare]`: 윈도우에서 보일 폴더 이름이다. 원하는 대로 지으면 된다.  
@@ -171,7 +162,6 @@ sudo smbpasswd -a chulsoo  <-- 본인 아이디 입력
 
 # 재시작
 sudo systemctl restart smbd
-
 ```
 
 ---
@@ -185,7 +175,6 @@ sudo systemctl restart smbd
 
 ```bash
 sudo ufw allow samba
-
 ```
 
 이제 윈도우에서 `\\우분투IP주소` 로 접속하면 똑같이 파일을 옮길 수 있다.  
