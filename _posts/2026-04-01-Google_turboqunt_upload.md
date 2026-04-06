@@ -14,5 +14,5 @@ sidebar:
 [링크](https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression/)  
 
 
-글을 다 못적었다.  
-내일 마저 적어야지.  
+간단하게 KV 캐시를 정화도 저하 없이 1비트로 양자화 하는 기술이라 생각하면 된다.  
+이거 할 때 들어가는 식이 있는데, 나도 이해 못했다.  
