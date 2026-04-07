@@ -2,7 +2,7 @@ title: Gihak111
 email: yeonjm12@gmail.com
 description: Write an awesome description for your new site here.
 baseurl: "" # 예시로 /blog, 실제 레포지토리 이름으로 대체
-url: "https://github.com/Gihak111/Gihak111.github.io" # GitHub Pages URL
+url: "https://gihak111.github.io" # GitHub Pages URL" # GitHub Pages URL
 
 twitter_username: jekyllrb
 github_username: jekyll
