@@ -63,6 +63,7 @@ sudo nano /etc/systemd/system/wol.service
 ```
 저 서비스에 아래 내용을 넣어 등록한다.  
 ```bash
+  
 [Unit]
 Description=Enable Wake On LAN
 After=network.target
