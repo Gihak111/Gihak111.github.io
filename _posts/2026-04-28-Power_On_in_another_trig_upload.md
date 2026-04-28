@@ -75,8 +75,11 @@ ExecStart=/sbin/ethtool -s 인터페이스이름 wol g
 [Install]
 WantedBy=basic.target
 ```
+
+
 이어서 crtl + 0 -> Enter -> ctrl + x
 이어서, 실행해 주면 된다.  
+
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable wol.service
