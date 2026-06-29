@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "AI 실습"
+title:  "강의 자료 2026 ver"
 categories: "AI"
 tag: "Explanation_best"
 toc: true
