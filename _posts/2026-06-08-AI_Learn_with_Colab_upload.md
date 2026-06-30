@@ -20,7 +20,7 @@ nav: "docs"
 다이폴 안테나  
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Gihak111/DeepLearning_code/blob/main/PINN/dipole.ipynb)  
 원하는 형상으로  
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Gihak111/DeepLearning_code/blob/main/PINN/app.ipynb)  
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Gihak111/DeepLearning_code/blob/main/PINN/all.ipynb)  
 
 
 <div style="display: none;">
