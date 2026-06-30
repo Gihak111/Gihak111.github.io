@@ -14,8 +14,10 @@ nav: "docs"
 [PDF 다운로드]( {{ "/file/class/MLP.pdf" | relative_url }} )  
 
 
-<div style="display: none;">
+
 ### PINN  
 [PDF 다운로드]( {{ "/file/class/PINN.pdf" | relative_url }} )  
+
+<div style="display: none;">
 </div>
   
