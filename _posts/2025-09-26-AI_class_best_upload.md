@@ -61,7 +61,7 @@ AI 강의를 진행하게 되어, 여기에 링크와 자료를 정리해 두었
 [PDF 다운로드]( {{ "/file/9._Vit.pdf" | relative_url }} )  
 
 
-### 10. 루ㅒ
+### 10. FNO
 [유튜브 링크](https://youtu.be/kaRO32LkMQQ)  
 [PDF 다운로드]( {{ "/file/10._FNO.pdf" | relative_url }} )  
 
